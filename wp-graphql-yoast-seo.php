@@ -7,7 +7,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         1.0.1
+ * Version:         2.0.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -46,12 +46,17 @@ add_action( 'graphql_register_types', function() {
 							'type' => 'SEO',
 							'description' => __( 'The Yoast SEO data of the '.$post_type_object->graphql_single_name, 'wp-graphql' ),
 							'resolve' => function( $post ) {
+
+								// Connect to Yoast 
+								$wpseo_frontend = WPSEO_Frontend::get_instance();
+								$wpseo_frontend->reset();
+
 								// Base array
 								$seo = array();
 
 								// Get data					
 								$seo = array(
-									'title' => get_post_meta($post->ID, '_yoast_wpseo_title', true),
+									'title' => $wpseo_frontend->get_content_title($post),
 									'metaDesc' => get_post_meta($post->ID, '_yoast_wpseo_metadesc', true),
 									'focuskw' => get_post_meta($post->ID,'_yoast_wpseo_focuskw', true),
 									'metaKeywords' => get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true),
