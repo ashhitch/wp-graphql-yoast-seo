@@ -54,10 +54,16 @@ add_action( 'graphql_register_types', function() {
 								// Base array
 								$seo = array();
 
+								query_posts( array(
+									'p'         => $post->ID, 
+									'post_type' => 'any'
+								) );
+								the_post();
+
 								// Get data					
 								$seo = array(
-									'title' => $wpseo_frontend->get_content_title($post),
-									'metaDesc' => get_post_meta($post->ID, '_yoast_wpseo_metadesc', true),
+									'title' => trim($wpseo_frontend->get_content_title($post)),
+									'metaDesc' => trim($wpseo_frontend->metadesc( false )),
 									'focuskw' => get_post_meta($post->ID,'_yoast_wpseo_focuskw', true),
 									'metaKeywords' => get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true),
 									'metaRobotsNoindex' => get_post_meta($post->ID, '_yoast_wpseo_meta-robots-noindex', true),
@@ -69,6 +75,7 @@ add_action( 'graphql_register_types', function() {
 									'twitterDescription' => get_post_meta($post->ID, '_yoast_wpseo_twitter-description', true),
 									'twitterImage' => get_post_meta($post->ID, '_yoast_wpseo_twitter-image', true)
 							);
+							wp_reset_query();
 
 								return ! empty( $seo ) ? $seo : null;
 							}
