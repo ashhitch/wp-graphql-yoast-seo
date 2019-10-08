@@ -1,0 +1,6 @@
+{
+    "name": "ashhitch/wp-graphql-yoast-seo",
+    "description": "Query Yoast SEO data with wp-graphql",
+    "type": "wordpress-plugin",
+    "require": {}
+}
