@@ -85,39 +85,44 @@ add_action('graphql_register_types', function () {
   if (!empty($taxonomies) && is_array($taxonomies)) {
     foreach ($taxonomies as $tax) {
 
+      $taxonomy = get_taxonomy( $tax );
       $wpseo_frontend = WPSEO_Frontend::get_instance();
       $wpseo_frontend->reset();
       // 
 
       $meta   = get_option( 'wpseo_taxonomy_meta' );
 
-      // printf( '<pre>%s</pre>', print_r( get_option( 'wpseo_taxonomy_meta' ), 1 ) );
 
-      register_graphql_field($meta[$taxonomy][$tax]['name'], 'seo', [
+
+      if (isset($taxonomy->graphql_single_name)):
+      register_graphql_field($tax, 'seo', [
         'type' => 'SEO',
-        'description' => __('The Yoast SEO data of the ' . $meta[$taxonomy][$tax]['name'], 'wp-graphql'),
-        'resolve' => function ($tax) {
+        'description' => __('The Yoast SEO data of the ' . $taxonomy->label . ' taxonomy.', 'wp-graphql'),
+        'resolve' => function ($taxonomy) {
+
+          $term = get_query_var( 'term' );
 
           // Get data
           $seo = array(
-            'title' => trim($wpseo_frontend->title($tax)),
+            'title' => trim($wpseo_frontend->title()),
             'metaDesc' => trim($wpseo_frontend->metadesc(false)),
-            'focuskw' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_focuskw']),
-            'metaKeywords' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_metakeywords']),
-            'metaRobotsNoindex' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_meta-robots-noindex']),
-            'metaRobotsNofollow' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_meta-robots-nofollow']),
-            'opengraphTitle' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_opengraph-title']),
-            'opengraphDescription' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_opengraph-description']),
-            'opengraphImage' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_opengraph-image']),
-            'twitterTitle' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_twitter-title']),
-            'twitterDescription' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_twitter-description']),
-            'twitterImage' => trim($meta[$taxonomy][$tax]['_yoast_wpseo_twitter-image'])
+            'focuskw' => trim($meta[$tax][$term]['_yoast_wpseo_focuskw']),
+            'metaKeywords' => trim($meta[$tax][$term]['_yoast_wpseo_metakeywords']),
+            'metaRobotsNoindex' => trim($meta[$tax][$term]['_yoast_wpseo_meta-robots-noindex']),
+            'metaRobotsNofollow' => trim($meta[$tax][$term]['_yoast_wpseo_meta-robots-nofollow']),
+            'opengraphTitle' => trim($meta[$tax][$term]['_yoast_wpseo_opengraph-title']),
+            'opengraphDescription' => trim($meta[$tax][$term]['_yoast_wpseo_opengraph-description']),
+            'opengraphImage' => trim($meta[$tax][$term]['_yoast_wpseo_opengraph-image']),
+            'twitterTitle' => trim($meta[$tax][$term]['_yoast_wpseo_twitter-title']),
+            'twitterDescription' => trim($meta[$tax][$term]['_yoast_wpseo_twitter-description']),
+            'twitterImage' => trim($meta[$tax][$term]['_yoast_wpseo_twitter-image'])
           );
    
 
           return !empty($seo) ? $seo : null;
         }
       ]);
+      endif;
 
     }
   }
