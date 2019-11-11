@@ -91,41 +91,50 @@ add_action('graphql_register_types', function () {
 				return;
 			}
 			
- 
-      register_graphql_field($taxonomy->graphql_single_name, 'seo', [
-        'type' => 'SEO',
-        'description' => __('The Yoast SEO data of the ' . $taxonomy->label . ' taxonomy.', 'wp-graphql'),
-        'resolve' => function ($taxonomy) {
 
+        register_graphql_field($taxonomy->graphql_single_name, 'seo', [
+          'type' => 'SEO',
+          'description' => __('The Yoast SEO data of the ' . $taxonomy->label . ' taxonomy.', 'wp-graphql'),
+          'resolve' => function ($term) {
 
-					$tax_obj = get_queried_object();
-					$wpseo_frontend = WPSEO_Frontend::get_instance(	$tax_obj);
-					$wpseo_frontend->reset();
-				
-					$meta =	WPSEO_Taxonomy_Meta::get_term_meta(get_queried_object_id(), $taxonomy->name);
+            $term_obj = get_term($term->term_id);
 
-				
-          // Get data
-          $seo = array(
-            'title' => trim($wpseo_frontend->title()),
-            'metaDesc' => trim($wpseo_frontend->metadesc(false)),
-            'focuskw' => trim($meta['_yoast_wpseo_focuskw']),
-            'metaKeywords' => trim($meta['_yoast_wpseo_metakeywords']),
-            'metaRobotsNoindex' => trim($meta['_yoast_wpseo_meta-robots-noindex']),
-            'metaRobotsNofollow' => trim($meta['_yoast_wpseo_meta-robots-nofollow']),
-            'opengraphTitle' => trim($meta['_yoast_wpseo_opengraph-title']),
-            'opengraphDescription' => trim($meta['_yoast_wpseo_opengraph-description']),
-            'opengraphImage' => trim($meta['_yoast_wpseo_opengraph-image']),
-            'twitterTitle' => trim($meta['_yoast_wpseo_twitter-title']),
-            'twitterDescription' => trim($meta['_yoast_wpseo_twitter-description']),
-            'twitterImage' => trim($meta['_yoast_wpseo_twitter-image'])
-          );
-   
-
-          return !empty($seo) ? $seo : null;
-        }
-      ]);
-   
+            query_posts( array(
+              'tax_query' => array(
+                array(
+                'taxonomy' => $term_obj->taxonomy,
+                'terms' => $term_obj->term_id,
+                'field' => 'term_id'
+                 )
+              )
+            ) );
+            the_post();
+  
+            $wpseo_frontend = WPSEO_Frontend::get_instance();
+            $wpseo_frontend->reset();
+          
+            $meta =	WPSEO_Taxonomy_Meta::get_term_meta($term_obj->term_id, $term_obj->taxonomy);
+             
+            // Get data
+            $seo = array(
+              'title' => trim($wpseo_frontend->title($post)) ,
+              'metaDesc' => trim($wpseo_frontend->metadesc( false )),
+                 'focuskw' => trim($meta['_yoast_wpseo_focuskw']),
+              'metaKeywords' => trim($meta['_yoast_wpseo_metakeywords']),
+              'metaRobotsNoindex' => trim($meta['_yoast_wpseo_meta-robots-noindex']),
+              'metaRobotsNofollow' => trim($meta['_yoast_wpseo_meta-robots-nofollow']),
+              'opengraphTitle' => trim($meta['_yoast_wpseo_opengraph-title']),
+              'opengraphDescription' => trim($meta['_yoast_wpseo_opengraph-description']),
+              'opengraphImage' => trim($meta['_yoast_wpseo_opengraph-image']),
+              'twitterTitle' => trim($meta['_yoast_wpseo_twitter-title']),
+              'twitterDescription' => trim($meta['_yoast_wpseo_twitter-description']),
+              'twitterImage' => trim($meta['_yoast_wpseo_twitter-image'])
+            );
+            wp_reset_query();
+  
+            return !empty($seo) ? $seo : null;
+          }
+        ]);  
 
     }
   }
