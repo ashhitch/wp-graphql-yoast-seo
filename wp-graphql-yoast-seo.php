@@ -29,10 +29,10 @@ add_action('graphql_register_types', function () {
       'metaRobotsNofollow' => ['type' => 'String'],
       'opengraphTitle' => ['type' => 'String'],
       'opengraphDescription' => ['type' => 'String'],
-      'opengraphImage' => ['type' => 'String'],
+      'opengraphImage' => ['type' => 'MediaItem'],
       'twitterTitle' => ['type' => 'String'],
       'twitterDescription' => ['type' => 'String'],
-      'twitterImage' => ['type' => 'String']
+      'twitterImage' => ['type' => 'MediaItem']
     ]
   ]);
 
