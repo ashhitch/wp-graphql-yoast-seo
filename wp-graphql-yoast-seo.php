@@ -7,7 +7,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         2.1.0
+ * Version:         3.0.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -68,10 +68,10 @@ add_action('graphql_register_types', function () {
               'metaRobotsNofollow' => trim(get_post_meta($post->ID, '_yoast_wpseo_meta-robots-nofollow', true)),
               'opengraphTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-title', true)),
               'opengraphDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-description', true)),
-              'opengraphImage' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-image', true)),
+              'opengraphImage' => wp_get_attachment_metadata(get_post_meta($post->ID, '_yoast_wpseo_opengraph-image-id', true)),
               'twitterTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-title', true)),
               'twitterDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-description', true)),
-              'twitterImage' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-image', true))
+              'twitterImage' => wp_get_attachment_metadata(get_post_meta($post->ID, '_yoast_wpseo_twitter-image-id', true))
             );
             wp_reset_query();
 
