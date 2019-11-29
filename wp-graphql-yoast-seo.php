@@ -15,6 +15,9 @@ if (!defined('ABSPATH')) {
   exit();
 }
 
+use WPGraphQL\AppContext;
+use WPGraphQL\Data\DataSource;
+
 add_action('graphql_register_types', function () {
   $post_types = \WPGraphQL::get_allowed_post_types();
   $taxonomies = \WPGraphQL::get_allowed_taxonomies();
@@ -44,7 +47,8 @@ add_action('graphql_register_types', function () {
         register_graphql_field($post_type_object->graphql_single_name, 'seo', [
           'type' => 'SEO',
           'description' => __('The Yoast SEO data of the ' . $post_type_object->graphql_single_name, 'wp-graphql'),
-          'resolve' => function ($post) {
+          'resolve' => function ($post, array $args, AppContext $context) {
+
             // Connect to Yoast
             $wpseo_frontend = WPSEO_Frontend::get_instance();
             $wpseo_frontend->reset();
@@ -68,10 +72,11 @@ add_action('graphql_register_types', function () {
               'metaRobotsNofollow' => trim(get_post_meta($post->ID, '_yoast_wpseo_meta-robots-nofollow', true)),
               'opengraphTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-title', true)),
               'opengraphDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-description', true)),
-              'opengraphImage' => wp_get_attachment_metadata(get_post_meta($post->ID, '_yoast_wpseo_opengraph-image-id', true)),
+              'opengraphImage' => DataSource::resolve_post_object(get_post_meta($post->ID, '_yoast_wpseo_opengraph-image-id', true), $context),
               'twitterTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-title', true)),
               'twitterDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-description', true)),
-              'twitterImage' => wp_get_attachment_metadata(get_post_meta($post->ID, '_yoast_wpseo_twitter-image-id', true))
+              'twitterImage' =>  DataSource::resolve_post_object(get_post_meta($post->ID, '_yoast_wpseo_twitter-image-id', true), $context)
+         
             );
             wp_reset_query();
 
