@@ -111,6 +111,7 @@ add_action('graphql_register_types', function () {
                   'field' => 'term_id'
                 )
               )
+              )
             ) );
             the_post();
   
