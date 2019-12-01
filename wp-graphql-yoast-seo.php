@@ -112,7 +112,7 @@ add_action('graphql_register_types', function () {
                 )
               )
               )
-            ) );
+            );
             the_post();
   
             $wpseo_frontend = WPSEO_Frontend::get_instance();
