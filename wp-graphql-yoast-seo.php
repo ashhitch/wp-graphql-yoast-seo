@@ -143,4 +143,29 @@ add_action('graphql_register_types', function () {
 
     }
   }
+
+
+
+  $userSeo = [
+    'type'        => 'SEO',
+    'description' => __('The Yoast SEO data of a user', 'wp-graphql'),
+    'resolve'     => function( $user ) {
+
+      $wpseo_frontend = WPSEO_Frontend::get_instance();
+      $wpseo_frontend->reset();
+
+
+      $userSeo = array(
+        'title' => trim($wpseo_frontend->get_author_title($user)),
+        'metaDesc' => trim($wpseo_frontend->metadesc(false)),
+        'metaRobotsNoindex' => trim(get_user_meta( $user->userId, 'wpseo_noindex_author', true )),
+      );
+      
+
+      return ! empty( $userSeo ) ? $userSeo : [];
+    },
+  ];
+
+  register_graphql_field( 'User', 'seo', $userSeo );
+
 });
