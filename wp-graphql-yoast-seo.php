@@ -39,6 +39,7 @@ add_action('graphql_register_types', function () {
     ]
   ]);
 
+
   if (!empty($post_types) && is_array($post_types)) {
     foreach ($post_types as $post_type) {
       $post_type_object = get_post_type_object($post_type);
@@ -143,4 +144,47 @@ add_action('graphql_register_types', function () {
 
     }
   }
+
+  // WooCommerce Support
+
+  if ( class_exists( '\WooCommerce' ) ):
+    register_graphql_field('product', 'seo', [
+      'type' => 'SEO',
+      'description' => __('The Yoast SEO data of the ' . 'product', 'wp-graphql'),
+      'resolve' => function ($post, array $args, AppContext $context) {
+
+        // Connect to Yoast
+        $wpseo_frontend = WPSEO_Frontend::get_instance();
+        $wpseo_frontend->reset();
+
+        // Base array
+        $seo = array();
+
+        query_posts(array(
+          'p' => $post->ID,
+          'post_type' => 'product'
+        ));
+        the_post();
+
+        // Get data
+        $seo = array(
+          'title' => trim($wpseo_frontend->title($post)),
+          'metaDesc' => trim($wpseo_frontend->metadesc(false)),
+          'focuskw' => trim(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
+          'metaKeywords' => trim(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
+          'metaRobotsNoindex' => trim(get_post_meta($post->ID, '_yoast_wpseo_meta-robots-noindex', true)),
+          'metaRobotsNofollow' => trim(get_post_meta($post->ID, '_yoast_wpseo_meta-robots-nofollow', true)),
+          'opengraphTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-title', true)),
+          'opengraphDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-description', true)),
+          'opengraphImage' => DataSource::resolve_post_object(get_post_meta($post->ID, '_yoast_wpseo_opengraph-image-id', true), $context),
+          'twitterTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-title', true)),
+          'twitterDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-description', true)),
+          'twitterImage' =>  DataSource::resolve_post_object(get_post_meta($post->ID, '_yoast_wpseo_twitter-image-id', true), $context)
+        );
+        wp_reset_query();
+
+        return !empty($seo) ? $seo : null;
+      }
+    ]);
+  endif;
 });
