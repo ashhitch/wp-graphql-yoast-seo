@@ -47,6 +47,12 @@ add_action('graphql_register_types', function () {
     ]
   ]);
 
+  register_graphql_object_type('SEOConfig', [
+    'fields' => [
+      'title' => ['type' => 'String'],
+    ]
+  ]);
+
 
   if (!empty($post_types) && is_array($post_types)) {
     foreach ($post_types as $post_type) {
@@ -154,4 +160,20 @@ add_action('graphql_register_types', function () {
       ]);
     }
   }
+
+  // base options
+  register_graphql_field( 'RootQuery', 'seo', [
+		'type' => 'SEOConfig', 
+		'description' => __( 'Returns the homepage', 'wp-graphql' ),
+		'resolve' => function($item, array $args, AppContext $context) {
+
+	
+			return  array(
+        'title' => trim( WPSEO_Options::get_group_name( 'test' )),
+      );
+		},
+	]);
+
 });
+
+
