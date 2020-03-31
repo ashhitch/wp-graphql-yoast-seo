@@ -49,8 +49,30 @@ add_action('graphql_register_types', function () {
 
   register_graphql_object_type('SEOConfig', [
     'fields' => [
-      'title' => ['type' => 'String'],
+      'companyName' => ['type' => 'String'],
+      'companyOrPerson' => ['type' => 'String'],
+      'companyLogo' => ['type' => 'MediaItem'],
+      'personLogo' => ['type' => 'MediaItem'],
+      'logo' => ['type' => 'MediaItem'],
     ]
+  ]);
+
+  register_graphql_field('RootQuery', 'seo', [
+    'type' => 'SEOConfig',
+    'description' => __('Returns seo site data', 'wp-graphql'),
+    'resolve' => function ($source, array $args, AppContext $context) {
+
+      $wpseo_options = WPSEO_Options::get_instance();
+      $all =  $wpseo_options->get_all();
+
+      return  array(
+        'companyName' => trim($all['company_name']),
+        'companyLogo' => DataSource::resolve_post_object($all['company_logo_id'], $context),
+        'personLogo' => DataSource::resolve_post_object($all['person_logo_id'], $context),
+        'logo' => DataSource::resolve_post_object($all['company_or_person'] === 'company' ? $all['company_logo_id'] : $all['person_logo_id'], $context),
+        'companyOrPerson' => trim($all['company_or_person']),
+      );
+    },
   ]);
 
 
@@ -160,20 +182,4 @@ add_action('graphql_register_types', function () {
       ]);
     }
   }
-
-  // base options
-  register_graphql_field( 'RootQuery', 'seo', [
-		'type' => 'SEOConfig', 
-		'description' => __( 'Returns the homepage', 'wp-graphql' ),
-		'resolve' => function($item, array $args, AppContext $context) {
-
-	
-			return  array(
-        'title' => trim( WPSEO_Options::get_group_name( 'test' )),
-      );
-		},
-	]);
-
 });
-
-
