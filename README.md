@@ -72,6 +72,7 @@ To query for the Yoast Data as the seo object to your query:
 
 ```
 
+
 To query for the site configuration data you can query from the root.
 
 ```
