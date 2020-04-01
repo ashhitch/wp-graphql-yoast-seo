@@ -12,7 +12,11 @@ This is an extension to the WPGraphQL plugin (https://github.com/wp-graphql/wp-g
 - Categories
 - Custom taxonomies
 - WooCommerce Products
-- Yoast Configuration (webmaster verification, schemas etc)
+- Yoast Configuration
+  - Webmaster verification
+  - Social profiles
+  - Schemas
+  - Breadcrumbs
 
 > If there is any Yoast data that is not currently returned, please raise an issue so we can add it to the roadmap.
 
