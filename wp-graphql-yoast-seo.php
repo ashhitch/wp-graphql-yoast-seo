@@ -308,39 +308,26 @@ add_action('graphql_register_types', function () {
 
           $term_obj = get_term($term->term_id);
 
-          query_posts(
-            array(
-              'tax_query' => array(
-                array(
-                  'taxonomy' => $term_obj->taxonomy,
-                  'terms' => $term_obj->term_id,
-                  'field' => 'term_id'
-                )
-              )
-            )
-          );
-          the_post();
-
-
           $meta =  WPSEO_Taxonomy_Meta::get_term_meta((int) $term_obj->term_id, $term_obj->taxonomy);
+          $robots = YoastSEO()->meta->for_term($term->term_id)->robots;
 
           // Get data
           $seo = array(
-            'title' => trim(YoastSEO()->meta->for_post($post->ID)->title),
-            'metaDesc' => trim(YoastSEO()->meta->for_post($post->ID)->description),
+            'title' => trim(YoastSEO()->meta->for_term($term->term_id)->title),
+            'metaDesc' => trim(YoastSEO()->meta->for_term($term->term_id)->description),
             'focuskw' => trim($meta['wpseo_focuskw']),
             'metaKeywords' => trim($meta['wpseo_metakeywords']),
-            'metaRobotsNoindex' => trim($meta['wpseo_meta-robots-noindex']),
-            'metaRobotsNofollow' => trim($meta['wpseo_meta-robots-nofollow']),
-            'opengraphTitle' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_title),
-            'opengraphType' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_type),
-            'opengraphAuthor' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
-            'opengraphPublisher' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_publisher),
-            'opengraphDescription' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_description),
+            'metaRobotsNoindex' => $robots['index'],
+            'metaRobotsNofollow' => $robots['follow'],
+            'opengraphTitle' => trim(YoastSEO()->meta->for_term($term->term_id)->open_graph_title),
+            'opengraphType' => trim(YoastSEO()->meta->for_term($term->term_id)->open_graph_type),
+            'opengraphAuthor' => trim(YoastSEO()->meta->for_term($term->term_id)->open_graph_article_author),
+            'opengraphPublisher' => trim(YoastSEO()->meta->for_term($term->term_id)->open_graph_article_publisher),
+            'opengraphDescription' => trim(YoastSEO()->meta->for_term($term->term_id)->open_graph_description),
             'opengraphImage' => DataSource::resolve_post_object($meta['wpseo_opengraph-image-id'], $context),
-            'twitterCardType' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_card),
-            'twitterTitle' => trim($meta['wpseo_twitter-title']),
-            'twitterDescription' => trim($meta['wpseo_twitter-description']),
+            'twitterCardType' => trim(YoastSEO()->meta->for_term($term->term_id)->twitter_card),
+            'twitterTitle' => trim(YoastSEO()->meta->for_term($term->term_id)->twitter_title),
+            'twitterDescription' => trim(YoastSEO()->meta->for_term($term->term_id)->twitter_description),
             'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
             'canonical' => trim($meta['canonical'])
           );
