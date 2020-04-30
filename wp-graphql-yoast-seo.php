@@ -269,7 +269,7 @@ add_action('graphql_register_types', function () {
               'opengraphType' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_type),
               'opengraphAuthor' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
               'opengraphPublisher' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
-              'opengraphDescription' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_publisher),
+              'opengraphDescription' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_description),
               'opengraphImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->open_graph_images), $context),
               'twitterCardType' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_card),
               'twitterTitle' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_title),
@@ -325,17 +325,21 @@ add_action('graphql_register_types', function () {
           $seo = array(
             'title' => trim(YoastSEO()->meta->for_post($post->ID)->title),
             'metaDesc' => trim(YoastSEO()->meta->for_post($post->ID)->description),
-            'focuskw' => trim($meta['wpseo_focuskw']),
-            'metaKeywords' => trim($meta['wpseo_metakeywords']),
+            'focuskw' => trim(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
+            'metaKeywords' => trim(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
             'metaRobotsNoindex' => trim($meta['wpseo_meta-robots-noindex']),
             'metaRobotsNofollow' => trim($meta['wpseo_meta-robots-nofollow']),
-            'opengraphTitle' => trim($meta['wpseo_opengraph-title']),
-            'opengraphDescription' => trim($meta['wpseo_opengraph-description']),
-            'opengraphImage' => DataSource::resolve_post_object($meta['wpseo_opengraph-image-id'], $context),
-            'twitterTitle' => trim($meta['wpseo_twitter-title']),
-            'twitterDescription' => trim($meta['wpseo_twitter-description']),
-            'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
-            'canonical' => trim($meta['canonical'])
+            'opengraphTitle' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_title),
+            'opengraphType' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_type),
+            'opengraphAuthor' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
+            'opengraphPublisher' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
+            'opengraphDescription' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_description),
+            'opengraphImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->open_graph_images), $context),
+            'twitterCardType' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_card),
+            'twitterTitle' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_title),
+            'twitterDescription' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_description),
+            'twitterImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
+            'canonical' => trim(YoastSEO()->meta->for_post($post->ID)->canonical)
           );
           wp_reset_query();
 
