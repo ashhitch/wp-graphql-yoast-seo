@@ -32,11 +32,12 @@ function get_og_image($images)
     return;
   }
 
-  if (!isset($image['id'])) {
+
+  if (!isset($image['url'])) {
     return;
   }
 
-  return $image['id'];
+  return attachment_url_to_postid($image['url']);
 }
 
 add_action('graphql_register_types', function () {
@@ -70,6 +71,9 @@ add_action('graphql_register_types', function () {
       'metaRobotsNoindex' => ['type' => 'String'],
       'metaRobotsNofollow' => ['type' => 'String'],
       'opengraphTitle' => ['type' => 'String'],
+      'opengraphType' => ['type' => 'String'],
+      'opengraphAuthor' => ['type' => 'String'],
+      'opengraphPublisher' => ['type' => 'String'],
       'opengraphDescription' => ['type' => 'String'],
       'opengraphImage' => ['type' => 'MediaItem'],
       'twitterTitle' => ['type' => 'String'],
@@ -260,7 +264,6 @@ add_action('graphql_register_types', function () {
             $seo = array(
               'title' => trim(YoastSEO()->meta->for_post($post->ID)->title),
               'metaDesc' => trim(YoastSEO()->meta->for_post($post->ID)->description),
-
               'focuskw' => trim(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
               'metaKeywords' => trim(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
               'metaRobotsNoindex' => $robots['index'],
@@ -274,7 +277,7 @@ add_action('graphql_register_types', function () {
               'twitterCardType' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_card),
               'twitterTitle' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_title),
               'twitterDescription' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_description),
-              'twitterImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
+              'twitterImage' => DataSource::resolve_post_object(attachment_url_to_postid(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
               'canonical' => trim(YoastSEO()->meta->for_post($post->ID)->canonical)
             );
 
@@ -325,8 +328,8 @@ add_action('graphql_register_types', function () {
           $seo = array(
             'title' => trim(YoastSEO()->meta->for_post($post->ID)->title),
             'metaDesc' => trim(YoastSEO()->meta->for_post($post->ID)->description),
-            'focuskw' => trim(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
-            'metaKeywords' => trim(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
+            'focuskw' => trim($meta['wpseo_focuskw']),
+            'metaKeywords' => trim($meta['wpseo_metakeywords']),
             'metaRobotsNoindex' => trim($meta['wpseo_meta-robots-noindex']),
             'metaRobotsNofollow' => trim($meta['wpseo_meta-robots-nofollow']),
             'opengraphTitle' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_title),
@@ -334,12 +337,12 @@ add_action('graphql_register_types', function () {
             'opengraphAuthor' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
             'opengraphPublisher' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
             'opengraphDescription' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_description),
-            'opengraphImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->open_graph_images), $context),
+            'opengraphImage' => DataSource::resolve_post_object($meta['wpseo_opengraph-image-id'], $context),
             'twitterCardType' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_card),
-            'twitterTitle' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_title),
-            'twitterDescription' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_description),
-            'twitterImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
-            'canonical' => trim(YoastSEO()->meta->for_post($post->ID)->canonical)
+            'twitterTitle' => trim($meta['wpseo_twitter-title']),
+            'twitterDescription' => trim($meta['wpseo_twitter-description']),
+            'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
+            'canonical' => trim($meta['canonical'])
           );
           wp_reset_query();
 
