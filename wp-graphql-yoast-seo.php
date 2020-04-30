@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         3.3.0
+ * Version:         4.0.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -18,6 +18,26 @@ if (!defined('ABSPATH')) {
 
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
+
+function get_og_image($images)
+{
+
+  if (empty($images)) {
+    return;
+  }
+
+  $image  = reset($images);
+
+  if (empty($image)) {
+    return;
+  }
+
+  if (!isset($image['id'])) {
+    return;
+  }
+
+  return $image['id'];
+}
 
 add_action('graphql_register_types', function () {
   $post_types = \WPGraphQL::get_allowed_post_types();
@@ -231,35 +251,34 @@ add_action('graphql_register_types', function () {
           'description' => __('The Yoast SEO data of the ' . $post_type_object->graphql_single_name, 'wp-graphql-yoast-seo'),
           'resolve' => function ($post, array $args, AppContext $context) {
 
-            // Connect to Yoast
-            $wpseo_frontend = WPSEO_Frontend::get_instance();
-            $wpseo_frontend->reset();
-
             // Base array
             $seo = array();
 
-            query_posts(array(
-              'p' => $post->ID,
-              'post_type' => 'any'
-            ));
-            the_post();
-
+            // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
+            $robots = YoastSEO()->meta->for_post($post->ID)->robots;
             // Get data
             $seo = array(
-              'title' => trim($wpseo_frontend->title($post->post_title)),
-              'metaDesc' => trim($wpseo_frontend->metadesc(false)),
+              'title' => trim(YoastSEO()->meta->for_post($post->ID)->title),
+              'metaDesc' => trim(YoastSEO()->meta->for_post($post->ID)->description),
+
               'focuskw' => trim(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
               'metaKeywords' => trim(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
-              'metaRobotsNoindex' => trim(get_post_meta($post->ID, '_yoast_wpseo_meta-robots-noindex', true)),
-              'metaRobotsNofollow' => trim(get_post_meta($post->ID, '_yoast_wpseo_meta-robots-nofollow', true)),
-              'opengraphTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-title', true)),
-              'opengraphDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_opengraph-description', true)),
-              'opengraphImage' => DataSource::resolve_post_object(get_post_meta($post->ID, '_yoast_wpseo_opengraph-image-id', true), $context),
-              'twitterTitle' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-title', true)),
-              'twitterDescription' => trim(get_post_meta($post->ID, '_yoast_wpseo_twitter-description', true)),
-              'twitterImage' =>  DataSource::resolve_post_object(get_post_meta($post->ID, '_yoast_wpseo_twitter-image-id', true), $context),
-              'canonical' => trim(get_post_meta($post->ID, '_yoast_wpseo_canonical', true))
+              'metaRobotsNoindex' => $robots['index'],
+              'metaRobotsNofollow' => $robots['follow'],
+              'opengraphTitle' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_title),
+              'opengraphType' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_type),
+              'opengraphAuthor' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
+              'opengraphPublisher' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_author),
+              'opengraphDescription' => trim(YoastSEO()->meta->for_post($post->ID)->open_graph_article_publisher),
+              'opengraphImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->open_graph_images), $context),
+              'twitterCardType' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_card),
+              'twitterTitle' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_title),
+              'twitterDescription' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_description),
+              'twitterImage' => DataSource::resolve_post_object(get_og_image(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
+              'canonical' => trim(YoastSEO()->meta->for_post($post->ID)->canonical)
             );
+
+
             wp_reset_query();
 
             return !empty($seo) ? $seo : null;
@@ -299,15 +318,13 @@ add_action('graphql_register_types', function () {
           );
           the_post();
 
-          $wpseo_frontend = WPSEO_Frontend::get_instance();
-          $wpseo_frontend->reset();
 
           $meta =  WPSEO_Taxonomy_Meta::get_term_meta((int) $term_obj->term_id, $term_obj->taxonomy);
 
           // Get data
           $seo = array(
-            'title' => trim($wpseo_frontend->title($post->post_title)),
-            'metaDesc' => trim($wpseo_frontend->metadesc(false)),
+            'title' => trim(YoastSEO()->meta->for_post($post->ID)->title),
+            'metaDesc' => trim(YoastSEO()->meta->for_post($post->ID)->description),
             'focuskw' => trim($meta['wpseo_focuskw']),
             'metaKeywords' => trim($meta['wpseo_metakeywords']),
             'metaRobotsNoindex' => trim($meta['wpseo_meta-robots-noindex']),
