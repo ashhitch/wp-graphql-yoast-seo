@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.0.0
+ * Version:         4.0.1
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -79,7 +79,16 @@ add_action('graphql_register_types', function () {
       'twitterTitle' => ['type' => 'String'],
       'twitterDescription' => ['type' => 'String'],
       'twitterImage' => ['type' => 'MediaItem'],
-      'canonical' => ['type' => 'String']
+      'canonical' => ['type' => 'String'],
+      'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
+    ]
+  ]);
+
+  register_graphql_object_type('SEOPostTypeBreadcrumbs', [
+    'fields' => [
+      'url' => ['type' => 'String'],
+      'text' => ['type' => 'String'],
+
     ]
   ]);
 
@@ -278,11 +287,9 @@ add_action('graphql_register_types', function () {
               'twitterTitle' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_title),
               'twitterDescription' => trim(YoastSEO()->meta->for_post($post->ID)->twitter_description),
               'twitterImage' => DataSource::resolve_post_object(attachment_url_to_postid(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
-              'canonical' => trim(YoastSEO()->meta->for_post($post->ID)->canonical)
+              'canonical' => trim(YoastSEO()->meta->for_post($post->ID)->canonical),
+              'breadcrumbs' => YoastSEO()->meta->for_post($post->ID)->breadcrumbs
             );
-
-
-            wp_reset_query();
 
             return !empty($seo) ? $seo : null;
           }
@@ -329,7 +336,8 @@ add_action('graphql_register_types', function () {
             'twitterTitle' => trim(YoastSEO()->meta->for_term($term->term_id)->twitter_title),
             'twitterDescription' => trim(YoastSEO()->meta->for_term($term->term_id)->twitter_description),
             'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
-            'canonical' => trim($meta['canonical'])
+            'canonical' => trim($meta['canonical']),
+            'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs
           );
           wp_reset_query();
 
