@@ -256,7 +256,7 @@ add_action('graphql_register_types', function () {
           'logo' => DataSource::resolve_post_object($all['company_or_person'] === 'company' ? $all['company_logo_id'] : $all['person_logo_id'], $context),
           'companyOrPerson' => trim($all['company_or_person']),
           'siteName' => trim(YoastSEO()->helpers->site->get_site_name()),
-          'wordpressSiteName' => trim(WPSEO_Utils::get_site_name()),
+          'wordpressSiteName' => trim(get_bloginfo('name')),
           'siteUrl' => trim(get_site_url()),
         )
       );
