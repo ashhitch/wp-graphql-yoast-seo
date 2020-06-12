@@ -29,7 +29,7 @@ add_action('graphql_init', function() {
 	$display_admin_notice = static function () use ( $missing_dependencies ) {
 		?>
 		<div class="notice notice-error">
-			<p><?php esc_html_e( 'The WPGraphQL Offset Pagination plugin can\'t be loaded because these dependencies are missing:', 'wp-graphql-yoast-seo' ); ?></p>
+			<p><?php esc_html_e( 'The WPGraphQL Yoast SEO plugin can\'t be loaded because these dependencies are missing:', 'wp-graphql-yoast-seo' ); ?></p>
 			<ul>
 				<?php foreach ( $missing_dependencies as $missing_dependency ) : ?>
 					<li><?php echo esc_html( $missing_dependency ); ?></li>
