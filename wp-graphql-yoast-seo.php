@@ -19,23 +19,23 @@ if (!defined('ABSPATH')) {
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
 
-add_action('graphql_init', function() {
+add_action('admin_init', function (){
 	$core_dependencies = [
 		'WPGraphQL plugin' => class_exists( 'WPGraphQL' ),
-		'Yoast SEO' => is_plugin_active('wordpress-seo/wp-seo.php') || is_plugin_active('wordpress-seo-premium/wp-seo-premium.php')
+		'Yoast SEO'        => is_plugin_active( 'wordpress-seo/wp-seo.php' ) || is_plugin_active( 'wordpress-seo-premium/wp-seo-premium.php' )
 	];
 
 	$missing_dependencies = array_keys( array_diff( $core_dependencies, array_filter( $core_dependencies ) ) );
 	$display_admin_notice = static function () use ( $missing_dependencies ) {
 		?>
-		<div class="notice notice-error">
-			<p><?php esc_html_e( 'The WPGraphQL Yoast SEO plugin can\'t be loaded because these dependencies are missing:', 'wp-graphql-yoast-seo' ); ?></p>
-			<ul>
+        <div class="notice notice-error">
+            <p><?php esc_html_e( 'The WPGraphQL Yoast SEO plugin can\'t be loaded because these dependencies are missing:', 'wp-graphql-yoast-seo' ); ?></p>
+            <ul>
 				<?php foreach ( $missing_dependencies as $missing_dependency ) : ?>
-					<li><?php echo esc_html( $missing_dependency ); ?></li>
+                    <li><?php echo esc_html( $missing_dependency ); ?></li>
 				<?php endforeach; ?>
-			</ul>
-		</div>
+            </ul>
+        </div>
 		<?php
 	};
 
@@ -45,7 +45,9 @@ add_action('graphql_init', function() {
 
 		return;
 	}
+});
 
+add_action('graphql_init', function() {
 	if (!function_exists('get_og_image')){
 		function get_og_image($images)
 		{
