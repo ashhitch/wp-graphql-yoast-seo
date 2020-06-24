@@ -128,6 +128,7 @@ add_action('graphql_init', function () {
     ]);
 
     register_graphql_object_type('SEOSchema', [
+      'description' => __('The Yoast SEO schema data', 'wp-graphql-yoast-seo'),
       'fields' => [
         'companyName' => ['type' => 'String'],
         'companyOrPerson' => ['type' => 'String'],
@@ -141,6 +142,7 @@ add_action('graphql_init', function () {
     ]);
 
     register_graphql_object_type('SEOWebmaster', [
+      'description' => __('The Yoast SEO  webmaster fields', 'wp-graphql-yoast-seo'),
       'fields' => [
         'baiduVerify' => ['type' => 'String'],
         'googleVerify' => ['type' => 'String'],
@@ -150,6 +152,7 @@ add_action('graphql_init', function () {
     ]);
 
     register_graphql_object_type('SEOBreadcrumbs', [
+      'description' => __('The Yoast SEO breadcrumb config', 'wp-graphql-yoast-seo'),
       'fields' => [
         'enabled' => ['type' => 'Boolean'],
         'boldLast' => ['type' => 'Boolean'],
@@ -213,6 +216,7 @@ add_action('graphql_init', function () {
 
 
     register_graphql_object_type('SEOSocial', [
+      'description' => __('The Yoast SEO Social media links', 'wp-graphql-yoast-seo'),
       'fields' => [
         'facebook' => ['type' => 'SEOSocialFacebook'],
         'twitter' => ['type' => 'SEOSocialTwitter'],
