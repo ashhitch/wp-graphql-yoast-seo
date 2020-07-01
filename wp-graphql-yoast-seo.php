@@ -214,7 +214,6 @@ add_action('graphql_init', function () {
       ]
     ]);
 
-
     register_graphql_object_type('SEOSocial', [
       'description' => __('The Yoast SEO Social media links', 'wp-graphql-yoast-seo'),
       'fields' => [
@@ -228,6 +227,7 @@ add_action('graphql_init', function () {
         'wikipedia' => ['type' => 'SEOSocialWikipedia'],
       ]
     ]);
+
     register_graphql_object_type('SEORedirect', [
       'description' => __('The Yoast redirect data  (Yoast Premium only)', 'wp-graphql-yoast-seo'),
       'fields' => [
@@ -249,6 +249,16 @@ add_action('graphql_init', function () {
         'redirects' => ['type' => [
           'list_of' => 'SEORedirect',
         ]]
+      ]
+    ]);
+
+
+    register_graphql_object_type('SEOUser', [
+      'fields' => [
+        'title' => ['type' => 'String'],
+        'metaDesc' => ['type' => 'String'],
+        'metaRobotsNoindex' => ['type' => 'String'],
+        'metaRobotsNofollow' => ['type' => 'String'],
       ]
     ]);
 
@@ -375,6 +385,24 @@ add_action('graphql_init', function () {
         endif;
       }
     }
+
+    register_graphql_field('User', 'seo',  [
+      'type'        => 'SEOUser',
+      'description' => __('The Yoast SEO data of a user', 'wp-graphql-yoast-seo'),
+      'resolve'     => function ($user, array $args, AppContext $context) {
+
+        $robots =  YoastSEO()->meta->for_author($user->userId)->robots;
+
+        $userSeo = array(
+          'title' => trim(YoastSEO()->meta->for_author($user->userId)->title),
+          'metaDesc' => trim(YoastSEO()->meta->for_author($user->userId)->description),
+          'metaRobotsNoindex' => $robots['index'],
+          'metaRobotsNofollow' => $robots['follow'],
+        );
+
+        return !empty($userSeo) ? $userSeo : [];
+      },
+    ]);
 
     if (!empty($taxonomies) && is_array($taxonomies)) {
       foreach ($taxonomies as $tax) {
