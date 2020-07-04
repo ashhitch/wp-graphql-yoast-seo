@@ -452,7 +452,7 @@ add_action('graphql_init', function () {
 
             // Get data
             $seo = array(
-              'title' => trim(YoastSEO()->meta->for_term($term->term_id)->title),
+              'title' => trim(html_entity_decode(strip_tags(YoastSEO()->meta->for_term($term->term_id)->title))),
               'metaDesc' => trim(YoastSEO()->meta->for_term($term->term_id)->description),
               'focuskw' => trim($meta['wpseo_focuskw']),
               'metaKeywords' => trim($meta['wpseo_metakeywords']),
