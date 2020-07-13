@@ -265,7 +265,8 @@ add_action('graphql_init', function () {
         'breadcrumbs' => ['type' => 'SEOBreadcrumbs'],
         'redirects' => ['type' => [
           'list_of' => 'SEORedirect',
-        ]]
+        ]],
+        'openGraph' => ['type' => 'SEOOpenGraph'],
       ]
     ]);
 
