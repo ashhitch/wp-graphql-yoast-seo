@@ -22,7 +22,7 @@ use WPGraphQL\Data\DataSource;
 add_action('admin_init', function () {
   $core_dependencies = [
     'WPGraphQL plugin' => class_exists('WPGraphQL'),
-    'Yoast SEO'        => function_exists('YoastSEO')
+    'Yoast SEO'        => function_exists('YoastSEO') || class_exists('WPSEO_Premium'),
   ];
 
   $missing_dependencies = array_keys(array_diff($core_dependencies, array_filter($core_dependencies)));
