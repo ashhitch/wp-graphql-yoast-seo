@@ -8,7 +8,7 @@
         "email": "hello@ashleyhitchcock.co.uk"
     }],
     "suggest": {
-        "wp-graphql/wp-graphql": ">=0.3.8"
+        "wp-graphql/wp-graphql": ">=0.3.8",
         "yoast/wordpress-seo": ">=14.0"
     }
 }
