@@ -138,6 +138,7 @@ add_action('graphql_init', function () {
         'siteName' => ['type' => 'String'],
         'wordpressSiteName' => ['type' => 'String'],
         'siteUrl' => ['type' => 'String'],
+        'inLanguage' => ['type' => 'String'],
       ]
     ]);
 
@@ -363,6 +364,7 @@ add_action('graphql_init', function () {
             'siteName' => trim(YoastSEO()->helpers->site->get_site_name()),
             'wordpressSiteName' => trim(get_bloginfo('name')),
             'siteUrl' => trim(get_site_url()),
+            'inLanguage' => trim(get_bloginfo('language')),
           ),
           'redirects' => array_map($mappedRedirects, $redirects),
           'openGraph' => array(
