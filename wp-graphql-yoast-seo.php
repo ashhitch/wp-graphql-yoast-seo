@@ -138,6 +138,7 @@ add_action('graphql_init', function () {
       'description' => __('The Yoast SEO schema data', 'wp-graphql-yoast-seo'),
       'fields' => [
         'companyName' => ['type' => 'String'],
+        'personName' => ['type' => 'String'],
         'companyOrPerson' => ['type' => 'String'],
         'companyLogo' => ['type' => 'MediaItem'],
         'personLogo' => ['type' => 'MediaItem'],
@@ -313,6 +314,8 @@ add_action('graphql_init', function () {
         $redirectsObj = class_exists('WPSEO_Redirect_Option') ? new WPSEO_Redirect_Option() : false;
         $redirects = $redirectsObj ? $redirectsObj->get_from_option() : [];
 
+        $userID = $all['company_or_person_user_id'];
+        $user = get_userdata($userID);
 
         $mappedRedirects = function ($value) {
 
@@ -364,6 +367,7 @@ add_action('graphql_init', function () {
           ),
           'schema' => array(
             'companyName' => wp_gql_seo_format_string($all['company_name']),
+            'personName' => wp_gql_seo_format_string($user->user_nicename),
             'companyLogo' => DataSource::resolve_post_object($all['company_logo_id'], $context),
             'personLogo' => DataSource::resolve_post_object($all['person_logo_id'], $context),
             'logo' => DataSource::resolve_post_object($all['company_or_person'] === 'company' ? $all['company_logo_id'] : $all['person_logo_id'], $context),
