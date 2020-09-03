@@ -123,6 +123,7 @@ add_action('graphql_init', function () {
         'twitterImage' => ['type' => 'MediaItem'],
         'canonical' => ['type' => 'String'],
         'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
+        'cornerstone' => ['type' => 'Boolean'],
       ]
     ]);
 
@@ -134,6 +135,13 @@ add_action('graphql_init', function () {
       ]
     ]);
 
+    register_graphql_object_type('SEOPostTypeSchema', [
+      'description' => __('The Yoast SEO schema data for single post type', 'wp-graphql-yoast-seo'),
+      'fields' => [
+        'pageType' => ['type' => 'String'],
+        'articleType' => ['type' => 'String'],
+      ]
+    ]);
     register_graphql_object_type('SEOSchema', [
       'description' => __('The Yoast SEO schema data', 'wp-graphql-yoast-seo'),
       'fields' => [
@@ -428,7 +436,12 @@ add_action('graphql_init', function () {
                 'twitterDescription' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->twitter_description),
                 'twitterImage' => DataSource::resolve_post_object(attachment_url_to_postid(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
                 'canonical' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->canonical),
-                'breadcrumbs' => YoastSEO()->meta->for_post($post->ID)->breadcrumbs
+                'breadcrumbs' => YoastSEO()->meta->for_post($post->ID)->breadcrumbs,
+                'cornerstone' => YoastSEO()->meta->for_post($post->ID)->is_cornerstone,
+                'schema' => array(
+                  'pageType' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->schema_page_type),
+                  'articleType' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->schema_article_type),
+                ),
               );
 
               return !empty($seo) ? $seo : null;
@@ -511,7 +524,8 @@ add_action('graphql_init', function () {
               'twitterDescription' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->twitter_description),
               'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
               'canonical' => wp_gql_seo_format_string($meta['canonical']),
-              'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs
+              'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs,
+              'cornerstone' => YoastSEO()->meta->for_term($term->term_id)->is_cornerstone,
             );
             wp_reset_query();
 
