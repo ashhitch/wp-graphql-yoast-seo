@@ -124,8 +124,11 @@ add_action('graphql_init', function () {
         'canonical' => ['type' => 'String'],
         'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
         'cornerstone' => ['type' => 'Boolean'],
+        'schema' => ['type' => 'SEOPostTypeSchema'],
       ]
     ]);
+
+
 
     register_graphql_object_type('SEOPostTypeBreadcrumbs', [
       'fields' => [
