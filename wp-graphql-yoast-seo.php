@@ -100,34 +100,46 @@ add_action('graphql_init', function () {
       ],
     ]);
 
-    register_graphql_object_type('SEO', [
+    register_graphql_object_type('SEOPostTypeSchema', [
+      'description' => __('The Schema types', 'wp-graphql-yoast-seo'),
       'fields' => [
-        'title' => ['type' => 'String'],
-        'metaDesc' => ['type' => 'String'],
-        'focuskw' => ['type' => 'String'],
-        'metaKeywords' => ['type' => 'String'],
-        'metaRobotsNoindex' => ['type' => 'String'],
-        'metaRobotsNofollow' => ['type' => 'String'],
-        'opengraphTitle' => ['type' => 'String'],
-        'opengraphUrl' => ['type' => 'String'],
-        'opengraphSiteName' => ['type' => 'String'],
-        'opengraphType' => ['type' => 'String'],
-        'opengraphAuthor' => ['type' => 'String'],
-        'opengraphPublisher' => ['type' => 'String'],
-        'opengraphPublishedTime' => ['type' => 'String'],
-        'opengraphModifiedTime' => ['type' => 'String'],
-        'opengraphDescription' => ['type' => 'String'],
-        'opengraphImage' => ['type' => 'MediaItem'],
-        'twitterTitle' => ['type' => 'String'],
-        'twitterDescription' => ['type' => 'String'],
-        'twitterImage' => ['type' => 'MediaItem'],
-        'canonical' => ['type' => 'String'],
-        'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
-        'cornerstone' => ['type' => 'Boolean'],
-        'schema' => ['type' => 'SEOPostTypeSchema'],
+        'pageType' =>  ['type' => ['list_of' => 'String']],
+        'articleType' =>  ['type' => ['list_of' => 'String']],
       ]
     ]);
 
+    $baseSEOFields = array(
+      'title' => ['type' => 'String'],
+      'metaDesc' => ['type' => 'String'],
+      'focuskw' => ['type' => 'String'],
+      'metaKeywords' => ['type' => 'String'],
+      'metaRobotsNoindex' => ['type' => 'String'],
+      'metaRobotsNofollow' => ['type' => 'String'],
+      'opengraphTitle' => ['type' => 'String'],
+      'opengraphUrl' => ['type' => 'String'],
+      'opengraphSiteName' => ['type' => 'String'],
+      'opengraphType' => ['type' => 'String'],
+      'opengraphAuthor' => ['type' => 'String'],
+      'opengraphPublisher' => ['type' => 'String'],
+      'opengraphPublishedTime' => ['type' => 'String'],
+      'opengraphModifiedTime' => ['type' => 'String'],
+      'opengraphDescription' => ['type' => 'String'],
+      'opengraphImage' => ['type' => 'MediaItem'],
+      'twitterTitle' => ['type' => 'String'],
+      'twitterDescription' => ['type' => 'String'],
+      'twitterImage' => ['type' => 'MediaItem'],
+      'canonical' => ['type' => 'String'],
+      'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
+      'cornerstone' => ['type' => 'Boolean'],
+    );
+
+    register_graphql_object_type('TaxonomySEO', [
+      'fields' => $baseSEOFields
+    ]);
+
+    register_graphql_object_type('PostTypeSEO', [
+      'fields' => array_merge($baseSEOFields, array('schema' => ['type' => 'SEOPostTypeSchema'])),
+    ]);
 
 
     register_graphql_object_type('SEOPostTypeBreadcrumbs', [
@@ -138,13 +150,7 @@ add_action('graphql_init', function () {
       ]
     ]);
 
-    register_graphql_object_type('SEOPostTypeSchema', [
-      'description' => __('The Yoast SEO schema data for single post type', 'wp-graphql-yoast-seo'),
-      'fields' => [
-        'pageType' => ['type' => 'String'],
-        'articleType' => ['type' => 'String'],
-      ]
-    ]);
+
     register_graphql_object_type('SEOSchema', [
       'description' => __('The Yoast SEO schema data', 'wp-graphql-yoast-seo'),
       'fields' => [
@@ -407,7 +413,7 @@ add_action('graphql_init', function () {
 
         if (isset($post_type_object->graphql_single_name)) :
           register_graphql_field($post_type_object->graphql_single_name, 'seo', [
-            'type' => 'SEO',
+            'type' => 'PostTypeSEO',
             'description' => __('The Yoast SEO data of the ' . $post_type_object->graphql_single_name, 'wp-graphql-yoast-seo'),
             'resolve' => function ($post, array $args, AppContext $context) {
 
@@ -442,8 +448,8 @@ add_action('graphql_init', function () {
                 'breadcrumbs' => YoastSEO()->meta->for_post($post->ID)->breadcrumbs,
                 'cornerstone' => YoastSEO()->meta->for_post($post->ID)->is_cornerstone,
                 'schema' => array(
-                  'pageType' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->schema_page_type),
-                  'articleType' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->schema_article_type),
+                  'pageType' => YoastSEO()->meta->for_post($post->ID)->schema_page_type,
+                  'articleType' => YoastSEO()->meta->for_post($post->ID)->schema_article_type,
                 ),
               );
 
@@ -495,7 +501,7 @@ add_action('graphql_init', function () {
 
 
         register_graphql_field($taxonomy->graphql_single_name, 'seo', [
-          'type' => 'SEO',
+          'type' => 'TaxonomySEO',
           'description' => __('The Yoast SEO data of the ' . $taxonomy->label . ' taxonomy.', 'wp-graphql-yoast-seo'),
           'resolve' => function ($term, array $args, AppContext $context) {
 
