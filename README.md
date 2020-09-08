@@ -95,6 +95,11 @@ To query for the Yoast Data simply add the seo object to your query:
             url
             text
           }
+          cornerstone
+          schema {
+            pageType
+            articleType
+          }
         }
 
         author {

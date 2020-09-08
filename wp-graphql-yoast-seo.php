@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.5.5
+ * Version:         4.6.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -422,6 +422,7 @@ add_action('graphql_init', function () {
 
               // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
               $robots = YoastSEO()->meta->for_post($post->ID)->robots;
+
               // Get data
               $seo = array(
                 'title' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->title),
@@ -446,12 +447,13 @@ add_action('graphql_init', function () {
                 'twitterImage' => DataSource::resolve_post_object(attachment_url_to_postid(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
                 'canonical' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->canonical),
                 'breadcrumbs' => YoastSEO()->meta->for_post($post->ID)->breadcrumbs,
-                'cornerstone' => YoastSEO()->meta->for_post($post->ID)->is_cornerstone,
+                'cornerstone' => boolval(YoastSEO()->meta->for_post($post->ID)->indexable->is_cornerstone),
                 'schema' => array(
-                  'pageType' => YoastSEO()->meta->for_post($post->ID)->schema_page_type,
-                  'articleType' => YoastSEO()->meta->for_post($post->ID)->schema_article_type,
+                  'pageType' => is_array(YoastSEO()->meta->for_post($post->ID)->schema_page_type) ? YoastSEO()->meta->for_post($post->ID)->schema_page_type : [],
+                  'articleType' => is_array(YoastSEO()->meta->for_post($post->ID)->schema_article_type) ? YoastSEO()->meta->for_post($post->ID)->schema_article_type : [],
                 ),
               );
+
 
               return !empty($seo) ? $seo : null;
             }
@@ -534,7 +536,7 @@ add_action('graphql_init', function () {
               'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
               'canonical' => wp_gql_seo_format_string($meta['canonical']),
               'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs,
-              'cornerstone' => YoastSEO()->meta->for_term($term->term_id)->is_cornerstone,
+              'cornerstone' => boolval(YoastSEO()->meta->for_term($term->term_id)->is_cornerstone),
             );
             wp_reset_query();
 
