@@ -458,34 +458,37 @@ add_action('graphql_init', function () {
               return !empty($seo) ? $seo : null;
             }
           ]);
-        endif;
 
 
-        $taxonomies = get_object_taxonomies($post_type, 'objects');
 
-        foreach ($taxonomies as $tax) {
+          $taxonomies = get_object_taxonomies($post_type, 'objects');
+          // wp_send_json($taxonomies);
+          foreach ($taxonomies as $tax) {
 
 
-          if ($tax->hierarchical) {
-            $name = ucfirst($post_type) . 'To' . ucfirst($tax->name) . 'ConnectionEdge';
+            if ($tax->hierarchical) {
 
-            register_graphql_field($name, 'primary',  [
-              'type'        => 'TermNode',
-              'description' => __('The Yoast SEO Primary ' . $tax->name . 'wp-graphql-yoast-seo'),
-              'resolve'     => function ($post, array $args, AppContext $context) {
-                $id = $post['source']->ID;
+              $name = ucfirst($post_type_object->graphql_single_name) . 'To' . ucfirst($tax->name) . 'ConnectionEdge';
 
-                $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $id);
-                $wpseo_primary_term = $wpseo_primary_term->get_primary_term();
+              register_graphql_field($name, 'primary',  [
+                'type'        => 'TermNode',
+                'description' => __('The Yoast SEO Primary ' . $tax->name . 'wp-graphql-yoast-seo'),
+                'resolve'     => function ($post, array $args, AppContext $context) {
+                  $id = $post['source']->ID;
 
-                $term = $context->get_loader('term')->load($wpseo_primary_term);
-                // this is needs to return true or false for each one
-                // wp_send_json($term);
-                return  $term;
-              }
-            ]);
+                  $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $id);
+                  $wpseo_primary_term = $wpseo_primary_term->get_primary_term();
+
+                  $term = $context->get_loader('term')->load($wpseo_primary_term);
+                  // this is needs to return true or false for each one
+                  // 
+                  return  $term;
+                }
+              ]);
+            }
           }
-        }
+
+        endif;
       }
     }
 
