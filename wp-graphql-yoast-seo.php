@@ -460,7 +460,7 @@ add_action('graphql_init', function () {
           ]);
 
 
-
+          // Loop each taxonomy to register on the edge if a category is the primary one.
           $taxonomies = get_object_taxonomies($post_type, 'objects');
 
           foreach ($taxonomies as $tax) {
@@ -472,7 +472,7 @@ add_action('graphql_init', function () {
 
               register_graphql_field($name, 'isPrimary',  [
                 'type'        => 'Boolean',
-                'description' => __('The Yoast SEO Primary ' . $tax->name . 'wp-graphql-yoast-seo'),
+                'description' => __('The Yoast SEO Primary ' . $tax->name, 'wp-graphql-yoast-seo'),
                 'resolve'     => function ($item, array $args, AppContext $context) use ($tax) {
 
                   $postId = $item['source']->ID;
