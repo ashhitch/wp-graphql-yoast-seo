@@ -462,7 +462,7 @@ add_action('graphql_init', function () {
 
 
           $taxonomies = get_object_taxonomies($post_type, 'objects');
-          // wp_send_json($taxonomies);
+
           foreach ($taxonomies as $tax) {
 
 
@@ -470,19 +470,19 @@ add_action('graphql_init', function () {
 
               $name = ucfirst($post_type_object->graphql_single_name) . 'To' . ucfirst($tax->name) . 'ConnectionEdge';
 
-              register_graphql_field($name, 'primary',  [
-                'type'        => 'TermNode',
+              register_graphql_field($name, 'isPrimary',  [
+                'type'        => 'Boolean',
                 'description' => __('The Yoast SEO Primary ' . $tax->name . 'wp-graphql-yoast-seo'),
-                'resolve'     => function ($post, array $args, AppContext $context) {
-                  $id = $post['source']->ID;
+                'resolve'     => function ($item, array $args, AppContext $context) use ($tax) {
 
-                  $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $id);
-                  $wpseo_primary_term = $wpseo_primary_term->get_primary_term();
+                  $postId = $item['source']->ID;
 
-                  $term = $context->get_loader('term')->load($wpseo_primary_term);
-                  // this is needs to return true or false for each one
-                  // 
-                  return  $term;
+                  $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);
+                  $primaryTaxId = $wpseo_primary_term->get_primary_term();
+                  $termId = $item['node']->term_id;
+
+
+                  return  $primaryTaxId === $termId;
                 }
               ]);
             }
@@ -492,20 +492,7 @@ add_action('graphql_init', function () {
       }
     }
 
-    // register_graphql_field('PostToCategoryConnectionEdge', 'primary',  [
-    //   'type'        => 'TermNode',
-    //   'description' => __('The Yoast SEO Primary category', 'wp-graphql-yoast-seo'),
-    //   'resolve'     => function ($post, array $args, AppContext $context) {
-    //     $id = $post['source']->ID;
 
-    //     $wpseo_primary_term = new WPSEO_Primary_Term('category', $id);
-    //     $wpseo_primary_term = $wpseo_primary_term->get_primary_term();
-
-    //     $term = $context->get_loader('term')->load($wpseo_primary_term);
-    //     // wp_send_json($term);
-    //     return  $term;
-    //   }
-    // ]);
 
     register_graphql_field('User', 'seo',  [
       'type'        => 'SEOUser',
