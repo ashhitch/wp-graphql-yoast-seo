@@ -466,9 +466,9 @@ add_action('graphql_init', function () {
           foreach ($taxonomies as $tax) {
 
 
-            if ($tax->hierarchical) {
+            if ($tax->hierarchical && $tax->graphql_single_name) {
 
-              $name = ucfirst($post_type_object->graphql_single_name) . 'To' . ucfirst($tax->name) . 'ConnectionEdge';
+              $name = ucfirst($post_type_object->graphql_single_name) . 'To' . ucfirst($tax->graphql_single_name) . 'ConnectionEdge';
 
               register_graphql_field($name, 'isPrimary',  [
                 'type'        => 'Boolean',
