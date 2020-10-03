@@ -355,7 +355,7 @@ add_action('graphql_init', function () {
           'social' => array(
             'facebook' => array(
               'url' =>  wp_gql_seo_format_string($all['facebook_site']),
-              'defaultImage' => DataSource::resolve_post_object($all['og_default_image_id'], $context)
+              'defaultImage' => $context->get_loader('post')->load($id)($all['og_default_image_id'], $context)
             ),
             'twitter' => array(
               'username' => wp_gql_seo_format_string($all['twitter_site']),
@@ -385,9 +385,9 @@ add_action('graphql_init', function () {
           'schema' => array(
             'companyName' => wp_gql_seo_format_string($all['company_name']),
             'personName' => wp_gql_seo_format_string($user->user_nicename),
-            'companyLogo' => DataSource::resolve_post_object($all['company_logo_id'], $context),
-            'personLogo' => DataSource::resolve_post_object($all['person_logo_id'], $context),
-            'logo' => DataSource::resolve_post_object($all['company_or_person'] === 'company' ? $all['company_logo_id'] : $all['person_logo_id'], $context),
+            'companyLogo' => $context->get_loader('post')->load($id)($all['company_logo_id'], $context),
+            'personLogo' => $context->get_loader('post')->load($id)($all['person_logo_id'], $context),
+            'logo' => $context->get_loader('post')->load($id)($all['company_or_person'] === 'company' ? $all['company_logo_id'] : $all['person_logo_id'], $context),
             'companyOrPerson' => wp_gql_seo_format_string($all['company_or_person']),
             'siteName' => wp_gql_seo_format_string(YoastSEO()->helpers->site->get_site_name()),
             'wordpressSiteName' => wp_gql_seo_format_string(get_bloginfo('name')),
@@ -396,11 +396,11 @@ add_action('graphql_init', function () {
           ),
           'redirects' => array_map($mappedRedirects, $redirects),
           'openGraph' => array(
-            'defaultImage' =>  DataSource::resolve_post_object($all['og_default_image_id'], $context),
+            'defaultImage' =>  $context->get_loader('post')->load($id)($all['og_default_image_id'], $context),
             'frontPage' => array(
               'title' => wp_gql_seo_format_string($all['og_frontpage_title']),
               'description' => wp_gql_seo_format_string($all['og_frontpage_desc']),
-              'image' => DataSource::resolve_post_object($all['og_frontpage_image_id'], $context),
+              'image' => $context->get_loader('post')->load($id)($all['og_frontpage_image_id'], $context),
             )
           )
         );
@@ -440,11 +440,11 @@ add_action('graphql_init', function () {
                 'opengraphPublishedTime' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->open_graph_article_published_time),
                 'opengraphModifiedTime' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->open_graph_article_modified_time),
                 'opengraphDescription' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->open_graph_description),
-                'opengraphImage' => DataSource::resolve_post_object(wp_gql_seo_get_og_image(YoastSEO()->meta->for_post($post->ID)->open_graph_images), $context),
+                'opengraphImage' => $context->get_loader('post')->load($id)(wp_gql_seo_get_og_image(YoastSEO()->meta->for_post($post->ID)->open_graph_images), $context),
                 'twitterCardType' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->twitter_card),
                 'twitterTitle' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->twitter_title),
                 'twitterDescription' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->twitter_description),
-                'twitterImage' => DataSource::resolve_post_object(attachment_url_to_postid(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
+                'twitterImage' => $context->get_loader('post')->load($id)(attachment_url_to_postid(YoastSEO()->meta->for_post($post->ID)->twitter_image), $context),
                 'canonical' => wp_gql_seo_format_string(YoastSEO()->meta->for_post($post->ID)->canonical),
                 'breadcrumbs' => YoastSEO()->meta->for_post($post->ID)->breadcrumbs,
                 'cornerstone' => boolval(YoastSEO()->meta->for_post($post->ID)->indexable->is_cornerstone),
@@ -561,11 +561,11 @@ add_action('graphql_init', function () {
               'opengraphPublishedTime' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->open_graph_article_published_time),
               'opengraphModifiedTime' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->open_graph_article_modified_time),
               'opengraphDescription' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->open_graph_description),
-              'opengraphImage' => DataSource::resolve_post_object($meta['wpseo_opengraph-image-id'], $context),
+              'opengraphImage' => $context->get_loader('post')->load($id)($meta['wpseo_opengraph-image-id'], $context),
               'twitterCardType' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->twitter_card),
               'twitterTitle' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->twitter_title),
               'twitterDescription' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->twitter_description),
-              'twitterImage' => DataSource::resolve_post_object($meta['wpseo_twitter-image-id'], $context),
+              'twitterImage' => $context->get_loader('post')->load($id)($meta['wpseo_twitter-image-id'], $context),
               'canonical' => wp_gql_seo_format_string($meta['canonical']),
               'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs,
               'cornerstone' => boolval(YoastSEO()->meta->for_term($term->term_id)->is_cornerstone),
