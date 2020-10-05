@@ -78,9 +78,37 @@ add_action('graphql_init', function () {
     }
   }
 
-  function wp_gql_seo_build_content_types($type)
+  function wp_gql_seo_build_content_types($types)
   {
-    return array($type => ['type' => 'SEOContentType']);
+    $carry = array();
+    foreach ($types as $type) {
+
+      $post_type_object = get_post_type_object($type);
+      if ($post_type_object->graphql_single_name) {
+
+        $carry[lcfirst($post_type_object->graphql_single_name)] = ['type' => 'SEOContentType'];
+      }
+    }
+    return $carry;
+  }
+
+  function wp_gql_seo_build_content_type_data($types, $all)
+  {
+    $carry = array();
+    foreach ($types as $type) {
+      $post_type_object = get_post_type_object($type);
+      if ($post_type_object->graphql_single_name) {
+
+        $tag = lcfirst($post_type_object->graphql_single_name);
+        $carry[$tag] = array(
+          'title' => $all['title-' . $tag],
+          'metaDesc' => $all['metadesc-' . $tag],
+          'metaRobotsNoindex' => $all['noindex-' . $tag],
+          'schemaType' => $all['schema-page-type-' . $tag],
+        );
+      }
+    }
+    return $carry;
   }
 
   add_action('graphql_register_types', function () {
@@ -300,9 +328,11 @@ add_action('graphql_init', function () {
       ]
     ]);
 
+    $allTypes =  wp_gql_seo_build_content_types($post_types);
+
     register_graphql_object_type('SEOContentTypes', [
       'description' => __('The Yoast SEO  Content Types Fields', 'wp-graphql-yoast-seo'),
-      'fields' => array_map('wp_gql_seo_build_content_types', $post_types),
+      'fields' => $allTypes,
     ]);
 
     register_graphql_object_type('SEOConfig', [
@@ -316,6 +346,7 @@ add_action('graphql_init', function () {
           'list_of' => 'SEORedirect',
         ]],
         'openGraph' => ['type' => 'SEOOpenGraph'],
+        'contentTypes' => ['type' => 'SEOContentTypes'],
       ]
     ]);
 
@@ -346,7 +377,7 @@ add_action('graphql_init', function () {
     register_graphql_field('RootQuery', 'seo', [
       'type' => 'SEOConfig',
       'description' => __('Returns seo site data', 'wp-graphql-yoast-seo'),
-      'resolve' => function ($source, array $args, AppContext $context) {
+      'resolve' => function ($source, array $args, AppContext $context) use ($post_types) {
 
         $wpseo_options = WPSEO_Options::get_instance();
         $all =  $wpseo_options->get_all();
@@ -368,7 +399,11 @@ add_action('graphql_init', function () {
         };
 
 
+
+        $contentTypes = wp_gql_seo_build_content_type_data($post_types, $all);
+
         return  array(
+          'contentTypes' => $contentTypes,
           'webmaster' => array(
             'baiduVerify' => wp_gql_seo_format_string($all['baiduverify']),
             'googleVerify' => wp_gql_seo_format_string($all['googleverify']),
