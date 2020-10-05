@@ -78,6 +78,11 @@ add_action('graphql_init', function () {
     }
   }
 
+  function wp_gql_seo_build_content_types($type)
+  {
+    return array($type => ['type' => 'SEOContentType']);
+  }
+
   add_action('graphql_register_types', function () {
     $post_types = \WPGraphQL::get_allowed_post_types();
     $taxonomies = \WPGraphQL::get_allowed_taxonomies();
@@ -280,6 +285,24 @@ add_action('graphql_init', function () {
         'defaultImage' => ['type' => 'MediaItem'],
         'frontPage' => ['type' => 'SEOOpenGraphFrontPage'],
       ]
+    ]);
+
+
+
+
+    register_graphql_object_type('SEOContentType', [
+      'description' => __('The Yoast SEO  Content Type Fields', 'wp-graphql-yoast-seo'),
+      'fields' => [
+        'title' => ['type' => 'String'],
+        'metaDesc' => ['type' => 'String'],
+        'metaRobotsNoindex' => ['type' => 'Boolean'],
+        'schemaType' => ['type' => 'String'],
+      ]
+    ]);
+
+    register_graphql_object_type('SEOContentTypes', [
+      'description' => __('The Yoast SEO  Content Types Fields', 'wp-graphql-yoast-seo'),
+      'fields' => array_map('wp_gql_seo_build_content_types', $post_types),
     ]);
 
     register_graphql_object_type('SEOConfig', [
