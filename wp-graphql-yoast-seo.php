@@ -327,7 +327,7 @@ add_action('graphql_init', function () {
     ]);
 
     register_graphql_object_type('SEOContentType', [
-      'description' => __('The Yoast SEO  Content Type Fields', 'wp-graphql-yoast-seo'),
+      'description' => __('he Yoast SEO search appearance content types fields', 'wp-graphql-yoast-seo'),
       'fields' => [
         'title' => ['type' => 'String'],
         'metaDesc' => ['type' => 'String'],
@@ -339,7 +339,7 @@ add_action('graphql_init', function () {
     $allTypes =  wp_gql_seo_build_content_types($post_types);
 
     register_graphql_object_type('SEOContentTypes', [
-      'description' => __('The Yoast SEO  Content Types Fields', 'wp-graphql-yoast-seo'),
+      'description' => __('The Yoast SEO search appearance content types', 'wp-graphql-yoast-seo'),
       'fields' => $allTypes,
     ]);
 
