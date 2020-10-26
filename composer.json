@@ -12,5 +12,9 @@
   "suggest": {
     "wp-graphql/wp-graphql": "Required to return data via GraphQl",
     "yoast/wordpress-seo": "Required to provide SEO data to this plugin"
+  },
+  "require-dev": {
+    "automattic/vipwpcs": "^2.2",
+    "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0"
   }
 }
