@@ -10,8 +10,9 @@
  * Domain Path:     /languages
  * Version:         4.8.0
  *
- * @package         WP_Graphql_YOAST_SEO
+ * @package WP_Graphql_YOAST_SEO
  */
+
 if (!defined('ABSPATH')) {
   exit();
 }
@@ -405,7 +406,6 @@ add_action('graphql_init', function () {
             'format' => $value['format'],
           );
         };
-
 
 
         $contentTypes = wp_gql_seo_build_content_type_data($post_types, $all);
