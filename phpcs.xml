@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ruleset name="WP">
+	<description>Coding standards for the WPGraphQL  Yoast SEO plugin</description>
+	<arg name="colors" />
+	<arg value="p" />
+	<arg name="extensions" value="php"/>
+
+	<arg name="parallel" value="20"/>
+
+	<!-- Includes -->
+	<file>./wp-graphql-yoast-seo.php</file>
+  </ruleset>
