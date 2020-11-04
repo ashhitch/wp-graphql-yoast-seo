@@ -14,7 +14,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
          - name: Install dependencies
-           run: composer install --prefer-dist --no-progress --working-dir $PWD../
+           run: composer install --prefer-dist --no-progress --working-dir ./../
          - name: PHPCS check
            uses: chekalsky/phpcs-action@v1
            with:
