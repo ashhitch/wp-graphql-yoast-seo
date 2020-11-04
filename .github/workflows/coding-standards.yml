@@ -13,8 +13,7 @@ jobs:
       name: PHPCS
       runs-on: ubuntu-latest
       steps:
-         - name: Show files
-           run: ls -a
+         - uses: actions/checkout@v2
          - name: Install dependencies
            run: composer install --prefer-dist --no-progress 
          - name: PHPCS check
