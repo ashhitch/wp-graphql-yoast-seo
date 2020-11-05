@@ -12,7 +12,12 @@
 	<arg name="basepath" value="."/><!-- Strip the file paths down to the relevant bit -->
 	<arg name="colors"/>
 	<arg name="extensions" value="php"/>
-	<arg name="parallel" value="50"/>
+	<arg name="parallel" value="20"/>
+
+	<rule ref="WordPressVIPMinimum">
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
+	</rule>
 
 	<!-- Tests for PHP version compatibility -->
 	<rule ref="PHPCompatibilityWP">
