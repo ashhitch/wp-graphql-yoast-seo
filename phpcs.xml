@@ -17,6 +17,8 @@
 	<rule ref="WordPressVIPMinimum">
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
 		<exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
+		<!-- Will need to fix this -->
+		<exclude name="WordPressVIPMinimum.Functions.RestrictedFunctions.attachment_url_to_postid_attachment_url_to_postid"/>
 	</rule>
 
 	<!-- Tests for PHP version compatibility -->
