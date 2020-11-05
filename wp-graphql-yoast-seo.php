@@ -16,9 +16,13 @@
 if (!defined('ABSPATH')) {
     exit();
 }
+if (is_readable(__DIR__ . '/vendor/autoload.php')) {
+    require __DIR__ . '/vendor/autoload.php';
+}
 
 use WPGraphQL\AppContext;
 use WPGraphQL\Data\DataSource;
+use MLL\GraphQLScalars\JSON;
 
 add_action('admin_init', function () {
     $core_dependencies = [
@@ -127,6 +131,7 @@ add_action('graphql_init', function () {
     }
 
     add_action('graphql_register_types', function () {
+        $json = new JSON();
         $post_types = \WPGraphQL::get_allowed_post_types();
         $taxonomies = \WPGraphQL::get_allowed_taxonomies();
 
@@ -153,6 +158,7 @@ add_action('graphql_init', function () {
             'fields' => [
                 'pageType' => ['type' => ['list_of' => 'String']],
                 'articleType' => ['type' => ['list_of' => 'String']],
+                'full' => ['type' => $json],
             ],
         ]);
 
@@ -720,6 +726,9 @@ add_action('graphql_init', function () {
                                             ? YoastSEO()->meta->for_post($post->ID)
                                                 ->schema_article_type
                                             : [],
+                                        'full' => YoastSEO()->meta->for_post(
+                                            $post->ID
+                                        )->schema,
                                     ],
                                 ];
 
