@@ -148,11 +148,51 @@ add_action('graphql_init', function () {
             ],
         ]);
 
+        register_graphql_object_type('SEORawLogo', [
+            'description' => __('Raw Image Schema', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'id' => ['type' => ['String']],
+            ],
+        ]);
+
+        register_graphql_object_type('SEORawImage', [
+            'description' => __('Raw Image Schema', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'id' => ['type' => ['String']],
+                'inLanguage' => ['type' => ['String']],
+                'url' => ['type' => ['String']],
+                'width' => ['type' => ['Int']],
+                'height' => ['type' => ['Int']],
+                'caption' => ['type' => ['String']],
+            ],
+        ]);
+
+        register_graphql_object_type('SEORawGraph', [
+            'description' => __('Raw Graph Schema', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'name' => ['type' => ['String']],
+                'description' => ['type' => ['String']],
+                'sameAs' => ['type' => ['list_of' => 'String']],
+                'logo' => ['type' => ['SEORawLogo']],
+                'image' => ['type' => ['SEORawImage']],
+                'type' => ['type' => ['list_of' => 'String']],
+            ],
+        ]);
+
+        register_graphql_object_type('SEOPostTypeRaw', [
+            'description' => __('Raw Schema', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'context' => ['type' => ['String']],
+                'graph' => ['type' => ['list_of' => 'String']],
+            ],
+        ]);
+
         register_graphql_object_type('SEOPostTypeSchema', [
             'description' => __('The Schema types', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'pageType' => ['type' => ['list_of' => 'String']],
                 'articleType' => ['type' => ['list_of' => 'String']],
+                'raw' => ['type' => ['SEOPostTypeRaw']],
             ],
         ]);
 
@@ -720,6 +760,9 @@ add_action('graphql_init', function () {
                                             ? YoastSEO()->meta->for_post($post->ID)
                                                 ->schema_article_type
                                             : [],
+                                        'raw' => YoastSEO()->meta->for_post(
+                                            $post->ID
+                                        )->schema,
                                     ],
                                 ];
 
