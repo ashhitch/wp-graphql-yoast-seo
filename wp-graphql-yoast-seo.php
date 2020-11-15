@@ -94,6 +94,13 @@ add_action('graphql_init', function () {
     }
 
     if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
+        function wpcom_vip_attachment_cache_key($url)
+        {
+            return 'wpcom_vip_attachment_url_post_id_' . md5($url);
+        }
+    }
+
+    if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
         function wpcom_vip_attachment_url_to_postid($url)
         {
             $cache_key = wpcom_vip_attachment_cache_key($url);
@@ -120,13 +127,6 @@ add_action('graphql_init', function () {
             }
 
             return $id;
-        }
-    }
-
-    if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
-        function wpcom_vip_attachment_cache_key($url)
-        {
-            return 'wpcom_vip_attachment_url_post_id_' . md5($url);
         }
     }
 
