@@ -169,12 +169,6 @@ add_action('graphql_init', function () {
         return $carry;
     }
 
-    function wp_gql_replaceArrayKeys($array)
-    {
-        $replacedKeys = str_replace('@', '', array_keys($array));
-        return array_combine($replacedKeys, $array);
-    }
-
     add_action('graphql_register_types', function () {
         $post_types = \WPGraphQL::get_allowed_post_types();
         $taxonomies = \WPGraphQL::get_allowed_taxonomies();
@@ -197,51 +191,12 @@ add_action('graphql_init', function () {
             ],
         ]);
 
-        register_graphql_object_type('SEORawLogo', [
-            'description' => __('Raw Image Schema', 'wp-graphql-yoast-seo'),
-            'fields' => [
-                'id' => ['type' => 'String'],
-            ],
-        ]);
-
-        register_graphql_object_type('SEORawImage', [
-            'description' => __('Raw Image Schema', 'wp-graphql-yoast-seo'),
-            'fields' => [
-                'id' => ['type' => 'String'],
-                'inLanguage' => ['type' => 'String'],
-                'url' => ['type' => 'String'],
-                'width' => ['type' => 'Int'],
-                'height' => ['type' => 'Int'],
-                'caption' => ['type' => 'String'],
-            ],
-        ]);
-
-        register_graphql_object_type('SEORawGraph', [
-            'description' => __('Raw Graph Schema', 'wp-graphql-yoast-seo'),
-            'fields' => [
-                'name' => ['type' => 'String'],
-                'description' => ['type' => 'String'],
-                'sameAs' => ['type' => ['list_of' => 'String']],
-                'logo' => ['type' => 'SEORawLogo'],
-                'image' => ['type' => 'SEORawImage'],
-                'type' => ['type' => ['list_of' => 'String']],
-            ],
-        ]);
-
-        register_graphql_object_type('SEOPostTypeRaw', [
-            'description' => __('Raw JSON Schema', 'wp-graphql-yoast-seo'),
-            'fields' => [
-                'context' => ['type' => 'String'],
-                'graph' => ['type' => ['list_of' => 'SEORawGraph']],
-            ],
-        ]);
-
         register_graphql_object_type('SEOPostTypeSchema', [
             'description' => __('The Schema types', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'pageType' => ['type' => ['list_of' => 'String']],
                 'articleType' => ['type' => ['list_of' => 'String']],
-                'raw' => ['type' => 'SEOPostTypeRaw'],
+                'raw' => ['type' => 'String'],
             ],
         ]);
 
@@ -691,7 +646,15 @@ add_action('graphql_init', function () {
                                 // Base array
                                 $seo = [];
 
-                                // wp_send_json(YoastSEO()->meta->for_post( $post->IDs )->schema);
+                                $map = [
+                                    '@id' => 'id',
+                                    '@type' => 'type',
+                                    '@graph' => 'graph',
+                                    '@context' => 'context',
+                                ];
+
+                                $schemaArray = YoastSEO()->meta->for_post($post->ID)
+                                    ->schema;
 
                                 // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
                                 $robots = YoastSEO()->meta->for_post($post->ID)
@@ -810,9 +773,9 @@ add_action('graphql_init', function () {
                                             ? YoastSEO()->meta->for_post($post->ID)
                                                 ->schema_article_type
                                             : [],
-                                        'raw' => wp_gql_replaceArrayKeys(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->schema
+                                        'raw' => json_encode(
+                                            $schemaArray,
+                                            JSON_UNESCAPED_SLASHES
                                         ),
                                     ],
                                 ];
