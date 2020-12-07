@@ -169,10 +169,45 @@ add_action('graphql_init', function () {
         return $carry;
     }
 
-    function wp_gql_replaceArrayKeys($array)
+    function wp_gql_convert_type_to_array($original)
     {
-        $replacedKeys = str_replace('@', '', array_keys($array));
-        return array_combine($replacedKeys, $array);
+        $graph = [];
+
+        foreach ($original['@graph'] as $item) {
+            $item = [];
+            foreach ($item as $k => $v) {
+                if ($k == '@type' && gettype($v) == 'string') {
+                    $item[$k] = [$v];
+                } else {
+                    $item[$k] = $v;
+                }
+            }
+
+            $graph[] = $item;
+        }
+
+        $original['@graph'] = $graph;
+        wp_send_json($original['@graph']);
+        return $original;
+    }
+
+    function wp_gql_replace_array_keys($original, $map = [])
+    {
+        $temp = json_encode($original, JSON_UNESCAPED_SLASHES);
+
+        foreach ($map as $k => &$v) {
+            $search = '"' . $k . '":';
+            $replace = '"' . $v . '":';
+            $temp = str_ireplace($search, $replace, $temp);
+        }
+
+        $array = true;
+
+        if (is_object($original)) {
+            $array = false;
+        }
+
+        return json_decode($temp, $array);
     }
 
     add_action('graphql_register_types', function () {
@@ -197,14 +232,14 @@ add_action('graphql_init', function () {
             ],
         ]);
 
-        register_graphql_object_type('SEORawLogo', [
+        register_graphql_object_type('SEOSchemaLogo', [
             'description' => __('Raw Image Schema', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'id' => ['type' => 'String'],
             ],
         ]);
 
-        register_graphql_object_type('SEORawImage', [
+        register_graphql_object_type('SEOSchemaImage', [
             'description' => __('Raw Image Schema', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'id' => ['type' => 'String'],
@@ -216,23 +251,24 @@ add_action('graphql_init', function () {
             ],
         ]);
 
-        register_graphql_object_type('SEORawGraph', [
+        register_graphql_object_type('SEOSchemaGraph', [
             'description' => __('Raw Graph Schema', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'name' => ['type' => 'String'],
+                'id' => ['type' => 'String'],
                 'description' => ['type' => 'String'],
                 'sameAs' => ['type' => ['list_of' => 'String']],
-                'logo' => ['type' => 'SEORawLogo'],
-                'image' => ['type' => 'SEORawImage'],
+                'logo' => ['type' => 'SEOSchemaLogo'],
+                'image' => ['type' => 'SEOSchemaImage'],
                 'type' => ['type' => ['list_of' => 'String']],
             ],
         ]);
 
-        register_graphql_object_type('SEOPostTypeRaw', [
-            'description' => __('Raw JSON Schema', 'wp-graphql-yoast-seo'),
+        register_graphql_object_type('SEOSchemaFull', [
+            'description' => __('Full JSON Schema', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'context' => ['type' => 'String'],
-                'graph' => ['type' => ['list_of' => 'SEORawGraph']],
+                'graph' => ['type' => ['list_of' => 'SEOSchemaGraph']],
             ],
         ]);
 
@@ -241,7 +277,8 @@ add_action('graphql_init', function () {
             'fields' => [
                 'pageType' => ['type' => ['list_of' => 'String']],
                 'articleType' => ['type' => ['list_of' => 'String']],
-                'raw' => ['type' => 'SEOPostTypeRaw'],
+                'full' => ['type' => 'SEOSchemaFull'],
+                'raw' => ['type' => 'String'],
             ],
         ]);
 
@@ -691,7 +728,23 @@ add_action('graphql_init', function () {
                                 // Base array
                                 $seo = [];
 
-                                // wp_send_json(YoastSEO()->meta->for_post( $post->IDs )->schema);
+                                $map = [
+                                    '@id' => 'id',
+                                    '@type' => 'type',
+                                    '@graph' => 'graph',
+                                    '@context' => 'context',
+                                ];
+
+                                $schemaArray = YoastSEO()->meta->for_post($post->ID)
+                                    ->schema;
+
+                                //$fixed = wp_gql_convert_type_to_array($schemaArray);
+                                $fullSchema = wp_gql_replace_array_keys(
+                                    $schemaArray,
+                                    $map
+                                );
+
+                                wp_send_json($fixed);
 
                                 // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
                                 $robots = YoastSEO()->meta->for_post($post->ID)
@@ -810,9 +863,10 @@ add_action('graphql_init', function () {
                                             ? YoastSEO()->meta->for_post($post->ID)
                                                 ->schema_article_type
                                             : [],
-                                        'raw' => wp_gql_replaceArrayKeys(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->schema
+                                        'full' => $fullSchema,
+                                        'raw' => json_encode(
+                                            $schemaArray,
+                                            JSON_UNESCAPED_SLASHES
                                         ),
                                     ],
                                 ];
