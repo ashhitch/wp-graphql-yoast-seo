@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.10.0
+ * Version:         4.10.1
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -473,16 +473,16 @@ add_action('graphql_init', function () {
             ],
         ]);
 
-        register_graphql_object_type('SEOEdgeSchema', [
-            'description' => __('The Schema types for Edge', 'wp-graphql-yoast-seo'),
+        register_graphql_object_type('SEOPageInfoSchema', [
+            'description' => __('The Schema for post type', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'raw' => ['type' => 'String'],
             ],
         ]);
-        register_graphql_object_type('SEOPostTypeEdge', [
-            'description' => __('The Schema types for Edge', 'wp-graphql-yoast-seo'),
+        register_graphql_object_type('SEOPostTypePageInfo', [
+            'description' => __('The page info SEO details', 'wp-graphql-yoast-seo'),
             'fields' => [
-                'schema' => ['type' => 'SEOEdgeSchema'],
+                'schema' => ['type' => 'SEOPageInfoSchema'],
             ],
         ]);
 
@@ -820,13 +820,12 @@ add_action('graphql_init', function () {
                     // register field on edge for arch
 
                     $name =
-                        'RootQueryTo' .
+                        'WP' .
                         ucfirst($post_type_object->graphql_single_name) .
-                        'ConnectionEdge';
+                        'Info';
 
-                    // todo move to RootQueryToPageConnection.pageInfo: WPPageInfo
                     register_graphql_field($name, 'seo', [
-                        'type' => 'SEOPostTypeEdge',
+                        'type' => 'SEOPostTypePageInfo',
                         'description' => __(
                             'Raw schema for ' .
                                 $post_type_object->graphql_single_name,
