@@ -804,6 +804,34 @@ add_action('graphql_init', function () {
                         ]
                     );
 
+                    // register field on edge for arch
+
+                    $name =
+                        'RootQueryTo' .
+                        ucfirst($post_type_object->graphql_single_name) .
+                        'ConnectionEdge';
+
+                    // TODO shouldbe schema > raw
+                    register_graphql_field($name, 'raw', [
+                        'type' => 'String',
+                        'description' => __(
+                            'TRaw schema for ' .
+                                $post_type_object->graphql_single_name,
+                            'wp-graphql-yoast-seo'
+                        ),
+                        'resolve' => function (
+                            $item,
+                            array $args,
+                            AppContext $context
+                        ) use ($post_type) {
+                            $rawScema = YoastSEO()->meta->for_post_type_archive(
+                                $post_type
+                            )->schema;
+
+                            return $rawScema;
+                        },
+                    ]);
+
                     // Loop each taxonomy to register on the edge if a category is the primary one.
                     $taxonomiesPostObj = get_object_taxonomies(
                         $post_type,
