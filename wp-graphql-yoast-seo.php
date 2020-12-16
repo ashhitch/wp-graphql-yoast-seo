@@ -473,6 +473,19 @@ add_action('graphql_init', function () {
             ],
         ]);
 
+        register_graphql_object_type('SEOEdgeSchema', [
+            'description' => __('The Schema types for Edge', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'raw' => ['type' => 'String'],
+            ],
+        ]);
+        register_graphql_object_type('SEOPostTypeEdge', [
+            'description' => __('The Schema types for Edge', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'schema' => ['type' => 'SEOEdgeSchema'],
+            ],
+        ]);
+
         register_graphql_field('RootQuery', 'seo', [
             'type' => 'SEOConfig',
             'description' => __('Returns seo site data', 'wp-graphql-yoast-seo'),
@@ -811,11 +824,11 @@ add_action('graphql_init', function () {
                         ucfirst($post_type_object->graphql_single_name) .
                         'ConnectionEdge';
 
-                    // TODO shouldbe schema > raw
-                    register_graphql_field($name, 'raw', [
-                        'type' => 'String',
+                    // todo move to RootQueryToPageConnection.pageInfo: WPPageInfo
+                    register_graphql_field($name, 'seo', [
+                        'type' => 'SEOPostTypeEdge',
                         'description' => __(
-                            'TRaw schema for ' .
+                            'Raw schema for ' .
                                 $post_type_object->graphql_single_name,
                             'wp-graphql-yoast-seo'
                         ),
@@ -824,11 +837,18 @@ add_action('graphql_init', function () {
                             array $args,
                             AppContext $context
                         ) use ($post_type) {
-                            $rawScema = YoastSEO()->meta->for_post_type_archive(
+                            $schemaArray = YoastSEO()->meta->for_post_type_archive(
                                 $post_type
                             )->schema;
 
-                            return $rawScema;
+                            return [
+                                'schema' => [
+                                    'raw' => json_encode(
+                                        $schemaArray,
+                                        JSON_UNESCAPED_SLASHES
+                                    ),
+                                ],
+                            ];
                         },
                     ]);
 
