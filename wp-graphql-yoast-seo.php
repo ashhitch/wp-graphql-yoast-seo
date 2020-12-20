@@ -158,11 +158,18 @@ add_action('graphql_init', function () {
                 $tag = wp_gql_seo_get_field_key(
                     $post_type_object->graphql_single_name
                 );
+
+                $schemaArray = YoastSEO()->meta->for_post_type_archive($type)
+                    ->schema;
+
                 $carry[$tag] = [
                     'title' => $all['title-' . $tag],
                     'metaDesc' => $all['metadesc-' . $tag],
                     'metaRobotsNoindex' => $all['noindex-' . $tag],
                     'schemaType' => $all['schema-page-type-' . $tag],
+                    'schema' => [
+                        'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                    ],
                 ];
             }
         }
@@ -408,6 +415,7 @@ add_action('graphql_init', function () {
                 'metaDesc' => ['type' => 'String'],
                 'metaRobotsNoindex' => ['type' => 'Boolean'],
                 'schemaType' => ['type' => 'String'],
+                'schema' => ['type' => 'SEOPageInfoSchema'],
             ],
         ]);
 
