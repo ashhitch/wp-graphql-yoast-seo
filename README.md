@@ -338,6 +338,9 @@ query GetSeoConfig {
             format
             type
         }
+        schema {
+            raw
+        }
     }
 }
 ```
