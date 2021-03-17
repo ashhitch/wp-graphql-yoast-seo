@@ -248,6 +248,7 @@ add_action('graphql_init', function () {
 
         register_graphql_object_type('PostTypeSEO', [
             'fields' => array_merge($baseSEOFields, [
+                'readingTime' => ['type' => 'Float'],
                 'schema' => ['type' => 'SEOPostTypeSchema'],
             ]),
         ]);
@@ -800,6 +801,10 @@ add_action('graphql_init', function () {
                                     'canonical' => wp_gql_seo_format_string(
                                         YoastSEO()->meta->for_post($post->ID)
                                             ->canonical
+                                    ),
+                                    'readingTime' => floatval(
+                                        YoastSEO()->meta->for_post($post->ID)
+                                            ->estimated_reading_time_minutes
                                     ),
                                     'breadcrumbs' => YoastSEO()->meta->for_post(
                                         $post->ID
