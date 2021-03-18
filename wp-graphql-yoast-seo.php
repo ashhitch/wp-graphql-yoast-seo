@@ -153,6 +153,7 @@ add_action('graphql_init', function () {
         $carry = [];
         foreach ($types as $type) {
             $post_type_object = get_post_type_object($type);
+
             if ($post_type_object->graphql_single_name) {
                 $tag = wp_gql_seo_get_field_key(
                     $post_type_object->graphql_single_name
@@ -162,13 +163,39 @@ add_action('graphql_init', function () {
                     ->schema;
 
                 $carry[$tag] = [
-                    'title' => $all['title-' . $tag],
-                    'metaDesc' => $all['metadesc-' . $tag],
-                    'metaRobotsNoindex' => $all['noindex-' . $tag],
-                    'schemaType' => $all['schema-page-type-' . $tag],
+                    'title' => $all['title-' . $type],
+                    'metaDesc' => $all['metadesc-' . $type],
+                    'metaRobotsNoindex' => $all['noindex-' . $type],
+                    'schemaType' => $all['schema-page-type-' . $type],
                     'schema' => [
                         'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                     ],
+                    'archive' =>
+                        $tag == 'post' //Posts are stored like this
+                            ? [
+                                'hasArchive' => true,
+                                'archiveLink' => get_post_type_archive_link($type),
+                                'title' => $all['title-archive-wpseo'],
+                                '' => $all['metadesc-archive-wpseo'],
+                                '' => $all['noindex-archive-wpseo'],
+                                'breadcrumbTitle' => $all['bctitle-archive-wpseo'],
+                            ]
+                            : [
+                                'hasArchive' => $post_type_object->has_archive,
+                                'archiveLink' => get_post_type_archive_link($type),
+                                'title' => $post_type_object->has_archive
+                                    ? $all['title-ptarchive-' . $type]
+                                    : null,
+                                'metaDesc' => $post_type_object->has_archive
+                                    ? $all['metadesc-ptarchive-' . $type]
+                                    : null,
+                                'metaRobotsNoindex' => $post_type_object->has_archive
+                                    ? $all['noindex-ptarchive-' . $type]
+                                    : null,
+                                'breadcrumbTitle' => $post_type_object->has_archive
+                                    ? $all['bctitle-ptarchive-' . $type]
+                                    : null,
+                            ],
                 ];
             }
         }
@@ -405,6 +432,20 @@ add_action('graphql_init', function () {
             ],
         ]);
 
+        register_graphql_object_type('SEOContentTypeArchive', [
+            'description' => __(
+                'he Yoast SEO search appearance content types fields',
+                'wp-graphql-yoast-seo'
+            ),
+            'fields' => [
+                'hasArchive' => ['type' => 'Boolean'],
+                'title' => ['type' => 'String'],
+                'archiveLink' => ['type' => 'String'],
+                'metaDesc' => ['type' => 'String'],
+                'metaRobotsNoindex' => ['type' => 'Boolean'],
+                'breadcrumbTitle' => ['type' => 'String'],
+            ],
+        ]);
         register_graphql_object_type('SEOContentType', [
             'description' => __(
                 'he Yoast SEO search appearance content types fields',
@@ -416,6 +457,7 @@ add_action('graphql_init', function () {
                 'metaRobotsNoindex' => ['type' => 'Boolean'],
                 'schemaType' => ['type' => 'String'],
                 'schema' => ['type' => 'SEOPageInfoSchema'],
+                'archive' => ['type' => 'SEOContentTypeArchive'],
             ],
         ]);
 
