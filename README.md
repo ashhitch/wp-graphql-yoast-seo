@@ -54,8 +54,8 @@ Image urls are now returned as `mediaItem` type.
 This applies to `twitterImage` and `opengraphImage`
 
 ## Usage with Gatsby
-Checkout the companion [Gatsby plugin](https://github.com/ashhitch/gatsby-plugin-wpgraphql-seo) to add in Metadata and JSON LD schema with ease.
 
+Checkout the companion [Gatsby plugin](https://github.com/ashhitch/gatsby-plugin-wpgraphql-seo) to add in Metadata and JSON LD schema with ease.
 
 ## Usage
 
@@ -107,6 +107,7 @@ query GetPages {
                         articleType
                         raw
                     }
+                    readingTime
                 }
                 author {
                     node {
@@ -331,6 +332,14 @@ query GetSeoConfig {
                 schema {
                     raw
                 }
+                archive {
+                    archiveLink
+                    breadcrumbTitle
+                    hasArchive
+                    metaDesc
+                    metaRobotsNoindex
+                    title
+                }
             }
             page {
                 metaDesc
@@ -352,12 +361,10 @@ query GetSeoConfig {
 }
 ```
 
-
 ## Support
 
 [Open an issue](https://github.com/ashhitch/wp-graphql-yoast-seo/issues)
 
 [Twitter: @ash_hitchcock](https://twitter.com/ash_hitchcock)
-
 
 > Please Note: Yoast and WPGraphQL and their logos are copyright to their respective owners.
