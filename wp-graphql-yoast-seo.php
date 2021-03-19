@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.11.0
+ * Version:         4.12.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -179,9 +179,14 @@ add_action('graphql_init', function () {
                                 '' => $all['metadesc-archive-wpseo'],
                                 '' => $all['noindex-archive-wpseo'],
                                 'breadcrumbTitle' => $all['bctitle-archive-wpseo'],
+                                'metaRobotsNoindex' => boolval(
+                                    $all['noindex-archive-wpseo']
+                                ),
                             ]
                             : [
-                                'hasArchive' => $post_type_object->has_archive,
+                                'hasArchive' => boolval(
+                                    $post_type_object->has_archive
+                                ),
                                 'archiveLink' => get_post_type_archive_link($type),
                                 'title' => $post_type_object->has_archive
                                     ? $all['title-ptarchive-' . $type]
@@ -190,8 +195,8 @@ add_action('graphql_init', function () {
                                     ? $all['metadesc-ptarchive-' . $type]
                                     : null,
                                 'metaRobotsNoindex' => $post_type_object->has_archive
-                                    ? $all['noindex-ptarchive-' . $type]
-                                    : null,
+                                    ? boolval($all['noindex-ptarchive-' . $type])
+                                    : false,
                                 'breadcrumbTitle' => $post_type_object->has_archive
                                     ? $all['bctitle-ptarchive-' . $type]
                                     : null,
