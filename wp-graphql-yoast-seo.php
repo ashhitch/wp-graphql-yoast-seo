@@ -163,12 +163,22 @@ add_action('graphql_init', function () {
                     ->schema;
 
                 $carry[$tag] = [
-                    'title' => $all['title-' . $type],
-                    'metaDesc' => $all['metadesc-' . $type],
-                    'metaRobotsNoindex' => $all['noindex-' . $type],
-                    'schemaType' => $all['schema-page-type-' . $type],
+                    'title' => !empty($all['title-' . $type])
+                        ? $all['title-' . $type]
+                        : null,
+                    'metaDesc' => !empty($all['metadesc-' . $type])
+                        ? $all['metadesc-' . $type]
+                        : null,
+                    'metaRobotsNoindex' => !empty($all['noindex-' . $type])
+                        ? boolval($all['noindex-' . $type])
+                        : false,
+                    'schemaType' => !empty($all['schema-page-type-' . $type])
+                        ? $all['schema-page-type-' . $type]
+                        : null,
                     'schema' => [
-                        'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                        'raw' => !empty($schemaArray)
+                            ? json_encode($schemaArray, JSON_UNESCAPED_SLASHES)
+                            : null,
                     ],
                     'archive' =>
                         $tag == 'post' //Posts are stored like this
@@ -188,16 +198,22 @@ add_action('graphql_init', function () {
                                     $post_type_object->has_archive
                                 ),
                                 'archiveLink' => get_post_type_archive_link($type),
-                                'title' => $post_type_object->has_archive
+                                'title' => !empty($all['title-ptarchive-' . $type])
                                     ? $all['title-ptarchive-' . $type]
                                     : null,
-                                'metaDesc' => $post_type_object->has_archive
+                                'metaDesc' => !empty(
+                                    $all['metadesc-ptarchive-' . $type]
+                                )
                                     ? $all['metadesc-ptarchive-' . $type]
                                     : null,
-                                'metaRobotsNoindex' => $post_type_object->has_archive
+                                'metaRobotsNoindex' => !empty(
+                                    $all['noindex-ptarchive-' . $type]
+                                )
                                     ? boolval($all['noindex-ptarchive-' . $type])
                                     : false,
-                                'breadcrumbTitle' => $post_type_object->has_archive
+                                'breadcrumbTitle' => !empty(
+                                    $all['bctitle-ptarchive-' . $type]
+                                )
                                     ? $all['bctitle-ptarchive-' . $type]
                                     : null,
                             ],
@@ -932,7 +948,10 @@ add_action('graphql_init', function () {
                     );
 
                     foreach ($taxonomiesPostObj as $tax) {
-                        if ($tax->hierarchical && $tax->graphql_single_name) {
+                        if (
+                            isset($tax->hierarchical) &&
+                            isset($tax->graphql_single_name)
+                        ) {
                             $name =
                                 ucfirst($postNameKey) .
                                 'To' .
