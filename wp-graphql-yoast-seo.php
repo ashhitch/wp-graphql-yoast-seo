@@ -175,6 +175,7 @@ add_action('graphql_init', function () {
                     'schemaType' => !empty($all['schema-page-type-' . $type])
                         ? $all['schema-page-type-' . $type]
                         : null,
+
                     'schema' => [
                         'raw' => !empty($schemaArray)
                             ? json_encode($schemaArray, JSON_UNESCAPED_SLASHES)
@@ -192,6 +193,9 @@ add_action('graphql_init', function () {
                                 'metaRobotsNoindex' => boolval(
                                     $all['noindex-archive-wpseo']
                                 ),
+                                'fullHead' => YoastSEO()
+                                    ->meta->for_post_type_archive($type)
+                                    ->get_head(),
                             ]
                             : [
                                 'hasArchive' => boolval(
@@ -216,6 +220,9 @@ add_action('graphql_init', function () {
                                 )
                                     ? $all['bctitle-ptarchive-' . $type]
                                     : null,
+                                'fullHead' => YoastSEO()
+                                    ->meta->for_post_type_archive($type)
+                                    ->get_head(),
                             ],
                 ];
             }
@@ -286,6 +293,7 @@ add_action('graphql_init', function () {
             'canonical' => ['type' => 'String'],
             'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
             'cornerstone' => ['type' => 'Boolean'],
+            'fullHead' => ['type' => 'String'],
         ];
 
         register_graphql_object_type('TaxonomySEO', [
@@ -465,6 +473,7 @@ add_action('graphql_init', function () {
                 'metaDesc' => ['type' => 'String'],
                 'metaRobotsNoindex' => ['type' => 'Boolean'],
                 'breadcrumbTitle' => ['type' => 'String'],
+                'fullHead' => ['type' => 'String'],
             ],
         ]);
         register_graphql_object_type('SEOContentType', [
@@ -539,6 +548,7 @@ add_action('graphql_init', function () {
                 'metaDesc' => ['type' => 'String'],
                 'metaRobotsNoindex' => ['type' => 'String'],
                 'metaRobotsNofollow' => ['type' => 'String'],
+                'fullHead' => ['type' => 'String'],
                 'social' => ['type' => 'SEOUserSocial'],
                 'schema' => ['type' => 'SEOUserSchema'],
             ],
@@ -725,6 +735,7 @@ add_action('graphql_init', function () {
             },
         ]);
 
+        // Post Type SEO Data
         if (!empty($post_types) && is_array($post_types)) {
             foreach ($post_types as $post_type) {
                 $post_type_object = get_post_type_object($post_type);
@@ -876,6 +887,9 @@ add_action('graphql_init', function () {
                                         YoastSEO()->meta->for_post($post->ID)
                                             ->indexable->is_cornerstone
                                     ),
+                                    'fullHead' => YoastSEO()
+                                        ->meta->for_post($post->ID)
+                                        ->get_head(),
                                     'schema' => [
                                         'pageType' => is_array(
                                             YoastSEO()->meta->for_post($post->ID)
@@ -986,7 +1000,7 @@ add_action('graphql_init', function () {
                 endif;
             }
         }
-
+        // User SEO Data
         register_graphql_field('User', 'seo', [
             'type' => 'SEOUser',
             'description' => __(
@@ -1007,7 +1021,9 @@ add_action('graphql_init', function () {
                     ),
                     'metaRobotsNoindex' => $robots['index'],
                     'metaRobotsNofollow' => $robots['follow'],
-
+                    'fullHead' => YoastSEO()
+                        ->meta->for_author($user->userId)
+                        ->get_head(),
                     'social' => [
                         'facebook' => wp_gql_seo_format_string(
                             get_the_author_meta('facebook', $user->userId)
@@ -1037,6 +1053,7 @@ add_action('graphql_init', function () {
                             get_the_author_meta('wikipedia', $user->userId)
                         ),
                     ],
+
                     'schema' => [
                         'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                     ],
@@ -1046,6 +1063,7 @@ add_action('graphql_init', function () {
             },
         ]);
 
+        // Taxonomy SEO Data
         if (!empty($taxonomies) && is_array($taxonomies)) {
             foreach ($taxonomies as $tax) {
                 $taxonomy = get_taxonomy($tax);
@@ -1164,6 +1182,9 @@ add_action('graphql_init', function () {
                                 YoastSEO()->meta->for_term($term->term_id)
                                     ->is_cornerstone
                             ),
+                            'fullHead' => YoastSEO()
+                                ->meta->for_term($term->term_id)
+                                ->get_head(),
                             'schema' => [
                                 'raw' => json_encode(
                                     $schemaArray,

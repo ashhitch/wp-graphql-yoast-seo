@@ -108,6 +108,7 @@ query GetPages {
                         raw
                     }
                     readingTime
+                    fullHead
                 }
                 author {
                     node {
@@ -145,6 +146,7 @@ query GetCategories {
             node {
                 id
                 seo {
+                    fullHead
                     canonical
                     title
                     metaDesc
@@ -190,6 +192,7 @@ query GetUsers {
                 metaRobotsNofollow
                 metaRobotsNoindex
                 title
+                fullHead
                 social {
                     youTube
                     wikipedia
@@ -332,7 +335,9 @@ query GetSeoConfig {
                 schema {
                     raw
                 }
+
                 archive {
+                    fullHead
                     archiveLink
                     breadcrumbTitle
                     hasArchive
