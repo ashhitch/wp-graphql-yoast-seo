@@ -57,7 +57,7 @@ add_action('graphql_init', function () {
     if (!function_exists('wp_gql_seo_format_string')) {
         function wp_gql_seo_format_string($string)
         {
-            return isset($string) ? trim($string) : null;
+            return isset($string) ? html_entity_decode(trim($string)) : null;
         }
     }
     if (!function_exists('wp_gql_seo_get_og_image')) {
