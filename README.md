@@ -43,6 +43,10 @@ This is an extension to the WPGraphQL plugin (https://github.com/wp-graphql/wp-g
 composer require ashhitch/wp-graphql-yoast-seo
 ```
 
+## Find this useful?
+
+<a href="https://www.buymeacoffee.com/hafowuvo" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 40px !important;width: auto !important;" ></a>
+
 ## V4 breaking change
 
 Plugin now requires at least Yoast 14.0.0
