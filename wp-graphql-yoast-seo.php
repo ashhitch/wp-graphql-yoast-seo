@@ -707,7 +707,7 @@ add_action('graphql_init', function () {
                         'wordpressSiteName' => wp_gql_seo_format_string(
                             get_bloginfo('name')
                         ),
-                        'siteUrl' => wp_gql_seo_format_string(get_site_url()),
+                        'siteUrl' => wp_gql_seo_format_string(apply_filters('wp_gql_seo_site_url', get_site_url())),
                         'inLanguage' => wp_gql_seo_format_string(
                             get_bloginfo('language')
                         ),
