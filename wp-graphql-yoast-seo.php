@@ -195,7 +195,7 @@ add_action('graphql_init', function () {
                                 ),
                                 'fullHead' => YoastSEO()
                                     ->meta->for_post_type_archive($type)
-                                    ->get_head(),
+                                    ->get_head()->html,
                             ]
                             : [
                                 'hasArchive' => boolval(
@@ -222,7 +222,7 @@ add_action('graphql_init', function () {
                                     : null,
                                 'fullHead' => YoastSEO()
                                     ->meta->for_post_type_archive($type)
-                                    ->get_head(),
+                                    ->get_head()->html,
                             ],
                 ];
             }
@@ -891,7 +891,7 @@ add_action('graphql_init', function () {
                                     ),
                                     'fullHead' => YoastSEO()
                                         ->meta->for_post($post->ID)
-                                        ->get_head(),
+                                        ->get_head()->html,
                                     'schema' => [
                                         'pageType' => is_array(
                                             YoastSEO()->meta->for_post($post->ID)
@@ -1025,7 +1025,7 @@ add_action('graphql_init', function () {
                     'metaRobotsNofollow' => $robots['follow'],
                     'fullHead' => YoastSEO()
                         ->meta->for_author($user->userId)
-                        ->get_head(),
+                        ->get_head()->html,
                     'social' => [
                         'facebook' => wp_gql_seo_format_string(
                             get_the_author_meta('facebook', $user->userId)
@@ -1188,7 +1188,7 @@ add_action('graphql_init', function () {
                             ),
                             'fullHead' => YoastSEO()
                                 ->meta->for_term($term->term_id)
-                                ->get_head(),
+                                ->get_head()->html,
                             'schema' => [
                                 'raw' => json_encode(
                                     $schemaArray,
