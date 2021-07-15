@@ -193,9 +193,17 @@ add_action('graphql_init', function () {
                                 'metaRobotsNoindex' => boolval(
                                     $all['noindex-archive-wpseo']
                                 ),
-                                'fullHead' => YoastSEO()
-                                    ->meta->for_post_type_archive($type)
-                                    ->get_head(),
+                                'fullHead' => is_string(
+                                    YoastSEO()
+                                        ->meta->for_post_type_archive($type)
+                                        ->get_head()
+                                )
+                                    ? YoastSEO()
+                                        ->meta->for_post_type_archive($type)
+                                        ->get_head()
+                                    : YoastSEO()
+                                        ->meta->for_post_type_archive($type)
+                                        ->get_head()->html,
                             ]
                             : [
                                 'hasArchive' => boolval(
@@ -220,9 +228,17 @@ add_action('graphql_init', function () {
                                 )
                                     ? $all['bctitle-ptarchive-' . $type]
                                     : null,
-                                'fullHead' => YoastSEO()
-                                    ->meta->for_post_type_archive($type)
-                                    ->get_head(),
+                                'fullHead' => is_string(
+                                    YoastSEO()
+                                        ->meta->for_post_type_archive($type)
+                                        ->get_head()
+                                )
+                                    ? YoastSEO()
+                                        ->meta->for_post_type_archive($type)
+                                        ->get_head()
+                                    : YoastSEO()
+                                        ->meta->for_post_type_archive($type)
+                                        ->get_head()->html,
                             ],
                 ];
             }
@@ -889,9 +905,17 @@ add_action('graphql_init', function () {
                                         YoastSEO()->meta->for_post($post->ID)
                                             ->indexable->is_cornerstone
                                     ),
-                                    'fullHead' => YoastSEO()
-                                        ->meta->for_post($post->ID)
-                                        ->get_head(),
+                                    'fullHead' => is_string(
+                                        YoastSEO()
+                                            ->meta->for_post($post->ID)
+                                            ->get_head()
+                                    )
+                                        ? YoastSEO()
+                                            ->meta->for_post($post->ID)
+                                            ->get_head()
+                                        : YoastSEO()
+                                            ->meta->for_post($post->ID)
+                                            ->get_head()->html,
                                     'schema' => [
                                         'pageType' => is_array(
                                             YoastSEO()->meta->for_post($post->ID)
@@ -1023,9 +1047,17 @@ add_action('graphql_init', function () {
                     ),
                     'metaRobotsNoindex' => $robots['index'],
                     'metaRobotsNofollow' => $robots['follow'],
-                    'fullHead' => YoastSEO()
-                        ->meta->for_author($user->userId)
-                        ->get_head(),
+                    'fullHead' => is_string(
+                        YoastSEO()
+                            ->meta->for_author($user->userId)
+                            ->get_head()
+                    )
+                        ? YoastSEO()
+                            ->meta->for_author($user->userId)
+                            ->get_head()
+                        : YoastSEO()
+                            ->meta->for_author($user->userId)
+                            ->get_head()->html,
                     'social' => [
                         'facebook' => wp_gql_seo_format_string(
                             get_the_author_meta('facebook', $user->userId)
@@ -1186,9 +1218,17 @@ add_action('graphql_init', function () {
                                 YoastSEO()->meta->for_term($term->term_id)
                                     ->is_cornerstone
                             ),
-                            'fullHead' => YoastSEO()
-                                ->meta->for_term($term->term_id)
-                                ->get_head(),
+                            'fullHead' => is_string(
+                                YoastSEO()
+                                    ->meta->for_term($term->term_id)
+                                    ->get_head()
+                            )
+                                ? YoastSEO()
+                                    ->meta->for_term($term->term_id)
+                                    ->get_head()
+                                : YoastSEO()
+                                    ->meta->for_term($term->term_id)
+                                    ->get_head()->html,
                             'schema' => [
                                 'raw' => json_encode(
                                     $schemaArray,
