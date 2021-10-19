@@ -566,6 +566,14 @@ add_action('graphql_init', function () {
                 'metaDesc' => ['type' => 'String'],
                 'metaRobotsNoindex' => ['type' => 'String'],
                 'metaRobotsNofollow' => ['type' => 'String'],
+                'canonical' => ['type' => 'String'],
+                'opengraphTitle' => ['type' => 'String'],
+                'opengraphDescription' => ['type' => 'String'],
+                'twitterTitle' => ['type' => 'String'],
+                'twitterDescription' => ['type' => 'String'],
+                'language' => ['type' => 'String'],
+                'region' => ['type' => 'String'],
+                'breadcrumbTitle' => ['type' => 'String'],
                 'fullHead' => ['type' => 'String'],
                 'social' => ['type' => 'SEOUserSocial'],
                 'schema' => ['type' => 'SEOUserSchema'],
@@ -1049,6 +1057,23 @@ add_action('graphql_init', function () {
                     ),
                     'metaRobotsNoindex' => $robots['index'],
                     'metaRobotsNofollow' => $robots['follow'],
+                    'canonical' => YoastSEO()->meta->for_author($user->userId)
+                        ->canonical,
+                    'opengraphTitle' => YoastSEO()->meta->for_author($user->userId)
+                        ->open_graph_title,
+                    'opengraphDescription' => YoastSEO()->meta->for_author(
+                        $user->userId
+                    )->open_graph_description,
+                    'twitterTitle' => YoastSEO()->meta->for_author($user->userId)
+                        ->twitter_title,
+                    'twitterDescription' => YoastSEO()->meta->for_author(
+                        $user->userId
+                    )->twitter_description,
+                    'language' => YoastSEO()->meta->for_author($user->userId)
+                        ->language,
+                    'region' => YoastSEO()->meta->for_author($user->userId)->region,
+                    'breadcrumbTitle' => YoastSEO()->meta->for_author($user->userId)
+                        ->breadcrumb_title,
                     'fullHead' => is_string(
                         YoastSEO()
                             ->meta->for_author($user->userId)
