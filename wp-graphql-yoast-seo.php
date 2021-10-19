@@ -569,6 +569,8 @@ add_action('graphql_init', function () {
                 'canonical' => ['type' => 'String'],
                 'opengraphTitle' => ['type' => 'String'],
                 'opengraphDescription' => ['type' => 'String'],
+                'opengraphImage' => ['type' => 'MediaItem'],
+                'twitterImage' => ['type' => 'MediaItem'],
                 'twitterTitle' => ['type' => 'String'],
                 'twitterDescription' => ['type' => 'String'],
                 'language' => ['type' => 'String'],
@@ -1064,6 +1066,22 @@ add_action('graphql_init', function () {
                     'opengraphDescription' => YoastSEO()->meta->for_author(
                         $user->userId
                     )->open_graph_description,
+                    'opengraphImage' => $context
+                        ->get_loader('post')
+                        ->load_deferred(
+                            absint(
+                                YoastSEO()->meta->for_author($user->userId)
+                                    ->open_graph_image_id
+                            )
+                        ),
+                    'twitterImage' => $context
+                        ->get_loader('post')
+                        ->load_deferred(
+                            absint(
+                                YoastSEO()->meta->for_author($user->userId)
+                                    ->twitter_image_id
+                            )
+                        ),
                     'twitterTitle' => YoastSEO()->meta->for_author($user->userId)
                         ->twitter_title,
                     'twitterDescription' => YoastSEO()->meta->for_author(
