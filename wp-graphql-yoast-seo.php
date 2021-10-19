@@ -516,6 +516,19 @@ add_action('graphql_init', function () {
             ),
             'fields' => $allTypes,
         ]);
+        register_graphql_object_type('SEOArchivesTypes', [
+            'description' => __(
+                'The Yoast SEO search appearance Archive types',
+                'wp-graphql-yoast-seo'
+            ),
+            'fields' => [
+                'showArchives' => ['type' => 'Boolean'],
+                'showInSearchResults' => ['type' => 'Boolean'],
+                'showWithoutPostsInSearchResults' => ['type' => 'Boolean'],
+                'title' => ['type' => 'String'],
+                'description' => ['type' => 'String'],
+            ],
+        ]);
 
         register_graphql_object_type('SEOConfig', [
             'description' => __(
@@ -534,6 +547,7 @@ add_action('graphql_init', function () {
                 ],
                 'openGraph' => ['type' => 'SEOOpenGraph'],
                 'contentTypes' => ['type' => 'SEOContentTypes'],
+                'archives' => ['type' => 'SEOArchivesTypes'],
             ],
         ]);
 
