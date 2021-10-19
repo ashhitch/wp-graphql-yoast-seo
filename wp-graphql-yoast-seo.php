@@ -555,8 +555,8 @@ add_action('graphql_init', function () {
             'description' => __('The Schema types for User', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'raw' => ['type' => 'String'],
-                'schemaPageType' => ['type' => 'String'],
-                'schemaArticleType' => ['type' => 'String'],
+                'pageType' => ['type' => ['list_of' => 'String']],
+                'articleType' => ['type' => ['list_of' => 'String']],
             ],
         ]);
 
@@ -1135,12 +1135,20 @@ add_action('graphql_init', function () {
 
                     'schema' => [
                         'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-                        'schemaPageType' => YoastSEO()->meta->for_author(
-                            $user->userId
-                        )->schema_page_type,
-                        'schemaArticleType' => YoastSEO()->meta->for_author(
-                            $user->userId
-                        )->schema_article_type,
+                        'pageType' => is_array(
+                            YoastSEO()->meta->for_author($user->userId)
+                                ->schema_page_type
+                        )
+                            ? YoastSEO()->meta->for_author($user->userId)
+                                ->schema_page_type
+                            : [],
+                        'articleType' => is_array(
+                            YoastSEO()->meta->for_author($user->userId)
+                                ->schema_article_type
+                        )
+                            ? YoastSEO()->meta->for_author($user->userId)
+                                ->schema_article_type
+                            : [],
                     ],
                 ];
 
