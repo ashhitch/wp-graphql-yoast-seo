@@ -555,6 +555,8 @@ add_action('graphql_init', function () {
             'description' => __('The Schema types for User', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'raw' => ['type' => 'String'],
+                'pageType' => ['type' => ['list_of' => 'String']],
+                'articleType' => ['type' => ['list_of' => 'String']],
             ],
         ]);
 
@@ -564,6 +566,16 @@ add_action('graphql_init', function () {
                 'metaDesc' => ['type' => 'String'],
                 'metaRobotsNoindex' => ['type' => 'String'],
                 'metaRobotsNofollow' => ['type' => 'String'],
+                'canonical' => ['type' => 'String'],
+                'opengraphTitle' => ['type' => 'String'],
+                'opengraphDescription' => ['type' => 'String'],
+                'opengraphImage' => ['type' => 'MediaItem'],
+                'twitterImage' => ['type' => 'MediaItem'],
+                'twitterTitle' => ['type' => 'String'],
+                'twitterDescription' => ['type' => 'String'],
+                'language' => ['type' => 'String'],
+                'region' => ['type' => 'String'],
+                'breadcrumbTitle' => ['type' => 'String'],
                 'fullHead' => ['type' => 'String'],
                 'social' => ['type' => 'SEOUserSocial'],
                 'schema' => ['type' => 'SEOUserSchema'],
@@ -1047,6 +1059,39 @@ add_action('graphql_init', function () {
                     ),
                     'metaRobotsNoindex' => $robots['index'],
                     'metaRobotsNofollow' => $robots['follow'],
+                    'canonical' => YoastSEO()->meta->for_author($user->userId)
+                        ->canonical,
+                    'opengraphTitle' => YoastSEO()->meta->for_author($user->userId)
+                        ->open_graph_title,
+                    'opengraphDescription' => YoastSEO()->meta->for_author(
+                        $user->userId
+                    )->open_graph_description,
+                    'opengraphImage' => $context
+                        ->get_loader('post')
+                        ->load_deferred(
+                            absint(
+                                YoastSEO()->meta->for_author($user->userId)
+                                    ->open_graph_image_id
+                            )
+                        ),
+                    'twitterImage' => $context
+                        ->get_loader('post')
+                        ->load_deferred(
+                            absint(
+                                YoastSEO()->meta->for_author($user->userId)
+                                    ->twitter_image_id
+                            )
+                        ),
+                    'twitterTitle' => YoastSEO()->meta->for_author($user->userId)
+                        ->twitter_title,
+                    'twitterDescription' => YoastSEO()->meta->for_author(
+                        $user->userId
+                    )->twitter_description,
+                    'language' => YoastSEO()->meta->for_author($user->userId)
+                        ->language,
+                    'region' => YoastSEO()->meta->for_author($user->userId)->region,
+                    'breadcrumbTitle' => YoastSEO()->meta->for_author($user->userId)
+                        ->breadcrumb_title,
                     'fullHead' => is_string(
                         YoastSEO()
                             ->meta->for_author($user->userId)
@@ -1090,6 +1135,20 @@ add_action('graphql_init', function () {
 
                     'schema' => [
                         'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                        'pageType' => is_array(
+                            YoastSEO()->meta->for_author($user->userId)
+                                ->schema_page_type
+                        )
+                            ? YoastSEO()->meta->for_author($user->userId)
+                                ->schema_page_type
+                            : [],
+                        'articleType' => is_array(
+                            YoastSEO()->meta->for_author($user->userId)
+                                ->schema_article_type
+                        )
+                            ? YoastSEO()->meta->for_author($user->userId)
+                                ->schema_article_type
+                            : [],
                     ],
                 ];
 
