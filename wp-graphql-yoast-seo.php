@@ -344,6 +344,7 @@ add_action('graphql_init', function () {
                 'siteName' => ['type' => 'String'],
                 'wordpressSiteName' => ['type' => 'String'],
                 'siteUrl' => ['type' => 'String'],
+                'homeUrl' => ['type' => 'String'],
                 'inLanguage' => ['type' => 'String'],
             ],
         ]);
@@ -737,6 +738,9 @@ add_action('graphql_init', function () {
                         ),
                         'siteUrl' => wp_gql_seo_format_string(
                             apply_filters('wp_gql_seo_site_url', get_site_url())
+                        ),
+                        'homeUrl' => wp_gql_seo_format_string(
+                            apply_filters('wp_gql_seo_home_url', get_home_url())
                         ),
                         'inLanguage' => wp_gql_seo_format_string(
                             get_bloginfo('language')
