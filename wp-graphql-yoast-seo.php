@@ -148,6 +148,21 @@ add_action('graphql_init', function () {
         return $carry;
     }
 
+    /**
+     * @param \Yoast\WP\SEO\Surfaces\Values\Meta|bool $metaForPost
+     * @return string
+     */
+    function wp_gql_seo_get_full_head($metaForPost)
+    {
+        if ($metaForPost !== false) {
+            $head = $metaForPost->get_head();
+
+            return is_string($head) ? $head : $head->html;
+        }
+
+        return '';
+    }
+
     function wp_gql_seo_build_content_type_data($types, $all)
     {
         $carry = [];
@@ -799,22 +814,20 @@ add_action('graphql_init', function () {
                                     '@graph' => 'graph',
                                     '@context' => 'context',
                                 ];
+                                $meta = YoastSEO()->meta->for_post($post->ID);
 
-                                $schemaArray = YoastSEO()->meta->for_post($post->ID)
-                                    ->schema;
+                                $schemaArray = $meta !== false ? $meta->schema : [];
 
                                 // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
-                                $robots = YoastSEO()->meta->for_post($post->ID)
-                                    ->robots;
+                                $robots = $meta !== false ? $meta->robots : [];
 
                                 // Get data
                                 $seo = [
                                     'title' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)->title
+                                        $meta !== false ? $meta->title : ''
                                     ),
                                     'metaDesc' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->description
+                                        $meta !== false ? $meta->description : ''
                                     ),
                                     'focuskw' => wp_gql_seo_format_string(
                                         get_post_meta(
@@ -833,48 +846,39 @@ add_action('graphql_init', function () {
                                     'metaRobotsNoindex' => $robots['index'],
                                     'metaRobotsNofollow' => $robots['follow'],
                                     'opengraphTitle' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_title
+                                        $meta !== false ? $meta->open_graph_title : ''
                                     ),
                                     'opengraphUrl' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_url
+                                        $meta !== false ? $meta->open_graph_url : ''
                                     ),
                                     'opengraphSiteName' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_site_name
+                                        $meta !== false ? $meta->open_graph_site_name : ''
                                     ),
                                     'opengraphType' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_type
+                                        $meta !== false ? $meta->open_graph_type : ''
                                     ),
                                     'opengraphAuthor' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_article_author
+                                        $meta !== false ? $meta->open_graph_article_author : ''
                                     ),
                                     'opengraphPublisher' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_article_publisher
+                                        $meta !== false ? $meta->open_graph_article_publisher : ''
                                     ),
                                     'opengraphPublishedTime' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_article_published_time
+                                        $meta !== false ? $meta->open_graph_article_published_time : ''
                                     ),
                                     'opengraphModifiedTime' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_article_modified_time
+                                        $meta !== false ? $meta->open_graph_article_modified_time : ''
                                     ),
                                     'opengraphDescription' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->open_graph_description
+                                        $meta !== false ? $meta->open_graph_description : ''
                                     ),
                                     'opengraphImage' => function () use (
                                         $post,
-                                        $context
+                                        $context,
+                                        $meta
                                     ) {
                                         $id = wp_gql_seo_get_og_image(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->open_graph_images
+                                            $meta !== false ? $meta->open_graph_images : []
                                         );
 
                                         return $context
@@ -882,24 +886,21 @@ add_action('graphql_init', function () {
                                             ->load_deferred(absint($id));
                                     },
                                     'twitterCardType' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->twitter_card
+                                        $meta !== false ? $meta->twitter_card : ''
                                     ),
                                     'twitterTitle' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->twitter_title
+                                        $meta !== false ? $meta->twitter_title : ''
                                     ),
                                     'twitterDescription' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->twitter_description
+                                        $meta !== false ? $meta->twitter_description : ''
                                     ),
                                     'twitterImage' => function () use (
                                         $post,
-                                        $context
+                                        $context,
+                                        $meta
                                     ) {
                                         $id = wpcom_vip_attachment_url_to_postid(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->twitter_image
+                                            $meta !== false ? $meta->twitter_image : ''
                                         );
 
                                         return $context
@@ -907,45 +908,23 @@ add_action('graphql_init', function () {
                                             ->load_deferred(absint($id));
                                     },
                                     'canonical' => wp_gql_seo_format_string(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->canonical
+                                        $meta !== false ? $meta->canonical : ''
                                     ),
                                     'readingTime' => floatval(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->estimated_reading_time_minutes
+                                        $meta !== false ? $meta->estimated_reading_time_minutes : ''
                                     ),
-                                    'breadcrumbs' => YoastSEO()->meta->for_post(
-                                        $post->ID
-                                    )->breadcrumbs,
+                                    'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
+                                    // TODO: Default should be true or false?
                                     'cornerstone' => boolval(
-                                        YoastSEO()->meta->for_post($post->ID)
-                                            ->indexable->is_cornerstone
+                                        $meta !== false ? $meta->indexable->is_cornerstone : false,
                                     ),
-                                    'fullHead' => is_string(
-                                        YoastSEO()
-                                            ->meta->for_post($post->ID)
-                                            ->get_head()
-                                    )
-                                        ? YoastSEO()
-                                            ->meta->for_post($post->ID)
-                                            ->get_head()
-                                        : YoastSEO()
-                                            ->meta->for_post($post->ID)
-                                            ->get_head()->html,
+                                    'fullHead' => wp_gql_seo_get_full_head($meta),
                                     'schema' => [
-                                        'pageType' => is_array(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->schema_page_type
-                                        )
-                                            ? YoastSEO()->meta->for_post($post->ID)
-                                                ->schema_page_type
+                                        'pageType' => $meta !== false && is_array($meta->schema_page_type)
+                                            ? $meta->schema_page_type
                                             : [],
-                                        'articleType' => is_array(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->schema_article_type
-                                        )
-                                            ? YoastSEO()->meta->for_post($post->ID)
-                                                ->schema_article_type
+                                        'articleType' => $meta !== false && is_array($meta->schema_article_type)
+                                            ? $meta->schema_article_type
                                             : [],
                                         'raw' => json_encode(
                                             $schemaArray,
