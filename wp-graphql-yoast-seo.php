@@ -843,8 +843,8 @@ add_action('graphql_init', function () {
                                             true
                                         )
                                     ),
-                                    'metaRobotsNoindex' => $robots['index'],
-                                    'metaRobotsNofollow' => $robots['follow'],
+                                    'metaRobotsNoindex' => $robots['index'] ?? '',
+                                    'metaRobotsNofollow' => $robots['follow'] ?? '',
                                     'opengraphTitle' => wp_gql_seo_format_string(
                                         $meta !== false ? $meta->open_graph_title : ''
                                     ),
