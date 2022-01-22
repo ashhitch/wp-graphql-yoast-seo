@@ -186,10 +186,22 @@ add_action('graphql_init', function () {
                             ? [
                                 'hasArchive' => true,
                                 'archiveLink' => get_post_type_archive_link($type),
-                                'title' => $all['title-archive-wpseo'],
-                                '' => $all['metadesc-archive-wpseo'],
-                                '' => $all['noindex-archive-wpseo'],
-                                'breadcrumbTitle' => $all['bctitle-archive-wpseo'],
+                                'title' => isset($all['title-archive-wpseo'])
+                                    ? $all['title-archive-wpseo']
+                                    : null,
+                                'metaDesc' => isset($all['metadesc-archive-wpseo'])
+                                    ? $all['metadesc-archive-wpseo']
+                                    : null,
+                                'metaRobotsNoindex' => isset(
+                                    $all['noindex-archive-wpseo']
+                                )
+                                    ? $all['noindex-archive-wpseo']
+                                    : null,
+                                'breadcrumbTitle' => isset(
+                                    $all['bctitle-archive-wpseo']
+                                )
+                                    ? $all['bctitle-archive-wpseo']
+                                    : null,
                                 'metaRobotsNoindex' => boolval(
                                     $all['noindex-archive-wpseo']
                                 ),
