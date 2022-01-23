@@ -186,18 +186,18 @@ add_action('graphql_init', function () {
                             ? [
                                 'hasArchive' => true,
                                 'archiveLink' => get_post_type_archive_link($type),
-                                'title' => isset($all['title-archive-wpseo'])
+                                'title' => !empty($all['title-archive-wpseo'])
                                     ? $all['title-archive-wpseo']
                                     : null,
-                                'metaDesc' => isset($all['metadesc-archive-wpseo'])
+                                'metaDesc' => !empty($all['metadesc-archive-wpseo'])
                                     ? $all['metadesc-archive-wpseo']
                                     : null,
-                                'metaRobotsNoindex' => isset(
+                                'metaRobotsNoindex' => !empty(
                                     $all['noindex-archive-wpseo']
                                 )
                                     ? $all['noindex-archive-wpseo']
                                     : null,
-                                'breadcrumbTitle' => isset(
+                                'breadcrumbTitle' => !empty(
                                     $all['bctitle-archive-wpseo']
                                 )
                                     ? $all['bctitle-archive-wpseo']
@@ -622,8 +622,10 @@ add_action('graphql_init', function () {
                     : false;
                 $redirects = $redirectsObj ? $redirectsObj->get_from_option() : [];
 
-                $userID = $all['company_or_person_user_id'];
-                $user = get_userdata($userID);
+                $userID = !empty($all['company_or_person_user_id'])
+                    ? $all['company_or_person_user_id']
+                    : null;
+                $user = !empty($userID) ? get_userdata($userID) : null;
 
                 $mappedRedirects = function ($value) {
                     return [
