@@ -1,24 +1,61 @@
 {
-    "name": "ashhitch/wp-graphql-yoast-seo",
-    "description": "Query Yoast SEO data with wp-graphql",
-    "type": "wordpress-plugin",
-    "license": "GPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Ash Hitchcock",
-            "email": "hello@ashleyhitchcock.co.uk"
-        }
-    ],
-    "suggest": {
-        "wp-graphql/wp-graphql": "Required to return data via GraphQl",
-        "yoast/wordpress-seo": "Required to provide SEO data to this plugin"
-    },
-    "require-dev": {
-        "automattic/vipwpcs": "^2.2",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.0",
-        "squizlabs/php_codesniffer": "^3.5"
-    },
-    "require": {
-        "phpcompatibility/phpcompatibility-wp": "^2.1"
-    }
+	"name": "ashhitch/wp-graphql-yoast-seo",
+	"description": "Query Yoast SEO data with wp-graphql",
+	"type": "wordpress-plugin",
+	"license": "GPL-3.0-or-later",
+	"authors": [
+		{
+			"name": "Ash Hitchcock",
+			"email": "hello@ashleyhitchcock.co.uk"
+		}
+	],
+	"suggest": {
+		"wp-graphql/wp-graphql": "Required to return data via GraphQl",
+		"yoast/wordpress-seo": "Required to provide SEO data to this plugin"
+	},
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"automattic/vipwpcs": "^2.3",
+		"dealerdirect/phpcodesniffer-composer-installer": "^0.7",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpstan/extension-installer": "^1.1",
+		"phpstan/phpstan": "^1.2",
+		"poolshark/wp-graphql-stubs": "^0.0.2",
+		"squizlabs/php_codesniffer": "^3.6",
+		"szepeviktor/phpstan-wordpress": "^1.0",
+		"wp-coding-standards/wpcs": "^2.3"
+	},
+	"config": {
+		"optimize-autoloader": true,
+		"process-timeout": 0,
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true,
+			"phpstan/extension-installer": true
+		}
+	},
+	"autoload": {
+		"files": [
+			"access-functions.php"
+		],
+		"psr-4": {
+			"WPGraphQL\\YoastSEO\\": "src/"
+		}
+	},
+	"scripts": {
+		"lint": "vendor/bin/phpcs",
+		"phpcs-i": [
+			"php ./vendor/bin/phpcs -i"
+		],
+		"check-cs": [
+			"php ./vendor/bin/phpcs src"
+		],
+		"fix-cs": [
+			"php ./vendor/bin/phpcbf src"
+		],
+		"phpstan": [
+			"phpstan analyze --ansi --memory-limit=1G"
+		]
+	}
 }
