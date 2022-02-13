@@ -1,29 +1,63 @@
 <?xml version="1.0"?>
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Coding Standards" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+<ruleset name="WordPress Coding Standards based custom ruleset for your plugin">
 	<description>Coding standards for the WPGraphQL Yoast SEO plugin</description>
-
+	<!-- What to scan -->
 	<file>.</file>
 	<!-- Exclude Composer vendor directory. -->
 	<exclude-pattern>*/.git/*</exclude-pattern>
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/wp-content/*</exclude-pattern>
-
+	<!-- How to scan -->
+	<!-- Usage instructions: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Usage -->
+	<!-- Annotated ruleset: https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
 	<arg value="sp"/> <!-- Show sniff and progress -->
 	<arg name="basepath" value="."/><!-- Strip the file paths down to the relevant bit -->
 	<arg name="colors"/>
 	<arg name="extensions" value="php"/>
-	<arg name="parallel" value="20"/>
-
-	<rule ref="WordPressVIPMinimum">
-		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
-		<exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
-		<!-- Will need to fix this -->
-		<exclude name="WordPressVIPMinimum.Functions.RestrictedFunctions.attachment_url_to_postid_attachment_url_to_postid"/>
-	</rule>
+	<arg name="parallel" value="8"/>
 
 	<!-- Tests for PHP version compatibility -->
 	<rule ref="PHPCompatibilityWP">
 		<config name="testVersion" value="7.0-"/>
 	</rule>
 
-  </ruleset>
+	<rule ref="WordPressVIPMinimum">
+		<exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="WordPress.PHP.DisallowShortTernary.Found"/>
+		<!-- Will need to fix this -->
+		<exclude name="WordPressVIPMinimum.Functions.RestrictedFunctions.attachment_url_to_postid_attachment_url_to_postid"/>
+		<exclude name="WordPress.Files.FileName" />
+	</rule>
+	<rule ref="WordPress-Docs" />
+	<rule ref="WordPress-Extra" />
+	<!-- https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Customizable-sniff-properties -->
+	<config name="minimum_supported_wp_version" value="4.9"/>
+
+<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<!-- Value: replace the function, class, and variable prefixes used. Separate multiple prefixes with a comma. -->
+			<property name="prefixes" type="array" value="WPGraphQL\YoastSeo, wp_graphql, wp_gql_seo" />
+		</properties>
+	</rule>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<!-- Value: replace the text domain used. -->
+			<property name="text_domain" type="array" value="wp-graphql-yoast-seo"/>
+		</properties>
+	</rule>
+	<rule ref="WordPress.WhiteSpace.ControlStructureSpacing">
+		<properties>
+			<property name="blank_line_check" value="true"/>
+		</properties>
+	</rule>
+
+	<!-- Enforce short array syntax -->
+	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+
+	<!--Disable DocBlock requirements if inherited -->
+	<rule ref="Squiz.Commenting.FunctionComment">
+		<properties>
+				<property name="skipIfInheritdoc" value="true" />
+		</properties>
+	</rule>
+</ruleset>
