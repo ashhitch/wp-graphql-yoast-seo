@@ -68,7 +68,6 @@ class ContentNodeWithSEO implements Registrable, Type {
 
 					$yoast_meta = YoastSEO()->meta->for_post( $post->ID );
 
-
 					$schema_array = isset( $yoast_meta->schema ) ? $yoast_meta->schema : [];
 
 					// @see https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
