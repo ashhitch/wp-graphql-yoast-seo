@@ -32,8 +32,8 @@ class CoreSchemaFilters implements Hookable {
 		if ( ! isset( $config['name'] ) ) {
 			return $config;
 		}
-
-		if ( 'ContentNode' === $config['name'] ) {
+		// @todo Remove product check once it implements 'ContentNode'.
+		if ( 'ContentNode' === $config['name'] || 'Product' === $config['name'] ) {
 			$config['interfaces'] = array_merge(
 				$config['interfaces'] ?? [],
 				[
