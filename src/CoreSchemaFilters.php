@@ -20,7 +20,7 @@ class CoreSchemaFilters implements Hookable {
 	 * {@inheritDoc}
 	 */
 	public static function register_hooks(): void {
-		add_filter( 'graphql_wp_object_type_config', [ __CLASS__, 'set_object_type_config' ] );
+		add_filter( 'graphql_wp_interface_type_config', [ __CLASS__, 'set_interface_type_config' ] );
 	}
 
 	/**
@@ -28,13 +28,12 @@ class CoreSchemaFilters implements Hookable {
 	 *
 	 * @param array $config .
 	 */
-	public static function set_object_type_config( array $config ) : array {
-		if ( ! isset( $config['interfaces'] ) ) {
+	public static function set_interface_type_config( array $config ) : array {
+		if ( ! isset( $config['name'] ) ) {
 			return $config;
 		}
 
-		// Add SEO interface to post types.
-		if ( in_array( 'ContentNode', $config['interfaces'], true ) ) {
+		if ( 'ContentNode' === $config['name'] ) {
 			$config['interfaces'] = array_merge(
 				$config['interfaces'] ?? [],
 				[
@@ -44,7 +43,7 @@ class CoreSchemaFilters implements Hookable {
 		}
 
 		// Add SEO interface to post types.
-		if ( in_array( 'TermNode', $config['interfaces'], true ) ) {
+		if ( 'TermNode' === $config['name'] ) {
 			$config['interfaces'] = array_merge(
 				$config['interfaces'] ?? [],
 				[
