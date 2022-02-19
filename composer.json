@@ -14,7 +14,7 @@
 		"yoast/wordpress-seo": "Required to provide SEO data to this plugin"
 	},
 	"require": {
-		"php": ">=7.4"
+		"php": ">=7.4 || ^8.0"
 	},
 	"require-dev": {
 		"automattic/vipwpcs": "^2.3",
