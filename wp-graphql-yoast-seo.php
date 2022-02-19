@@ -86,7 +86,7 @@ function wp_gql_seo_init() {
 	}
 
 	foreach ( $not_ready as $dep ) {
-		$display_admin_notice = static function() use( $dep ) {
+		$display_admin_notice = static function() use ( $dep ) {
 			?>
 				<div class="notice notice-error>
 					<p>

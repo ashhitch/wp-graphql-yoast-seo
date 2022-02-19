@@ -31,6 +31,7 @@ class SEOPostTypeBreadcrumbs implements Registrable, Type, TypeWithFields {
 		register_graphql_object_type(
 			static::$type,
 			[
+				// phpcs:ignore
 				// 'description' => static::get_description(),
 				'fields' => static::get_fields(),
 			]
@@ -42,7 +43,7 @@ class SEOPostTypeBreadcrumbs implements Registrable, Type, TypeWithFields {
 	 */
 	public static function get_description() : string {
 		// @todo update description.
-		return __( 'The Schema types for Taxonomy', 'wp-graphql-yoast-seo' );
+		return __( 'placeholder description', 'wp-graphql-yoast-seo' );
 	}
 
 	/**

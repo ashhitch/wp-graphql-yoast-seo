@@ -8,8 +8,9 @@
 
 namespace WPGraphQL\YoastSEO\Type\WPObject;
 
-use YoastSEO;
+use function YoastSEO;
 use WPGraphQL\AppContext;
+use WPGraphQL\Model\User as ModelUser;
 use WPGraphQL\Registry\TypeRegistry;
 use WPGraphQL\YoastSEO\Interfaces\Field;
 use WPGraphQL\YoastSEO\Interfaces\Registrable;
@@ -42,6 +43,7 @@ class SEOUser implements Registrable, Type, TypeWithFields, Field {
 		register_graphql_object_type(
 			static::$type,
 			[
+				// phpcs:ignore
 				// 'description' => static::get_description(),
 				'fields' => static::get_fields(),
 			]
@@ -93,63 +95,27 @@ class SEOUser implements Registrable, Type, TypeWithFields, Field {
 			[
 				'type'        => static::$type,
 				'description' => __( 'The Yoast SEO data of a user', 'wp-graphql-yoast-seo' ),
-				'resolve'     => static function ( $user, array $args, AppContext $context ) {
-					$robots = YoastSEO()->meta->for_author( $user->userId )->robots;
+				'resolve'     => static function ( ModelUser $user, array $args, AppContext $context ) {
+					$yoast_meta = YoastSEO()->meta->for_author( $user->userId );
+					$robots     = isset( $yoast_meta->robots ) ? $yoast_meta->robots : [];
 
-					$schemaArray = YoastSEO()->meta->for_author( $user->userId )->schema;
-					$userSeo     = [
-						'title'                => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_author( $user->userId )->title
-						),
-						'metaDesc'             => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_author( $user->userId )->description
-						),
-						'metaRobotsNoindex'    => $robots['index'],
-						'metaRobotsNofollow'   => $robots['follow'],
-						'canonical'            => YoastSEO()->meta->for_author( $user->userId )
-							->canonical,
-						'opengraphTitle'       => YoastSEO()->meta->for_author( $user->userId )
-							->open_graph_title,
-						'opengraphDescription' => YoastSEO()->meta->for_author(
-							$user->userId
-						)->open_graph_description,
-						'opengraphImage'       => $context
-							->get_loader( 'post' )
-							->load_deferred(
-								absint(
-									YoastSEO()->meta->for_author( $user->userId )
-										->open_graph_image_id
-								)
-							),
-						'twitterImage'         => $context
-							->get_loader( 'post' )
-							->load_deferred(
-								absint(
-									YoastSEO()->meta->for_author( $user->userId )
-										->twitter_image_id
-								)
-							),
-						'twitterTitle'         => YoastSEO()->meta->for_author( $user->userId )
-							->twitter_title,
-						'twitterDescription'   => YoastSEO()->meta->for_author(
-							$user->userId
-						)->twitter_description,
-						'language'             => YoastSEO()->meta->for_author( $user->userId )
-							->language,
-						'region'               => YoastSEO()->meta->for_author( $user->userId )->region,
-						'breadcrumbTitle'      => YoastSEO()->meta->for_author( $user->userId )
-							->breadcrumb_title,
-						'fullHead'             => is_string(
-							YoastSEO()
-								->meta->for_author( $user->userId )
-								->get_head()
-						)
-							? YoastSEO()
-								->meta->for_author( $user->userId )
-								->get_head()
-							: YoastSEO()
-								->meta->for_author( $user->userId )
-								->get_head()->html,
+					$schema_array = isset( $yoast_meta->schema ) ? $yoast_meta->schema : [];
+
+					$userSeo = [
+						'title'                => wp_gql_seo_format_string( $yoast_meta->title ),
+						'metaDesc'             => wp_gql_seo_format_string( $yoast_meta->description ),
+						'metaRobotsNoindex'    => $robots['index'] ?? null,
+						'metaRobotsNofollow'   => $robots['follow'] ?? null,
+						'canonical'            => isset( $yoast_meta->canonical ) ? $yoast_meta->canonical : null,
+						'opengraphTitle'       => isset( $yoast_meta->open_graph_title ) ? $yoast_meta->open_graph_title : null,
+						'opengraphDescription' => isset( $yoast_meta->open_graph_description ) ? $yoast_meta->open_graph_description : null,
+						'opengraphImage'       => isset( $yoast_meta->open_graph_image_id ) ? $context->get_loader( 'post' )->load_deferred( absint( $yoast_meta->open_graph_image_id ) ) : null,
+						'twitterImage'         => isset( $yoast_meta->twitter_image_id ) ? $context->get_loader( 'post' )->load_deferred( absint( $yoast_meta->twitter_image_id ) ) : null, 
+						'twitterDescription'   => isset( $yoast_meta->twitter_description ) ? $yoast_meta->twitter_description : null,
+						'language'             => isset( $yoast_meta->language ) ? $yoast_meta->language : null,
+						'region'               => isset( $yoast_meta->region ) ? $yoast_meta->region : null,
+						'breadcrumbTitle'      => isset( $yoast_meta->breadcrumb_title ) ? $yoast_meta->breadcrumb_title : null,
+						'fullHead'             => is_string( $yoast_meta->get_head() ) ? $yoast_meta->get_head() : $yoast_meta->get_head()->html,
 						'social'               => [
 							'facebook'   => wp_gql_seo_format_string(
 								get_the_author_meta( 'facebook', $user->userId )
@@ -179,27 +145,14 @@ class SEOUser implements Registrable, Type, TypeWithFields, Field {
 								get_the_author_meta( 'wikipedia', $user->userId )
 							),
 						],
-
 						'schema'               => [
-							'raw'         => json_encode( $schemaArray, JSON_UNESCAPED_SLASHES ),
-							'pageType'    => is_array(
-								YoastSEO()->meta->for_author( $user->userId )
-									->schema_page_type
-							)
-								? YoastSEO()->meta->for_author( $user->userId )
-									->schema_page_type
-								: [],
-							'articleType' => is_array(
-								YoastSEO()->meta->for_author( $user->userId )
-									->schema_article_type
-							)
-								? YoastSEO()->meta->for_author( $user->userId )
-									->schema_article_type
-								: [],
+							'raw'         => json_encode( $schema_array, JSON_UNESCAPED_SLASHES ),
+							'pageType'    => isset( $yoast_meta->schema_page_type ) ? $yoast_meta->schema_page_type : [],
+							'articleType' => isset( $yoast_meta->indexable ) && isset( $yoast_meta->indexable->schema_article_type ) ? $yoast_meta->indexable->schema_article_type : [],
 						],
 					];
 
-					return ! empty( $userSeo ) ? $userSeo : [];
+					return $userSeo;
 				},
 			]
 		);

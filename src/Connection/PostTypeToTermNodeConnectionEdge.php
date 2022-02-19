@@ -8,7 +8,6 @@
 
 namespace WPGraphQL\YoastSEO\Connection;
 
-use WPGraphQL\AppContext;
 use WPGraphQL\Registry\TypeRegistry;
 use WPGraphQL\YoastSEO\Interfaces\Registrable;
 use WPSEO_Primary_Term;
@@ -20,12 +19,12 @@ class PostTypeToTermNodeConnectionEdge implements Registrable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public static function register( TypeRegistry $type_registry = null ) : void {
+	public static function register( TypeRegistry $type_registry = null ) : void { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$post_types = \WPGraphQL::get_allowed_post_types();
 
-		// If WooCommerce installed then add these post types and taxonomies
+		// If WooCommerce installed then add these post types.
 		if ( class_exists( '\WooCommerce' ) ) {
-			array_push( $post_types, 'product' );
+			$post_types[] = 'product';
 		}
 
 		if ( empty( $post_types ) ) {
@@ -46,7 +45,7 @@ class PostTypeToTermNodeConnectionEdge implements Registrable {
 
 			foreach ( $taxonomies as $tax ) {
 				// Skip if not a hierarchical taxonomy registered to GraphQL.
-				if ( ! isset( $tax->hierarchical ) && ! isset( $tax->graphql_single_name ) ) {
+				if ( empty( $tax->hierarchical ) && ! isset( $tax->graphql_single_name ) ) {
 					continue;
 				}
 
@@ -63,7 +62,7 @@ class PostTypeToTermNodeConnectionEdge implements Registrable {
 						'type'        => 'Boolean',
 						// translators: Taxonomy name.
 						'description' => sprintf( __( 'The Yoast SEO primary %s.', 'wp-graphql-yoast-seo' ), $tax->labels->name ),
-						'resolve'     => static function( $item, array $args, AppContext $context ) use ( $tax ) {
+						'resolve'     => static function( $item ) use ( $tax ) {
 							$post_id = $item['source']->ID;
 							$term_id = $item['node']->term_id;
 

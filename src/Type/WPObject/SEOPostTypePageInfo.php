@@ -8,14 +8,13 @@
 
 namespace WPGraphQL\YoastSEO\Type\WPObject;
 
-use WPGraphQL\AppContext;
 use WPGraphQL\Registry\TypeRegistry;
 use WPGraphQL\YoastSEO\Interfaces\Field;
 use WPGraphQL\YoastSEO\Type\WPObject\PageInfo;
 use WPGraphQL\YoastSEO\Interfaces\Registrable;
 use WPGraphQL\YoastSEO\Interfaces\Type;
 use WPGraphQL\YoastSEO\Interfaces\TypeWithFields;
-
+use YoastSEO;
 /**
  * Class - SEOPostTypePageInfo
  */
@@ -69,15 +68,13 @@ class SEOPostTypePageInfo implements Registrable, Type, TypeWithFields, Field {
 			[
 				'type'        => self::$type,
 				'description' => __( 'Raw schema for archive', 'wp-graphql-yoast-seo' ),
-				'resolve'     => static function( $item, array $args, AppContext $context ) {
-					$schemaArray = YoastSEO()->meta->for_post_type_archive()->schema;
+				'resolve'     => static function() {
+					$yoast_meta   = YoastSEO()->meta->for_post_type_archive();
+					$schema_array = false !== $yoast_meta ? $yoast_meta->schema : [];
 
 					return [
 						'schema' => [
-							'raw' => json_encode(
-								$schemaArray,
-								JSON_UNESCAPED_SLASHES
-							),
+							'raw' => json_encode( $schema_array, JSON_UNESCAPED_SLASHES ),
 						],
 					];
 				},

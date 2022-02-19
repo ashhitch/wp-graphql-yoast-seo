@@ -1,8 +1,11 @@
 /.git
 /.github
 /node_modules
-/vendor
+/phpstan
 .prettierrc
 .distignore
 .gitignore
+phpcs.xml
+phpstan.neon.dist
 yarn.lock
+

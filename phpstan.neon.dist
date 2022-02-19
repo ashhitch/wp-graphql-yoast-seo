@@ -4,6 +4,10 @@ parameters:
 		checkMissingIterableValueType: false
 		featureToggles:
 			disableRuntimeReflectionProvider: true
+		stubFiles:
+			# Simulate added properties
+			- phpstan/class-wp-post-type.stub
+			- phpstan/class-wp-taxonomy.stub
 		bootstrapFiles:
 			- access-functions.php
 			- wp-graphql-yoast-seo.php
@@ -14,5 +18,3 @@ parameters:
 		scanDirectories:
 			- ../wp-graphql/
 			- ../wordpress-seo/
-		ignoreErrors:
-			- '#^Function apply_filters(_ref_array)? invoked with ([1-9]|1[0-2]) parameters, 2 required\.$#'

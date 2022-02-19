@@ -7,5 +7,10 @@ node_modules/
 *.zip
 .idea*
 wp-content/
-vendor/
+!vendor
+vendor/*
+!vendor/autoload.php
+!vendor/composer
+vendor/composer/installed.json
+vendor/composer/*/
 notes.md

@@ -25,7 +25,8 @@
 		"poolshark/wp-graphql-stubs": "^0.0.2",
 		"squizlabs/php_codesniffer": "^3.6",
 		"szepeviktor/phpstan-wordpress": "^1.0",
-		"wp-coding-standards/wpcs": "^2.3"
+		"wp-coding-standards/wpcs": "^2.3",
+		"php-stubs/wordpress-seo-stubs": "^17.2"
 	},
 	"config": {
 		"optimize-autoloader": true,
@@ -49,10 +50,10 @@
 			"php ./vendor/bin/phpcs -i"
 		],
 		"check-cs": [
-			"php ./vendor/bin/phpcs src"
+			"php ./vendor/bin/phpcs"
 		],
 		"fix-cs": [
-			"php ./vendor/bin/phpcbf src"
+			"php ./vendor/bin/phpcbf"
 		],
 		"phpstan": [
 			"phpstan analyze --ansi --memory-limit=1G"

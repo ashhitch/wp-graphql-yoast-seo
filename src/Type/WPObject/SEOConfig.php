@@ -8,6 +8,7 @@
 
 namespace WPGraphQL\YoastSEO\Type\WPObject;
 
+use WP_Post_Type;
 use WPGraphQL\AppContext;
 use WPGraphQL\Registry\TypeRegistry;
 use WPGraphQL\YoastSEO\Interfaces\Field;
@@ -88,16 +89,15 @@ class SEOConfig implements Registrable, Type, TypeWithFields, Field {
 				'type'        => static::$type,
 				'description' => __( 'Returns seo site data.', 'wp-graphql-yoast-seo' ),
 				'resolve'     => static function ( $source, array $args, AppContext $context ) use ( $post_types ) {
-					$wpseo_options = WPSEO_Options::get_instance();
-					$all           = $wpseo_options->get_all();
+					$wpseo_options = WPSEO_Options::get_all();
 
-					$redirects_obj = class_exists( 'WPSEO_Redirect_Option' ) ? new WPSEO_Redirect_Option() : false;
+					$redirects_obj = class_exists( 'WPSEO_Redirect_Option' ) ? new \WPSEO_Redirect_Option() : false;
 					$redirects     = $redirects_obj ? $redirects_obj->get_from_option() : [];
 
-					$user_id = $all['company_or_person_user_id'];
+					$user_id = $wpseo_options['company_or_person_user_id'];
 					$user    = get_userdata( $user_id );
 
-					$mappedRedirects = function ( $value ) {
+					$mapped_redirects = function ( $value ) {
 						return [
 							'origin' => $value['origin'],
 							'target' => $value['url'],
@@ -106,111 +106,67 @@ class SEOConfig implements Registrable, Type, TypeWithFields, Field {
 						];
 					};
 
-					$contentTypes = self::build_content_type_data( $post_types, $all );
+					$contentTypes = self::build_content_type_data( $post_types, $wpseo_options );
 
 					return [
 						'contentTypes' => $contentTypes,
 						'webmaster'    => [
-							'baiduVerify'  => wp_gql_seo_format_string(
-								$all['baiduverify']
-							),
-							'googleVerify' => wp_gql_seo_format_string(
-								$all['googleverify']
-							),
-							'msVerify'     => wp_gql_seo_format_string( $all['msverify'] ),
-							'yandexVerify' => wp_gql_seo_format_string(
-								$all['yandexverify']
-							),
+							'baiduVerify'  => isset( $wpseo_options['baiduverify'] ) ? wp_gql_seo_format_string( $wpseo_options['baiduverify'] ) : null,
+							'googleVerify' => isset( $wpseo_options['googleverify'] ) ? wp_gql_seo_format_string( $wpseo_options['googleverify'] ) : null,
+							'msVerify'     => isset( $wpseo_options['msverify'] ) ? wp_gql_seo_format_string( $wpseo_options['msverify'] ) : null,
+							'yandexVerify' => isset( $wpseo_options['yandexverify'] ) ? wp_gql_seo_format_string( $wpseo_options['yandexverify'] ) : null,
 						],
 						'social'       => [
 							'facebook'  => [
-								'url'          => wp_gql_seo_format_string( $all['facebook_site'] ),
-								'defaultImage' => $context
-									->get_loader( 'post' )
-									->load_deferred( $all['og_default_image_id'] ),
+								'url'          => isset( $wpseo_options['facebook_site'] ) ? wp_gql_seo_format_string( $wpseo_options['facebook_site'] ) : null,
+								'defaultImage' => isset( $wpseo_options['og_default_image_id'] ) ? $context->get_loader( 'post' )->load_deferred( $wpseo_options['og_default_image_id'] ) : null,
 							],
 							'twitter'   => [
-								'username' => wp_gql_seo_format_string(
-									$all['twitter_site']
-								),
-								'cardType' => wp_gql_seo_format_string(
-									$all['twitter_card_type']
-								),
+								'username' => isset( $wpseo_options['twitter_site'] ) ? wp_gql_seo_format_string( $wpseo_options['twitter_site'] ) : null,
+								'cardType' => isset( $wpseo_options['twitter_card_type'] ) ? wp_gql_seo_format_string( $wpseo_options['twitter_card_type'] ) : null,
 							],
 							'instagram' => [
-								'url' => wp_gql_seo_format_string( $all['instagram_url'] ),
+								'url' => isset( $wpseo_options['instagram_url'] ) ? wp_gql_seo_format_string( $wpseo_options['instagram_url'] ) : null,
 							],
 							'linkedIn'  => [
-								'url' => wp_gql_seo_format_string( $all['linkedin_url'] ),
+								'url' => isset( $wpseo_options['linkedin_url'] ) ? wp_gql_seo_format_string( $wpseo_options['linkedin_url'] ) : null,
 							],
 							'mySpace'   => [
-								'url' => wp_gql_seo_format_string( $all['myspace_url'] ),
+								'url' => isset( $wpseo_options['myspace_url'] ) ? wp_gql_seo_format_string( $wpseo_options['myspace_url'] ) : null,
 							],
 							'pinterest' => [
-								'url'     => wp_gql_seo_format_string( $all['pinterest_url'] ),
-								'metaTag' => wp_gql_seo_format_string(
-									$all['pinterestverify']
-								),
+								'url'     => isset( $wpseo_options['pinterest_url'] ) ? wp_gql_seo_format_string( $wpseo_options['pinterest_url'] ) : null,
+								'metaTag' => isset( $wpseo_options['pinterestverify'] ) ? wp_gql_seo_format_string( $wpseo_options['pinterestverify'] ) : null,
 							],
 							'youTube'   => [
-								'url' => wp_gql_seo_format_string( $all['youtube_url'] ),
+								'url' => isset( $wpseo_options['youtube_url'] ) ? wp_gql_seo_format_string( $wpseo_options['youtube_url'] ) : null,
 							],
 							'wikipedia' => [
-								'url' => wp_gql_seo_format_string( $all['wikipedia_url'] ),
+								'url' => isset( $wpseo_options['wikipedia_url'] ) ? wp_gql_seo_format_string( $wpseo_options['wikipedia_url'] ) : null,
 							],
 						],
 						'breadcrumbs'  => [
-							'enabled'       => wp_gql_seo_format_string(
-								$all['breadcrumbs-enable']
-							),
-							'boldLast'      => wp_gql_seo_format_string(
-								$all['breadcrumbs-boldlast']
-							),
-							'showBlogPage'  => wp_gql_seo_format_string(
-								$all['breadcrumbs-display-blog-page']
-							),
-							'archivePrefix' => wp_gql_seo_format_string(
-								$all['breadcrumbs-archiveprefix']
-							),
-							'prefix'        => wp_gql_seo_format_string(
-								$all['breadcrumbs-prefix']
-							),
-							'notFoundText'  => wp_gql_seo_format_string(
-								$all['breadcrumbs-404crumb']
-							),
-							'homeText'      => wp_gql_seo_format_string(
-								$all['breadcrumbs-home']
-							),
-							'searchPrefix'  => wp_gql_seo_format_string(
-								$all['breadcrumbs-searchprefix']
-							),
-							'separator'     => wp_gql_seo_format_string(
-								$all['breadcrumbs-sep']
-							),
+							'enabled'       => isset( $wpseo_options['breadcrumbs-enable'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-enable'] ) : null,
+							'boldLast'      => isset( $wpseo_options['breadcrumbs-boldlast'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-boldlast'] ) : null,
+							'showBlogPage'  => isset( $wpseo_options['breadcrumbs-display-blog-page'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-display-blog-page'] ) : null,
+							'archivePrefix' => isset( $wpseo_options['breadcrumbs-archiveprefix'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-archiveprefix'] ) : null,
+							'prefix'        => isset( $wpseo_options['breadcrumbs-prefix'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-prefix'] ) : null,
+							'notFoundText'  => isset( $wpseo_options['breadcrumbs-404crumb'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-404crumb'] ) : null,
+							'homeText'      => isset( $wpseo_options['breadcrumbs-home'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-home'] ) : null,
+							'searchPrefix'  => isset( $wpseo_options['breadcrumbs-searchprefix'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-searchprefix'] ) : null,
+							'separator'     => isset( $wpseo_options['breadcrumbs-sep'] ) ? wp_gql_seo_format_string( $wpseo_options['breadcrumbs-sep'] ) : null,
 						],
 						'schema'       => [
-							'companyName'       => wp_gql_seo_format_string(
-								$all['company_name']
+							'companyName'       => isset( $wpseo_options['company_name'] ) ? wp_gql_seo_format_string( $wpseo_options['company_name'] ) : null,
+							'personName'        => $user instanceof WP_User ? wp_gql_seo_format_string( $user->user_nicename ) : null,
+							'companyLogo'       => isset( $wpseo_options['company_logo_id'] ) ? $context->get_loader( 'post' )->load_deferred( absint( $wpseo_options['company_logo_id'] ) ) : null,
+							'personLogo'        => isset( $wpseo_options['person_logo_id'] ) ? $context->get_loader( 'post' )->load_deferred( absint( $wpseo_options['person_logo_id'] ) ) : null,
+							'logo'              => $context->get_loader( 'post' )->load_deferred(
+								'company' === $wpseo_options['company_or_person']
+										? absint( $wpseo_options['company_logo_id'] )
+										: absint( $wpseo_options['person_logo_id'] )
 							),
-							'personName'        => wp_gql_seo_format_string(
-								$user->user_nicename
-							),
-							'companyLogo'       => $context
-								->get_loader( 'post' )
-								->load_deferred( absint( $all['company_logo_id'] ) ),
-							'personLogo'        => $context
-								->get_loader( 'post' )
-								->load_deferred( absint( $all['person_logo_id'] ) ),
-							'logo'              => $context
-								->get_loader( 'post' )
-								->load_deferred(
-									$all['company_or_person'] === 'company'
-										? absint( $all['company_logo_id'] )
-										: absint( $all['person_logo_id'] )
-								),
-							'companyOrPerson'   => wp_gql_seo_format_string(
-								$all['company_or_person']
-							),
+							'companyOrPerson'   => isset( $wpseo_options['company_or_person'] ) ? wp_gql_seo_format_string( $wpseo_options['company_or_person'] ) : null,
 							'siteName'          => wp_gql_seo_format_string(
 								YoastSEO()->helpers->site->get_site_name()
 							),
@@ -227,23 +183,13 @@ class SEOConfig implements Registrable, Type, TypeWithFields, Field {
 								get_bloginfo( 'language' )
 							),
 						],
-						'redirects'    => array_map( $mappedRedirects, $redirects ),
+						'redirects'    => array_map( $mapped_redirects, $redirects ),
 						'openGraph'    => [
-							'defaultImage' => $context
-								->get_loader( 'post' )
-								->load_deferred( absint( $all['og_default_image_id'] ) ),
+							'defaultImage' => isset( $wpseo_options['og_default_image_id'] ) ? $context->get_loader( 'post' )->load_deferred( absint( $wpseo_options['og_default_image_id'] ) ) : null,
 							'frontPage'    => [
-								'title'       => wp_gql_seo_format_string(
-									$all['og_frontpage_title']
-								),
-								'description' => wp_gql_seo_format_string(
-									$all['og_frontpage_desc']
-								),
-								'image'       => $context
-									->get_loader( 'post' )
-									->load_deferred(
-										absint( $all['og_frontpage_image_id'] )
-									),
+								'title'       => isset( $wpseo_options['og_frontpage_title'] ) ? wp_gql_seo_format_string( $wpseo_options['og_frontpage_title'] ) : null,
+								'description' => isset( $wpseo_options['og_frontpage_desc'] ) ? wp_gql_seo_format_string( $wpseo_options['og_frontpage_desc'] ) : null,
+								'image'       => isset( $wpseo_options['og_frontpage_image_id'] ) ? $context->get_loader( 'post' )->load_deferred( absint( $wpseo_options['og_frontpage_image_id'] ) ) : null,
 							],
 						],
 					];
@@ -252,98 +198,55 @@ class SEOConfig implements Registrable, Type, TypeWithFields, Field {
 		);
 	}
 
-	private static function build_content_type_data( $types, $all ) : array {
+	/**
+	 * Builds the resolver data for all SEOContentTypes
+	 *
+	 * @param string[] $types The post types.
+	 * @param array    $wpseo_options An array of all WPSEO options.
+	 */
+	private static function build_content_type_data( $types, $wpseo_options ) : array {
 		$carry = [];
 		foreach ( $types as $type ) {
 			$post_type_object = get_post_type_object( $type );
 
-			if ( $post_type_object->graphql_single_name ) {
+			if ( $post_type_object instanceof WP_Post_Type && $post_type_object->graphql_single_name ) {
 				$tag = wp_gql_seo_get_field_key(
 					$post_type_object->graphql_single_name
 				);
 
-				$schemaArray = YoastSEO()->meta->for_post_type_archive( $type )
-					->schema;
+				$yoast_meta   = YoastSEO()->meta->for_post_type_archive( $type );
+				$schema_array = false !== $yoast_meta ? $yoast_meta->schema : null; 
 
 				$carry[ $tag ] = [
-					'title'             => ! empty( $all[ 'title-' . $type ] )
-					? $all[ 'title-' . $type ]
-					: null,
-					'metaDesc'          => ! empty( $all[ 'metadesc-' . $type ] )
-					? $all[ 'metadesc-' . $type ]
-					: null,
-					'metaRobotsNoindex' => ! empty( $all[ 'noindex-' . $type ] )
-					? boolval( $all[ 'noindex-' . $type ] )
-					: false,
-					'schemaType'        => ! empty( $all[ 'schema-page-type-' . $type ] )
-					? $all[ 'schema-page-type-' . $type ]
-					: null,
-
+					'title'             => ! empty( $wpseo_options[ 'title-' . $type ] ) ? $wpseo_options[ 'title-' . $type ] : null,
+					'metaDesc'          => ! empty( $wpseo_options[ 'metadesc-' . $type ] ) ? $wpseo_options[ 'metadesc-' . $type ] : null,
+					'metaRobotsNoindex' => ! empty( $wpseo_options[ 'noindex-' . $type ] ),
+					'schemaType'        => ! empty( $wpseo_options[ 'schema-page-type-' . $type ] ) ? $wpseo_options[ 'schema-page-type-' . $type ] : null,
 					'schema'            => [
-						'raw' => ! empty( $schemaArray )
-							? json_encode( $schemaArray, JSON_UNESCAPED_SLASHES )
-							: null,
+						'raw' => ! empty( $schema_array ) ? json_encode( $schema_array, JSON_UNESCAPED_SLASHES ) : null,
 					],
-					'archive'           =>
-					$tag == 'post' // Posts are stored like this
-						? [
-							'hasArchive'        => true,
-							'archiveLink'       => get_post_type_archive_link( $type ),
-							'title'             => $all['title-archive-wpseo'] ?? null,
-							'metaDesc'          => $all['metadesc-archive-wpseo'] ?? null,
-							'metaRobotsNoindex' => $all['noindex-archive-wpseo'] ?? null,
-							'breadcrumbTitle'   => $all['bctitle-archive-wpseo'] ?? null,
-							'metaRobotsNoindex' => boolval(
-								$all['noindex-archive-wpseo']
-							),
-							'fullHead'          => is_string(
-								YoastSEO()
-									->meta->for_post_type_archive( $type )
-									->get_head()
-							)
-								? YoastSEO()
-									->meta->for_post_type_archive( $type )
-									->get_head()
-								: YoastSEO()
-									->meta->for_post_type_archive( $type )
-									->get_head()->html,
-						]
-						: [
-							'hasArchive'        => boolval(
-								$post_type_object->has_archive
-							),
-							'archiveLink'       => get_post_type_archive_link( $type ),
-							'title'             => ! empty( $all[ 'title-ptarchive-' . $type ] )
-								? $all[ 'title-ptarchive-' . $type ]
-								: null,
-							'metaDesc'          => ! empty(
-								$all[ 'metadesc-ptarchive-' . $type ]
-							)
-								? $all[ 'metadesc-ptarchive-' . $type ]
-								: null,
-							'metaRobotsNoindex' => ! empty(
-								$all[ 'noindex-ptarchive-' . $type ]
-							)
-								? boolval( $all[ 'noindex-ptarchive-' . $type ] )
-								: false,
-							'breadcrumbTitle'   => ! empty(
-								$all[ 'bctitle-ptarchive-' . $type ]
-							)
-								? $all[ 'bctitle-ptarchive-' . $type ]
-								: null,
-							'fullHead'          => is_string(
-								YoastSEO()
-									->meta->for_post_type_archive( $type )
-									->get_head()
-							)
-								? YoastSEO()
-									->meta->for_post_type_archive( $type )
-									->get_head()
-								: YoastSEO()
-									->meta->for_post_type_archive( $type )
-									->get_head()->html,
-						],
+					// These are shared by all post types.
+					'archive'           => [
+						'archiveLink' => get_post_type_archive_link( $type ),
+						'fullHead'    => is_string( $yoast_meta->get_head() ) ? $yoast_meta->get_head() : $yoast_meta->get_head()->html,
+					],
 				];
+
+				// Set archive values and merge with existing.
+				$archive_values           = 'post' === $tag ? [
+					'hasArchive'        => true,
+					'title'             => $wpseo_options['title-archive-wpseo'] ?? null,
+					'metaDesc'          => $wpseo_options['metadesc-archive-wpseo'] ?? null,
+					'metaRobotsNoindex' => $wpseo_options['noindex-archive-wpseo'] ?? null,
+					'breadcrumbTitle'   => $wpseo_options['bctitle-archive-wpseo'] ?? null,
+				] : [
+					'hasArchive'        => boolval( $post_type_object->has_archive ),
+					'title'             => ! empty( $wpseo_options[ 'title-ptarchive-' . $type ] ) ? $wpseo_options[ 'title-ptarchive-' . $type ] : null,
+					'metaDesc'          => ! empty( $wpseo_options[ 'metadesc-ptarchive-' . $type ] ) ? $wpseo_options[ 'metadesc-ptarchive-' . $type ] : null,
+					'metaRobotsNoindex' => ! empty( $wpseo_options[ 'noindex-ptarchive-' . $type ] ) ? boolval( $wpseo_options[ 'noindex-ptarchive-' . $type ] ) : false,
+					'breadcrumbTitle'   => ! empty( $wpseo_options[ 'bctitle-ptarchive-' . $type ] ) ? $wpseo_options[ 'bctitle-ptarchive-' . $type ] : null,
+				];
+				$carry[ $tag ]['archive'] = array_merge( $carry[ $tag ]['archive'], $archive_values );
 			}
 		}
 		return $carry;
