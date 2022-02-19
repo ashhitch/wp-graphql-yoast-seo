@@ -5,10 +5,11 @@ parameters:
 		featureToggles:
 			disableRuntimeReflectionProvider: true
 		bootstrapFiles:
-			- phpstan/constants.php
+			- access-functions.php
 			- wp-graphql-yoast-seo.php
 		paths:
-			- wp-graphql-yoast.php
+			- access-functions.php
+			- wp-graphql-yoast-seo.php
 			- src/
 		scanDirectories:
 			- ../wp-graphql/
