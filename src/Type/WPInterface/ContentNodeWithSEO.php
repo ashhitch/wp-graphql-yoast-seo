@@ -13,8 +13,7 @@ use WPGraphQL\Registry\TypeRegistry;
 use WPGraphQL\YoastSEO\Interfaces\Registrable;
 use WPGraphQL\YoastSEO\Interfaces\Type;
 use WPGraphQL\YoastSEO\Type\WPObject\PostTypeSEO;
-use WPGraphQL\YoastSEO\Type\WPObject\SEOBaseFields;
-use WPGraphQL\YoastSEO\Type\WPObject\SEOPostTypeBreadcrumbs;
+use function YoastSEO;
 
 /**
  * Class - ContentNodeWithSEO
@@ -60,9 +59,6 @@ class ContentNodeWithSEO implements Registrable, Type {
 			'seo' => [
 				'type'    => PostTypeSEO::$type,
 				'resolve' => static function( $post, array $args, AppContext $context ) {
-					// Base array.
-					$seo = [];
-
 					$map = [
 						'@id'      => 'id',
 						'@type'    => 'type',
@@ -70,161 +66,57 @@ class ContentNodeWithSEO implements Registrable, Type {
 						'@context' => 'context',
 					];
 
-					$schemaArray = YoastSEO()->meta->for_post( $post->ID )
-						->schema;
+					$yoast_meta = YoastSEO()->meta->for_post( $post->ID );
 
-					// https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
-					$robots = YoastSEO()->meta->for_post( $post->ID )
-						->robots;
 
-					// Get data
+					$schema_array = isset( $yoast_meta->schema ) ? $yoast_meta->schema : [];
+
+					// @see https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
+					$robots = isset( $yoast_meta->robots ) ? $yoast_meta->robots : [];
+
+					// Get data.
 					$seo = [
-						'title'                  => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )->title
-						),
-						'metaDesc'               => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->description
-						),
-						'focuskw'                => wp_gql_seo_format_string(
-							get_post_meta(
-								$post->ID,
-								'_yoast_wpseo_focuskw',
-								true
-							)
-						),
-						'metaKeywords'           => wp_gql_seo_format_string(
-							get_post_meta(
-								$post->ID,
-								'_yoast_wpseo_metakeywords',
-								true
-							)
-						),
-						'metaRobotsNoindex'      => $robots['index'],
-						'metaRobotsNofollow'     => $robots['follow'],
-						'opengraphTitle'         => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_title
-						),
-						'opengraphUrl'           => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_url
-						),
-						'opengraphSiteName'      => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_site_name
-						),
-						'opengraphType'          => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_type
-						),
-						'opengraphAuthor'        => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_article_author
-						),
-						'opengraphPublisher'     => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_article_publisher
-						),
-						'opengraphPublishedTime' => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_article_published_time
-						),
-						'opengraphModifiedTime'  => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_article_modified_time
-						),
-						'opengraphDescription'   => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->open_graph_description
-						),
-						'opengraphImage'         => function () use (
-							$post,
-							$context
-						) {
-							$id = wp_gql_seo_get_og_image(
-								YoastSEO()->meta->for_post( $post->ID )
-									->open_graph_images
-							);
+						'title'                  => isset( $yoast_meta->title ) ? wp_gql_seo_format_string( $yoast_meta->title ) : null,
+						'metaDesc'               => isset( $yoast_meta->description ) ? wp_gql_seo_format_string( $yoast_meta->description ) : null,
+						'focuskw'                => wp_gql_seo_format_string( get_post_meta( $post->ID, '_yoast_wpseo_focuskw', true ) ) ?: null,
+						'metaKeywords'           => wp_gql_seo_format_string( get_post_meta( $post->ID, '_yoast_wpseo_metakeywords', true ) ) ?: null,
+						'metaRobotsNoindex'      => $robots['index'] ?? null,
+						'metaRobotsNofollow'     => $robots['follow'] ?? null,
+						'opengraphTitle'         => isset( $yoast_meta->open_graph_title ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_title ) : null,
+						'opengraphUrl'           => isset( $yoast_meta->open_graph_url ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_url ) : null,
+						'opengraphSiteName'      => isset( $yoast_meta->open_graph_site_name ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_site_name ) : null,
+						'opengraphType'          => isset( $yoast_meta->open_graph_type ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_type ) : null,
+						'opengraphAuthor'        => isset( $yoast_meta->open_graph_article_author ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_article_author ) : null,
+						'opengraphPublisher'     => isset( $yoast_meta->open_graph_article_publisher ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_article_publisher ) : null,
+						'opengraphPublishedTime' => isset( $yoast_meta->open_graph_article_published_time ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_article_published_time ) : null,
+						'opengraphModifiedTime'  => isset( $yoast_meta->open_graph_article_modified_time ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_article_modified_time ) : null,
+						'opengraphDescription'   => isset( $yoast_meta->open_graph_description ) ? wp_gql_seo_format_string( $yoast_meta->open_graph_description ) : null,
+						'opengraphImage'         => static function () use ( $context, $yoast_meta ) {
+							$id = ! empty( $yoast_meta->open_graph_images ) ? wp_gql_seo_get_og_image( $yoast_meta->open_graph_images ) : null;
 
-							return $context
-								->get_loader( 'post' )
-								->load_deferred( absint( $id ) );
+							return null !== $id ? $context->get_loader( 'post' )->load_deferred( absint( $id ) ) : null;
 						},
-						'twitterCardType'        => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->twitter_card
-						),
-						'twitterTitle'           => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->twitter_title
-						),
-						'twitterDescription'     => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->twitter_description
-						),
-						'twitterImage'           => function () use (
-							$post,
-							$context
-						) {
-							$id = wpcom_vip_attachment_url_to_postid(
-								YoastSEO()->meta->for_post( $post->ID )
-									->twitter_image
-							);
+						'twitterCardType'        => isset( $yoast_meta->twitter_card ) ? wp_gql_seo_format_string( $yoast_meta->twitter_card ) : null,
+						'twitterTitle'           => isset( $yoast_meta->twitter_title ) ? wp_gql_seo_format_string( $yoast_meta->twitter_title ) : null,
+						'twitterDescription'     => isset( $yoast_meta->twitter_description ) ? wp_gql_seo_format_string( $yoast_meta->twitter_description ) : null,
+						'twitterImage'           => static function () use ( $context, $yoast_meta ) {
+							$id = isset( $yoast_meta->twitter_image ) ? wpcom_vip_attachment_url_to_postid( $yoast_meta->twitter_image ) : null;
 
-							return $context
-								->get_loader( 'post' )
-								->load_deferred( absint( $id ) );
+							return null !== $id ? $context->get_loader( 'post' )->load_deferred( absint( $id ) ) : null;
 						},
-						'canonical'              => wp_gql_seo_format_string(
-							YoastSEO()->meta->for_post( $post->ID )
-								->canonical
-						),
-						'readingTime'            => floatval(
-							YoastSEO()->meta->for_post( $post->ID )
-								->estimated_reading_time_minutes
-						),
-						'breadcrumbs'            => YoastSEO()->meta->for_post(
-							$post->ID
-						)->breadcrumbs,
-						'cornerstone'            => boolval(
-							YoastSEO()->meta->for_post( $post->ID )
-								->indexable->is_cornerstone
-						),
-						'fullHead'               => is_string(
-							YoastSEO()
-								->meta->for_post( $post->ID )
-								->get_head()
-						)
-							? YoastSEO()
-								->meta->for_post( $post->ID )
-								->get_head()
-							: YoastSEO()
-								->meta->for_post( $post->ID )
-								->get_head()->html,
+						'canonical'              => isset( $yoast_meta->canonical ) ? wp_gql_seo_format_string( $yoast_meta->canonical ) : null,
+						'readingTime'            => isset( $yoast_meta->estimated_reading_time_minutes ) ? floatval( $yoast_meta->estimated_reading_time_minutes ) : null,
+						'breadcrumbs'            => isset( $yoast_meta->breadcrumbs ) ? $yoast_meta->breadcrumbs : null,
+						'cornerstone'            => isset( $yoast_meta->indexable ) && isset( $yoast_meta->indexable->is_cornerstone ) ? boolval( $yoast_meta->indexable->is_cornerstone ) : null,
+						'fullHead'               => is_string( $yoast_meta->get_head() ) ? $yoast_meta->get_head() : $yoast_meta->get_head()->html,
 						'schema'                 => [
-							'pageType'    => is_array(
-								YoastSEO()->meta->for_post( $post->ID )
-									->schema_page_type
-							)
-								? YoastSEO()->meta->for_post( $post->ID )
-									->schema_page_type
-								: [],
-							'articleType' => is_array(
-								YoastSEO()->meta->for_post( $post->ID )
-									->schema_article_type
-							)
-								? YoastSEO()->meta->for_post( $post->ID )
-									->schema_article_type
-								: [],
-							'raw'         => json_encode(
-								$schemaArray,
-								JSON_UNESCAPED_SLASHES
-							),
+							'pageType'    => isset( $yoast_meta->indexable ) && isset( $yoast_meta->indexable->schema_page_type ) ? $yoast_meta->schema_page_type : [],
+							'articleType' => isset( $yoast_meta->indexable ) && isset( $yoast_meta->indexable->schema_article_type ) ? $yoast_meta->schema_article_type : [],
+							'raw'         => json_encode( $schema_array, JSON_UNESCAPED_SLASHES ),
 						],
 					];
 
-					return ! empty( $seo ) ? $seo : null;
+					return $seo;
 				},
 			],
 		];

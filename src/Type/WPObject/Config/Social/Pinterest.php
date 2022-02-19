@@ -31,6 +31,7 @@ class Pinterest implements Registrable, Type, TypeWithFields {
 		register_graphql_object_type(
 			static::$type,
 			[
+				// phpcs:ignore
 				// 'description' => static::get_description(),
 				'fields' => static::get_fields(),
 			]

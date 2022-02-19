@@ -8,6 +8,7 @@
 
 namespace WPGraphQL\YoastSEO\Type\WPObject\Config;
 
+use WP_Post_Type;
 use WPGraphQL;
 use WPGraphQL\Registry\TypeRegistry;
 use WPGraphQL\YoastSEO\Interfaces\Registrable;
@@ -52,15 +53,25 @@ class ContentTypes implements Registrable, Type, TypeWithFields {
 	public static function get_fields() : array {
 		$post_types = WPGraphQL::get_allowed_post_types();
 
+		// If WooCommerce installed then add these post types.
+		if ( class_exists( '\WooCommerce' ) ) {
+			$post_types[] = 'product';
+		}
+
 		return self::build_content_types( $post_types );
 	}
 
-	private static function build_content_types( $types ) : array {
+	/**
+	 * Builds a ContentType field configuration for each post type.
+	 *
+	 * @param string[] $types .
+	 */
+	private static function build_content_types( array $types ) : array {
 		$carry = [];
 
 		foreach ( $types as $type ) {
 			$post_type_object = get_post_type_object( $type );
-			if ( $post_type_object->graphql_single_name ) {
+			if ( $post_type_object instanceof WP_Post_Type && $post_type_object->graphql_single_name ) {
 				$carry[ wp_gql_seo_get_field_key( $post_type_object->graphql_single_name ) ] = [ 'type' => ContentType::$type ];
 			}
 		}
