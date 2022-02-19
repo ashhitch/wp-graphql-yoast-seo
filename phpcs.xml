@@ -36,7 +36,7 @@
 <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<!-- Value: replace the function, class, and variable prefixes used. Separate multiple prefixes with a comma. -->
-			<property name="prefixes" type="array" value="WPGraphQL\YoastSeo, wp_graphql, wp_gql_seo" />
+			<property name="prefixes" type="array" value="WPGraphQL\YoastSeo, wp_graphql, wp_gql_seo, WPGRAPHQL_SEO, graphql_seo" />
 		</properties>
 	</rule>
 	<rule ref="WordPress.WP.I18n">
