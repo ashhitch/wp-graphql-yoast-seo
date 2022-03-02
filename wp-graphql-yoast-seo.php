@@ -82,6 +82,10 @@ add_action('graphql_init', function () {
                 '$1.$2',
                 $image['url']
             );
+            // If the image is equal as the original and the original has an id, return this ID
+            if (isset($image['id']) && $url === $image['url']) {
+               return $image['id'];
+            }
             return wpcom_vip_attachment_url_to_postid($url);
         }
     }
