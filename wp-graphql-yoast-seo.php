@@ -911,10 +911,14 @@ add_action('graphql_init', function () {
                                         $post,
                                         $context
                                     ) {
-                                        $id = wpcom_vip_attachment_url_to_postid(
-                                            YoastSEO()->meta->for_post($post->ID)
-                                                ->twitter_image
+                                        $twitter_image = YoastSEO()->meta->for_post($post->ID)
+                                                ->twitter_image;
+
+                                        if (empty($twitter_image)) {
+                                            return __return_empty_string();
                                         );
+
+                                        $id = wpcom_vip_attachment_url_to_postid($twitter_image);
 
                                         return $context
                                             ->get_loader('post')
