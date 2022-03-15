@@ -494,6 +494,7 @@ add_action('graphql_init', function () {
                 'title' => ['type' => 'String'],
                 'description' => ['type' => 'String'],
                 'image' => ['type' => 'MediaItem'],
+                'fullHead' => ['type' => 'String']
             ],
         ]);
 
@@ -791,7 +792,18 @@ add_action('graphql_init', function () {
                                 ->get_loader('post')
                                 ->load_deferred(
                                     absint($all['og_frontpage_image_id'])
-                                ),
+                            ),
+	                        'fullHead' => is_string(
+                                    YoastSEO()
+                                        ->meta->for_home_page()
+                                        ->get_head()
+                                )
+                                    ? YoastSEO()
+                                        ->meta->for_home_page()
+                                        ->get_head()
+                                    : YoastSEO()
+                                        ->meta->for_home_page()
+                                        ->get_head()->html,
                         ],
                     ],
                 ];
