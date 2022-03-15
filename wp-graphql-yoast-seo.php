@@ -783,15 +783,15 @@ add_action('graphql_init', function () {
                             ->load_deferred(absint($all['og_default_image_id'])),
                         'frontPage' => [
                             'title' => wp_gql_seo_format_string(
-                                $all['og_frontpage_title']
+                                $all['open_graph_frontpage_title']
                             ),
                             'description' => wp_gql_seo_format_string(
-                                $all['og_frontpage_desc']
+                                $all['open_graph_frontpage_desc']
                             ),
                             'image' => $context
                                 ->get_loader('post')
                                 ->load_deferred(
-                                    absint($all['og_frontpage_image_id'])
+                                    absint($all['open_graph_frontpage_image_id'])
                             ),
 	                        'fullHead' => is_string(
                                     YoastSEO()
