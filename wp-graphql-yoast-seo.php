@@ -740,9 +740,9 @@ add_action('graphql_init', function () {
                         'companyName' => wp_gql_seo_format_string(
                             $all['company_name']
                         ),
-                        'personName' => wp_gql_seo_format_string(
-                            $user->user_nicename
-                        ),
+                        'personName' => !empty($user)
+                            ? wp_gql_seo_format_string($user->user_nicename)
+                            : null,
                         'companyLogo' => $context
                             ->get_loader('post')
                             ->load_deferred(absint($all['company_logo_id'])),
