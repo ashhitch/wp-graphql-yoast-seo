@@ -57,7 +57,13 @@ add_action('graphql_init', function () {
     if (!function_exists('wp_gql_seo_format_string')) {
         function wp_gql_seo_format_string($string)
         {
-            return isset($string) ? html_entity_decode(wpseo_replace_vars(trim($string),'post')) : null;
+            // Get all the post types that have been registered.
+            $post_types = get_post_types();
+            // Get all the taxonomies that have been registered.
+            $taxomonies = get_taxonomies();
+            // Merge them together and pass them through.
+            $objects    = array_merge($post_types,$taxomonies);
+            return isset($string) ? html_entity_decode(wpseo_replace_vars(trim($string),$objects)) : null;
         }
     }
     if (!function_exists('wp_gql_seo_get_og_image')) {
