@@ -57,13 +57,20 @@ add_action('graphql_init', function () {
     if (!function_exists('wp_gql_seo_format_string')) {
         function wp_gql_seo_format_string($string)
         {
+            return isset($string) ? html_entity_decode(trim($string)) : null;
+        }
+    }
+
+    if (!function_exists('wp_gql_seo_replace_vars')) {
+        function wp_gql_seo_replace_vars($string)
+        {
             // Get all the post types that have been registered.
             $post_types = get_post_types();
             // Get all the taxonomies that have been registered.
             $taxomonies = get_taxonomies();
             // Merge them together and pass them through.
-            $objects    = array_merge($post_types,$taxomonies);
-            return isset($string) ? html_entity_decode(wpseo_replace_vars(trim($string),$objects)) : null;
+            $objects = array_merge($post_types, $taxomonies);
+            return isset($string) ? wpseo_replace_vars($string, $objects) : null;
         }
     }
     if (!function_exists('wp_gql_seo_get_og_image')) {
@@ -185,10 +192,14 @@ add_action('graphql_init', function () {
 
                 $carry[$tag] = [
                     'title' => !empty($all['title-' . $type])
-                        ? $all['title-' . $type]
+                        ? wp_gql_seo_format_string(
+                            wp_gql_seo_replace_vars($all['title-' . $type])
+                        )
                         : null,
                     'metaDesc' => !empty($all['metadesc-' . $type])
-                        ? $all['metadesc-' . $type]
+                        ? wp_gql_seo_format_string(
+                            wp_gql_seo_replace_vars($all['metadesc-' . $type])
+                        )
                         : null,
                     'metaRobotsNoindex' => !empty($all['noindex-' . $type])
                         ? boolval($all['noindex-' . $type])
@@ -208,10 +219,18 @@ add_action('graphql_init', function () {
                                 'hasArchive' => true,
                                 'archiveLink' => get_post_type_archive_link($type),
                                 'title' => !empty($all['title-archive-wpseo'])
-                                    ? $all['title-archive-wpseo']
+                                    ? wp_gql_seo_format_string(
+                                        wp_gql_seo_replace_vars(
+                                            $all['title-archive-wpseo']
+                                        )
+                                    )
                                     : null,
                                 'metaDesc' => !empty($all['metadesc-archive-wpseo'])
-                                    ? $all['metadesc-archive-wpseo']
+                                    ? wp_gql_seo_format_string(
+                                        wp_gql_seo_replace_vars(
+                                            $all['metadesc-archive-wpseo']
+                                        )
+                                    )
                                     : null,
                                 'metaRobotsNoindex' => !empty(
                                     $all['noindex-archive-wpseo']
@@ -788,16 +807,20 @@ add_action('graphql_init', function () {
                             ->load_deferred(absint($all['og_default_image_id'])),
                         'frontPage' => [
                             'title' => wp_gql_seo_format_string(
-                                $all['open_graph_frontpage_title']
+                                wp_gql_seo_replace_vars(
+                                    $all['open_graph_frontpage_title']
+                                )
                             ),
                             'description' => wp_gql_seo_format_string(
-                                $all['open_graph_frontpage_desc']
+                                wp_gql_seo_replace_vars(
+                                    $all['open_graph_frontpage_desc']
+                                )
                             ),
                             'image' => $context
                                 ->get_loader('post')
                                 ->load_deferred(
                                     absint($all['open_graph_frontpage_image_id'])
-                            ),
+                                ),
                         ],
                     ],
                 ];
@@ -866,31 +889,45 @@ add_action('graphql_init', function () {
                                     'metaRobotsNoindex' => $robots['index'] ?? '',
                                     'metaRobotsNofollow' => $robots['follow'] ?? '',
                                     'opengraphTitle' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_title : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_title
+                                            : ''
                                     ),
                                     'opengraphUrl' => wp_gql_seo_format_string(
                                         $meta !== false ? $meta->open_graph_url : ''
                                     ),
                                     'opengraphSiteName' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_site_name : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_site_name
+                                            : ''
                                     ),
                                     'opengraphType' => wp_gql_seo_format_string(
                                         $meta !== false ? $meta->open_graph_type : ''
                                     ),
                                     'opengraphAuthor' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_article_author : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_article_author
+                                            : ''
                                     ),
                                     'opengraphPublisher' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_article_publisher : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_article_publisher
+                                            : ''
                                     ),
                                     'opengraphPublishedTime' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_article_published_time : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_article_published_time
+                                            : ''
                                     ),
                                     'opengraphModifiedTime' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_article_modified_time : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_article_modified_time
+                                            : ''
                                     ),
                                     'opengraphDescription' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->open_graph_description : ''
+                                        $meta !== false
+                                            ? $meta->open_graph_description
+                                            : ''
                                     ),
                                     'opengraphImage' => function () use (
                                         $post,
@@ -898,7 +935,9 @@ add_action('graphql_init', function () {
                                         $meta
                                     ) {
                                         $id = wp_gql_seo_get_og_image(
-                                            $meta !== false ? $meta->open_graph_images : []
+                                            $meta !== false
+                                                ? $meta->open_graph_images
+                                                : []
                                         );
 
                                         return $context
@@ -912,7 +951,9 @@ add_action('graphql_init', function () {
                                         $meta !== false ? $meta->twitter_title : ''
                                     ),
                                     'twitterDescription' => wp_gql_seo_format_string(
-                                        $meta !== false ? $meta->twitter_description : ''
+                                        $meta !== false
+                                            ? $meta->twitter_description
+                                            : ''
                                     ),
                                     'twitterImage' => function () use (
                                         $post,
@@ -920,7 +961,9 @@ add_action('graphql_init', function () {
                                         $meta
                                     ) {
                                         $id = wpcom_vip_attachment_url_to_postid(
-                                            $meta !== false ? $meta->twitter_image : ''
+                                            $meta !== false
+                                                ? $meta->twitter_image
+                                                : ''
                                         );
 
                                         return $context
@@ -931,21 +974,30 @@ add_action('graphql_init', function () {
                                         $meta !== false ? $meta->canonical : ''
                                     ),
                                     'readingTime' => floatval(
-                                        $meta !== false ? $meta->estimated_reading_time_minutes : ''
+                                        $meta !== false
+                                            ? $meta->estimated_reading_time_minutes
+                                            : ''
                                     ),
-                                    'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
+                                    'breadcrumbs' =>
+                                        $meta !== false ? $meta->breadcrumbs : [],
                                     // TODO: Default should be true or false?
                                     'cornerstone' => boolval(
-                                        $meta !== false ? $meta->indexable->is_cornerstone : false,
+                                        $meta !== false
+                                            ? $meta->indexable->is_cornerstone
+                                            : false
                                     ),
                                     'fullHead' => wp_gql_seo_get_full_head($meta),
                                     'schema' => [
-                                        'pageType' => $meta !== false && is_array($meta->schema_page_type)
-                                            ? $meta->schema_page_type
-                                            : [],
-                                        'articleType' => $meta !== false && is_array($meta->schema_article_type)
-                                            ? $meta->schema_article_type
-                                            : [],
+                                        'pageType' =>
+                                            $meta !== false &&
+                                            is_array($meta->schema_page_type)
+                                                ? $meta->schema_page_type
+                                                : [],
+                                        'articleType' =>
+                                            $meta !== false &&
+                                            is_array($meta->schema_article_type)
+                                                ? $meta->schema_article_type
+                                                : [],
                                         'raw' => json_encode(
                                             $schemaArray,
                                             JSON_UNESCAPED_SLASHES
