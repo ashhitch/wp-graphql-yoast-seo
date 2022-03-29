@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.16.1
+ * Version:         4.16.2
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -95,6 +95,10 @@ add_action('graphql_init', function () {
                 '$1.$2',
                 $image['url']
             );
+            // If the image is equal as the original and the original has an id, return this ID
+            if (isset($image['id']) && $url === $image['url']) {
+                return $image['id'];
+            }
             return wpcom_vip_attachment_url_to_postid($url);
         }
     }
@@ -765,9 +769,9 @@ add_action('graphql_init', function () {
                         'companyName' => wp_gql_seo_format_string(
                             $all['company_name']
                         ),
-                        'personName' => wp_gql_seo_format_string(
-                            $user->user_nicename
-                        ),
+                        'personName' => !empty($user)
+                            ? wp_gql_seo_format_string($user->user_nicename)
+                            : null,
                         'companyLogo' => $context
                             ->get_loader('post')
                             ->load_deferred(absint($all['company_logo_id'])),
@@ -960,10 +964,14 @@ add_action('graphql_init', function () {
                                         $context,
                                         $meta
                                     ) {
+                                        $twitter_image = $meta->twitter_image;
+
+                                        if (empty($twitter_image)) {
+                                            return __return_empty_string();
+                                        }
+
                                         $id = wpcom_vip_attachment_url_to_postid(
-                                            $meta !== false
-                                                ? $meta->twitter_image
-                                                : ''
+                                            $twitter_image
                                         );
 
                                         return $context
