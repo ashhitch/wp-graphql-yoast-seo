@@ -551,7 +551,7 @@ add_action('graphql_init', function () {
         ]);
         register_graphql_object_type('SEOContentType', [
             'description' => __(
-                'he Yoast SEO search appearance content types fields',
+                'The Yoast SEO search appearance content types fields',
                 'wp-graphql-yoast-seo'
             ),
             'fields' => [
