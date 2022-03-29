@@ -60,6 +60,19 @@ add_action('graphql_init', function () {
             return isset($string) ? html_entity_decode(trim($string)) : null;
         }
     }
+
+    if (!function_exists('wp_gql_seo_replace_vars')) {
+        function wp_gql_seo_replace_vars($string)
+        {
+            // Get all the post types that have been registered.
+            $post_types = get_post_types();
+            // Get all the taxonomies that have been registered.
+            $taxomonies = get_taxonomies();
+            // Merge them together and pass them through.
+            $objects = array_merge($post_types, $taxomonies);
+            return isset($string) ? wpseo_replace_vars($string, $objects) : null;
+        }
+    }
     if (!function_exists('wp_gql_seo_get_og_image')) {
         function wp_gql_seo_get_og_image($images)
         {
@@ -183,10 +196,14 @@ add_action('graphql_init', function () {
 
                 $carry[$tag] = [
                     'title' => !empty($all['title-' . $type])
-                        ? $all['title-' . $type]
+                        ? wp_gql_seo_format_string(
+                            wp_gql_seo_replace_vars($all['title-' . $type])
+                        )
                         : null,
                     'metaDesc' => !empty($all['metadesc-' . $type])
-                        ? $all['metadesc-' . $type]
+                        ? wp_gql_seo_format_string(
+                            wp_gql_seo_replace_vars($all['metadesc-' . $type])
+                        )
                         : null,
                     'metaRobotsNoindex' => !empty($all['noindex-' . $type])
                         ? boolval($all['noindex-' . $type])
@@ -206,10 +223,18 @@ add_action('graphql_init', function () {
                                 'hasArchive' => true,
                                 'archiveLink' => get_post_type_archive_link($type),
                                 'title' => !empty($all['title-archive-wpseo'])
-                                    ? $all['title-archive-wpseo']
+                                    ? wp_gql_seo_format_string(
+                                        wp_gql_seo_replace_vars(
+                                            $all['title-archive-wpseo']
+                                        )
+                                    )
                                     : null,
                                 'metaDesc' => !empty($all['metadesc-archive-wpseo'])
-                                    ? $all['metadesc-archive-wpseo']
+                                    ? wp_gql_seo_format_string(
+                                        wp_gql_seo_replace_vars(
+                                            $all['metadesc-archive-wpseo']
+                                        )
+                                    )
                                     : null,
                                 'metaRobotsNoindex' => !empty(
                                     $all['noindex-archive-wpseo']
@@ -786,15 +811,19 @@ add_action('graphql_init', function () {
                             ->load_deferred(absint($all['og_default_image_id'])),
                         'frontPage' => [
                             'title' => wp_gql_seo_format_string(
-                                $all['og_frontpage_title']
+                                wp_gql_seo_replace_vars(
+                                    $all['open_graph_frontpage_title']
+                                )
                             ),
                             'description' => wp_gql_seo_format_string(
-                                $all['og_frontpage_desc']
+                                wp_gql_seo_replace_vars(
+                                    $all['open_graph_frontpage_desc']
+                                )
                             ),
                             'image' => $context
                                 ->get_loader('post')
                                 ->load_deferred(
-                                    absint($all['og_frontpage_image_id'])
+                                    absint($all['open_graph_frontpage_image_id'])
                                 ),
                         ],
                     ],
