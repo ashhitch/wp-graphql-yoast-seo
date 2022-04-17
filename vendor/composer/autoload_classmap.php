@@ -18,6 +18,7 @@ return array(
     'WPGraphQL\\YoastSEO\\TypeRegistry' => $baseDir . '/src/TypeRegistry.php',
     'WPGraphQL\\YoastSEO\\Type\\Enum\\SEOCardTypeEnum' => $baseDir . '/src/Type/Enum/SEOCardTypeEnum.php',
     'WPGraphQL\\YoastSEO\\Type\\WPInterface\\ContentNodeWithSEO' => $baseDir . '/src/Type/WPInterface/ContentNodeWithSEO.php',
+    'WPGraphQL\\YoastSEO\\Type\\WPInterface\\ContentTypeWithSEO' => $baseDir . '/src/Type/WPInterface/ContentTypeWithSEO.php',
     'WPGraphQL\\YoastSEO\\Type\\WPInterface\\SEOBaseFields' => $baseDir . '/src/Type/WPInterface/SEOBaseFields.php',
     'WPGraphQL\\YoastSEO\\Type\\WPInterface\\TermNodeWithSEO' => $baseDir . '/src/Type/WPInterface/TermNodeWithSEO.php',
     'WPGraphQL\\YoastSEO\\Type\\WPObject\\Config\\Breadcrumbs' => $baseDir . '/src/Type/WPObject/Config/Breadcrumbs.php',

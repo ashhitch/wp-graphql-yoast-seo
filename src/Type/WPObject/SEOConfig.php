@@ -106,7 +106,7 @@ class SEOConfig implements Registrable, Type, TypeWithFields, Field {
 						];
 					};
 
-					$contentTypes = self::build_content_type_data( $post_types, $wpseo_options );
+					$contentTypes = self::get_content_types( $post_types );
 
 					return [
 						'contentTypes' => $contentTypes,
@@ -202,53 +202,22 @@ class SEOConfig implements Registrable, Type, TypeWithFields, Field {
 	 * Builds the resolver data for all SEOContentTypes
 	 *
 	 * @param string[] $types The post types.
-	 * @param array    $wpseo_options An array of all WPSEO options.
 	 */
-	private static function build_content_type_data( $types, $wpseo_options ) : array {
+	private static function get_content_types( $types ) : array {
 		$carry = [];
 		foreach ( $types as $type ) {
 			$post_type_object = get_post_type_object( $type );
 
-			if ( $post_type_object instanceof WP_Post_Type && $post_type_object->graphql_single_name ) {
-				$tag = wp_gql_seo_get_field_key(
-					$post_type_object->graphql_single_name
-				);
-
-				$yoast_meta   = YoastSEO()->meta->for_post_type_archive( $type );
-				$schema_array = false !== $yoast_meta ? $yoast_meta->schema : null; 
-
-				$carry[ $tag ] = [
-					'title'             => ! empty( $wpseo_options[ 'title-' . $type ] ) ? $wpseo_options[ 'title-' . $type ] : null,
-					'metaDesc'          => ! empty( $wpseo_options[ 'metadesc-' . $type ] ) ? $wpseo_options[ 'metadesc-' . $type ] : null,
-					'metaRobotsNoindex' => ! empty( $wpseo_options[ 'noindex-' . $type ] ),
-					'schemaType'        => ! empty( $wpseo_options[ 'schema-page-type-' . $type ] ) ? $wpseo_options[ 'schema-page-type-' . $type ] : null,
-					'schema'            => [
-						'raw' => ! empty( $schema_array ) ? json_encode( $schema_array, JSON_UNESCAPED_SLASHES ) : null,
-					],
-					// These are shared by all post types.
-					'archive'           => [
-						'archiveLink' => get_post_type_archive_link( $type ),
-						'fullHead'    => is_string( $yoast_meta->get_head() ) ? $yoast_meta->get_head() : $yoast_meta->get_head()->html,
-					],
-				];
-
-				// Set archive values and merge with existing.
-				$archive_values           = 'post' === $tag ? [
-					'hasArchive'        => true,
-					'title'             => $wpseo_options['title-archive-wpseo'] ?? null,
-					'metaDesc'          => $wpseo_options['metadesc-archive-wpseo'] ?? null,
-					'metaRobotsNoindex' => $wpseo_options['noindex-archive-wpseo'] ?? null,
-					'breadcrumbTitle'   => $wpseo_options['bctitle-archive-wpseo'] ?? null,
-				] : [
-					'hasArchive'        => boolval( $post_type_object->has_archive ),
-					'title'             => ! empty( $wpseo_options[ 'title-ptarchive-' . $type ] ) ? $wpseo_options[ 'title-ptarchive-' . $type ] : null,
-					'metaDesc'          => ! empty( $wpseo_options[ 'metadesc-ptarchive-' . $type ] ) ? $wpseo_options[ 'metadesc-ptarchive-' . $type ] : null,
-					'metaRobotsNoindex' => ! empty( $wpseo_options[ 'noindex-ptarchive-' . $type ] ) ? boolval( $wpseo_options[ 'noindex-ptarchive-' . $type ] ) : false,
-					'breadcrumbTitle'   => ! empty( $wpseo_options[ 'bctitle-ptarchive-' . $type ] ) ? $wpseo_options[ 'bctitle-ptarchive-' . $type ] : null,
-				];
-				$carry[ $tag ]['archive'] = array_merge( $carry[ $tag ]['archive'], $archive_values );
+			if ( ! $post_type_object instanceof WP_Post_Type || empty( $post_type_object->graphql_single_name ) ) {
+				continue;
 			}
+			$tag = wp_gql_seo_get_field_key(
+				$post_type_object->graphql_single_name
+			);
+
+			$carry[ $tag ] = $post_type_object;
 		}
+
 		return $carry;
 	}
 }

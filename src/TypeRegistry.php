@@ -68,6 +68,7 @@ class TypeRegistry {
 	public static function register_interfaces( GraphQLRegistry $type_registry ) : void {
 		WPInterface\SEOBaseFields::register( $type_registry );
 		WPInterface\ContentNodeWithSEO::register( $type_registry );
+		WPInterface\ContentTypeWithSEO::register( $type_registry );
 		WPInterface\TermNodeWithSEO::register( $type_registry );
 
 		/**

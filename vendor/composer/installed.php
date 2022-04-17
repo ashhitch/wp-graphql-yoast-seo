@@ -5,7 +5,7 @@
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => '4442ada0afd284682ca81e345db1fe2fa8b64a1a',
+        'reference' => 'cf32379861a75024a9319ca41c3fe20310ebe3b4',
         'name' => 'ashhitch/wp-graphql-yoast-seo',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => '4442ada0afd284682ca81e345db1fe2fa8b64a1a',
+            'reference' => 'cf32379861a75024a9319ca41c3fe20310ebe3b4',
             'dev_requirement' => false,
         ),
         'automattic/vipwpcs' => array(

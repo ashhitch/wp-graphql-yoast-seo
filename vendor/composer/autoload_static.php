@@ -37,6 +37,7 @@ class ComposerStaticInitccec7e4645ca6ddf694d702594caaacb
         'WPGraphQL\\YoastSEO\\TypeRegistry' => __DIR__ . '/../..' . '/src/TypeRegistry.php',
         'WPGraphQL\\YoastSEO\\Type\\Enum\\SEOCardTypeEnum' => __DIR__ . '/../..' . '/src/Type/Enum/SEOCardTypeEnum.php',
         'WPGraphQL\\YoastSEO\\Type\\WPInterface\\ContentNodeWithSEO' => __DIR__ . '/../..' . '/src/Type/WPInterface/ContentNodeWithSEO.php',
+        'WPGraphQL\\YoastSEO\\Type\\WPInterface\\ContentTypeWithSEO' => __DIR__ . '/../..' . '/src/Type/WPInterface/ContentTypeWithSEO.php',
         'WPGraphQL\\YoastSEO\\Type\\WPInterface\\SEOBaseFields' => __DIR__ . '/../..' . '/src/Type/WPInterface/SEOBaseFields.php',
         'WPGraphQL\\YoastSEO\\Type\\WPInterface\\TermNodeWithSEO' => __DIR__ . '/../..' . '/src/Type/WPInterface/TermNodeWithSEO.php',
         'WPGraphQL\\YoastSEO\\Type\\WPObject\\Config\\Breadcrumbs' => __DIR__ . '/../..' . '/src/Type/WPObject/Config/Breadcrumbs.php',

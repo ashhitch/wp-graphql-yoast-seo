@@ -71,7 +71,7 @@ class ContentTypes implements Registrable, Type, TypeWithFields {
 
 		foreach ( $types as $type ) {
 			$post_type_object = get_post_type_object( $type );
-			if ( $post_type_object instanceof WP_Post_Type && $post_type_object->graphql_single_name ) {
+			if ( $post_type_object instanceof WP_Post_Type && isset( $post_type_object->graphql_single_name ) ) {
 				$carry[ wp_gql_seo_get_field_key( $post_type_object->graphql_single_name ) ] = [ 'type' => ContentType::$type ];
 			}
 		}

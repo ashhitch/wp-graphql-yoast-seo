@@ -111,7 +111,7 @@ class ContentNodeWithSEO implements Registrable, Type {
 						'schema'                 => [
 							'pageType'    => isset( $yoast_meta->indexable ) && isset( $yoast_meta->indexable->schema_page_type ) ? $yoast_meta->schema_page_type : [],
 							'articleType' => isset( $yoast_meta->indexable ) && isset( $yoast_meta->indexable->schema_article_type ) ? $yoast_meta->schema_article_type : [],
-							'raw'         => json_encode( $schema_array, JSON_UNESCAPED_SLASHES ),
+							'raw'         => wp_json_encode( $schema_array, JSON_UNESCAPED_SLASHES ),
 						],
 					];
 
