@@ -4,7 +4,8 @@
     "description": "A WPGraphQL Extension that adds support for Yoast SEO",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "prettier": "prettier wp-graphql-yoast-seo.php --write"
+        "prettier": "prettier wp-graphql-yoast-seo.php --write",
+        "prepare": "husky install"
     },
     "repository": {
         "type": "git",
@@ -16,17 +17,9 @@
     },
     "homepage": "https://github.com/ashhitch/wp-graphql-yoast-seo#readme",
     "devDependencies": {
-        "@prettier/plugin-php": "^0.14.2",
-        "husky": ">=4",
-        "lint-staged": ">=10",
-        "prettier": "^2.0.5"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "lint-staged"
-        }
-    },
-    "lint-staged": {
-        "*.{js,css,md,php}": "prettier wp-graphql-yoast-seo.php --write"
+        "@prettier/plugin-php": "^0.18.7",
+        "husky": ">=8.0.1",
+        "lint-staged": ">=13.0.1",
+        "prettier": "^2.6.2"
     }
 }
