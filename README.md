@@ -48,8 +48,8 @@ composer require ashhitch/wp-graphql-yoast-seo
 <a href="https://www.buymeacoffee.com/hafowuvo" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 40px !important;width: auto !important;" ></a>
 
 ## Canonicals
-> Please note canonicals will not be returned if you have the discourage search engines option turned on in your WordPress settings.
 
+> Please note canonicals will not be returned if you have the discourage search engines option turned on in your WordPress settings.
 
 ## V4 breaking change
 
@@ -372,6 +372,36 @@ query GetSeoConfig {
         }
     }
 }
+```
+
+### contentNode and nodeByUri
+
+```graphql
+contentNode(id: "1", idType: DATABASE_ID) {
+    id
+    contentTypeName
+    seo {
+      title
+      metaDesc
+    }
+  }
+  node(id: "cG9zdDox",) {
+    ... on NodeWithTitle {
+      seo {
+        title
+        metaDesc
+      }
+    }
+
+  }
+  nodeByUri(uri: "/") {
+    ... on NodeWithTitle {
+      seo {
+        title
+        metaDesc
+      }
+    }
+  }
 ```
 
 ## Support

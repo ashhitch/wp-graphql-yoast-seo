@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.17.0
+ * Version:         4.18.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -693,169 +693,100 @@ add_action('graphql_init', function () {
             },
         ]);
 
-        // Post Type SEO Data
-        if (!empty($post_types) && is_array($post_types)) {
-            foreach ($post_types as $post_type) {
-                $post_type_object = get_post_type_object($post_type);
+        function get_post_type_graphql_fields($post, array $args, AppContext $context)
+        {
+            // Base array
+            $seo = [];
 
-                if (isset($post_type_object->graphql_single_name)):
-                    register_graphql_field($post_type_object->graphql_single_name, 'seo', [
-                        'type' => 'PostTypeSEO',
-                        'description' => __(
-                            'The Yoast SEO data of the ' . $post_type_object->graphql_single_name,
-                            'wp-graphql-yoast-seo'
-                        ),
-                        'resolve' => function ($post, array $args, AppContext $context) {
-                            // Base array
-                            $seo = [];
+            $map = [
+                '@id' => 'id',
+                '@type' => 'type',
+                '@graph' => 'graph',
+                '@context' => 'context',
+            ];
+            $meta = YoastSEO()->meta->for_post($post->ID);
 
-                            $map = [
-                                '@id' => 'id',
-                                '@type' => 'type',
-                                '@graph' => 'graph',
-                                '@context' => 'context',
-                            ];
-                            $meta = YoastSEO()->meta->for_post($post->ID);
+            $schemaArray = $meta !== false ? $meta->schema : [];
 
-                            $schemaArray = $meta !== false ? $meta->schema : [];
+            // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
+            $robots = $meta !== false ? $meta->robots : [];
 
-                            // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
-                            $robots = $meta !== false ? $meta->robots : [];
+            // Get data
+            $seo = [
+                'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : ''),
+                'metaDesc' => wp_gql_seo_format_string($meta !== false ? $meta->description : ''),
+                'focuskw' => wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
+                'metaKeywords' => wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
+                'metaRobotsNoindex' => $robots['index'] ?? '',
+                'metaRobotsNofollow' => $robots['follow'] ?? '',
+                'opengraphTitle' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_title : ''),
+                'opengraphUrl' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_url : ''),
+                'opengraphSiteName' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_site_name : ''),
+                'opengraphType' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_type : ''),
+                'opengraphAuthor' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_article_author : ''),
+                'opengraphPublisher' => wp_gql_seo_format_string(
+                    $meta !== false ? $meta->open_graph_article_publisher : ''
+                ),
+                'opengraphPublishedTime' => wp_gql_seo_format_string(
+                    $meta !== false ? $meta->open_graph_article_published_time : ''
+                ),
+                'opengraphModifiedTime' => wp_gql_seo_format_string(
+                    $meta !== false ? $meta->open_graph_article_modified_time : ''
+                ),
+                'opengraphDescription' => wp_gql_seo_format_string(
+                    $meta !== false ? $meta->open_graph_description : ''
+                ),
+                'opengraphImage' => function () use ($post, $context, $meta) {
+                    $id = wp_gql_seo_get_og_image($meta !== false ? $meta->open_graph_images : []);
 
-                            // Get data
-                            $seo = [
-                                'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : ''),
-                                'metaDesc' => wp_gql_seo_format_string($meta !== false ? $meta->description : ''),
-                                'focuskw' => wp_gql_seo_format_string(
-                                    get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)
-                                ),
-                                'metaKeywords' => wp_gql_seo_format_string(
-                                    get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)
-                                ),
-                                'metaRobotsNoindex' => $robots['index'] ?? '',
-                                'metaRobotsNofollow' => $robots['follow'] ?? '',
-                                'opengraphTitle' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_title : ''
-                                ),
-                                'opengraphUrl' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_url : ''
-                                ),
-                                'opengraphSiteName' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_site_name : ''
-                                ),
-                                'opengraphType' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_type : ''
-                                ),
-                                'opengraphAuthor' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_article_author : ''
-                                ),
-                                'opengraphPublisher' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_article_publisher : ''
-                                ),
-                                'opengraphPublishedTime' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_article_published_time : ''
-                                ),
-                                'opengraphModifiedTime' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_article_modified_time : ''
-                                ),
-                                'opengraphDescription' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->open_graph_description : ''
-                                ),
-                                'opengraphImage' => function () use ($post, $context, $meta) {
-                                    $id = wp_gql_seo_get_og_image($meta !== false ? $meta->open_graph_images : []);
+                    return $context->get_loader('post')->load_deferred(absint($id));
+                },
+                'twitterCardType' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_card : ''),
+                'twitterTitle' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_title : ''),
+                'twitterDescription' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_description : ''),
+                'twitterImage' => function () use ($post, $context, $meta) {
+                    $twitter_image = $meta->twitter_image;
 
-                                    return $context->get_loader('post')->load_deferred(absint($id));
-                                },
-                                'twitterCardType' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->twitter_card : ''
-                                ),
-                                'twitterTitle' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_title : ''),
-                                'twitterDescription' => wp_gql_seo_format_string(
-                                    $meta !== false ? $meta->twitter_description : ''
-                                ),
-                                'twitterImage' => function () use ($post, $context, $meta) {
-                                    $twitter_image = $meta->twitter_image;
-
-                                    if (empty($twitter_image)) {
-                                        return __return_empty_string();
-                                    }
-
-                                    $id = wpcom_vip_attachment_url_to_postid($twitter_image);
-
-                                    return $context->get_loader('post')->load_deferred(absint($id));
-                                },
-                                'canonical' => wp_gql_seo_format_string($meta !== false ? $meta->canonical : ''),
-                                'readingTime' => floatval($meta !== false ? $meta->estimated_reading_time_minutes : ''),
-                                'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
-                                // TODO: Default should be true or false?
-                                'cornerstone' => boolval($meta !== false ? $meta->indexable->is_cornerstone : false),
-                                'fullHead' => wp_gql_seo_get_full_head($meta),
-                                'schema' => [
-                                    'pageType' =>
-                                        $meta !== false && is_array($meta->schema_page_type)
-                                            ? $meta->schema_page_type
-                                            : [],
-                                    'articleType' =>
-                                        $meta !== false && is_array($meta->schema_article_type)
-                                            ? $meta->schema_article_type
-                                            : [],
-                                    'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-                                ],
-                            ];
-
-                            return !empty($seo) ? $seo : null;
-                        },
-                    ]);
-
-                    // register field on edge for arch
-
-                    $name = 'WP' . ucfirst($post_type_object->graphql_single_name) . 'Info';
-
-                    register_graphql_field($name, 'seo', [
-                        'type' => 'SEOPostTypePageInfo',
-                        'description' => __(
-                            'Raw schema for ' . $post_type_object->graphql_single_name,
-                            'wp-graphql-yoast-seo'
-                        ),
-                        'resolve' => function ($item, array $args, AppContext $context) use ($post_type) {
-                            $schemaArray = YoastSEO()->meta->for_post_type_archive($post_type)->schema;
-
-                            return [
-                                'schema' => [
-                                    'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-                                ],
-                            ];
-                        },
-                    ]);
-
-                    // Loop each taxonomy to register on the edge if a category is the primary one.
-                    $taxonomiesPostObj = get_object_taxonomies($post_type, 'objects');
-
-                    $postNameKey = wp_gql_seo_get_field_key($post_type_object->graphql_single_name);
-
-                    foreach ($taxonomiesPostObj as $tax) {
-                        if (isset($tax->hierarchical) && isset($tax->graphql_single_name)) {
-                            $name =
-                                ucfirst($postNameKey) . 'To' . ucfirst($tax->graphql_single_name) . 'ConnectionEdge';
-
-                            register_graphql_field($name, 'isPrimary', [
-                                'type' => 'Boolean',
-                                'description' => __('The Yoast SEO Primary ' . $tax->name, 'wp-graphql-yoast-seo'),
-                                'resolve' => function ($item, array $args, AppContext $context) use ($tax) {
-                                    $postId = $item['source']->ID;
-
-                                    $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);
-                                    $primaryTaxId = $wpseo_primary_term->get_primary_term();
-                                    $termId = $item['node']->term_id;
-
-                                    return $primaryTaxId === $termId;
-                                },
-                            ]);
-                        }
+                    if (empty($twitter_image)) {
+                        return __return_empty_string();
                     }
-                endif;
-            }
+
+                    $id = wpcom_vip_attachment_url_to_postid($twitter_image);
+
+                    return $context->get_loader('post')->load_deferred(absint($id));
+                },
+                'canonical' => wp_gql_seo_format_string($meta !== false ? $meta->canonical : ''),
+                'readingTime' => floatval($meta !== false ? $meta->estimated_reading_time_minutes : ''),
+                'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
+                // TODO: Default should be true or false?
+                'cornerstone' => boolval($meta !== false ? $meta->indexable->is_cornerstone : false),
+                'fullHead' => wp_gql_seo_get_full_head($meta),
+                'schema' => [
+                    'pageType' => $meta !== false && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
+                    'articleType' =>
+                        $meta !== false && is_array($meta->schema_article_type) ? $meta->schema_article_type : [],
+                    'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                ],
+            ];
+
+            return !empty($seo) ? $seo : null;
         }
+
+        register_graphql_field('ContentNode', 'seo', [
+            'type' => 'PostTypeSEO',
+            'description' => __('The Yoast SEO data of the ContentNode', 'wp-graphql-yoast-seo'),
+            'resolve' => function ($post, array $args, AppContext $context) {
+                return get_post_type_graphql_fields($post, $args, $context);
+            },
+        ]);
+        register_graphql_field('NodeWithTitle', 'seo', [
+            'type' => 'PostTypeSEO',
+            'description' => __('The Yoast SEO data of the ContentNode', 'wp-graphql-yoast-seo'),
+            'resolve' => function ($post, array $args, AppContext $context) {
+                return get_post_type_graphql_fields($post, $args, $context);
+            },
+        ]);
+
         // User SEO Data
         register_graphql_field('User', 'seo', [
             'type' => 'SEOUser',
