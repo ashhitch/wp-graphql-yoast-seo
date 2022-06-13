@@ -786,6 +786,62 @@ add_action('graphql_init', function () {
                 return get_post_type_graphql_fields($post, $args, $context);
             },
         ]);
+        // TODO connect to content node
+        // Post Type SEO Data
+        if (!empty($post_types) && is_array($post_types)) {
+            foreach ($post_types as $post_type) {
+                $post_type_object = get_post_type_object($post_type);
+
+                if (isset($post_type_object->graphql_single_name)):
+                    // register field on edge for arch
+
+                    $name = 'WP' . ucfirst($post_type_object->graphql_single_name) . 'Info';
+
+                    register_graphql_field($name, 'seo', [
+                        'type' => 'SEOPostTypePageInfo',
+                        'description' => __(
+                            'Raw schema for ' . $post_type_object->graphql_single_name,
+                            'wp-graphql-yoast-seo'
+                        ),
+                        'resolve' => function ($item, array $args, AppContext $context) use ($post_type) {
+                            $schemaArray = YoastSEO()->meta->for_post_type_archive($post_type)->schema;
+
+                            return [
+                                'schema' => [
+                                    'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                                ],
+                            ];
+                        },
+                    ]);
+
+                    // Loop each taxonomy to register on the edge if a category is the primary one.
+                    $taxonomiesPostObj = get_object_taxonomies($post_type, 'objects');
+
+                    $postNameKey = wp_gql_seo_get_field_key($post_type_object->graphql_single_name);
+
+                    foreach ($taxonomiesPostObj as $tax) {
+                        if (isset($tax->hierarchical) && isset($tax->graphql_single_name)) {
+                            $name =
+                                ucfirst($postNameKey) . 'To' . ucfirst($tax->graphql_single_name) . 'ConnectionEdge';
+
+                            register_graphql_field($name, 'isPrimary', [
+                                'type' => 'Boolean',
+                                'description' => __('The Yoast SEO Primary ' . $tax->name, 'wp-graphql-yoast-seo'),
+                                'resolve' => function ($item, array $args, AppContext $context) use ($tax) {
+                                    $postId = $item['source']->ID;
+
+                                    $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);
+                                    $primaryTaxId = $wpseo_primary_term->get_primary_term();
+                                    $termId = $item['node']->term_id;
+
+                                    return $primaryTaxId === $termId;
+                                },
+                            ]);
+                        }
+                    }
+                endif;
+            }
+        }
 
         // User SEO Data
         register_graphql_field('User', 'seo', [
