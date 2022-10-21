@@ -445,6 +445,11 @@ add_action('graphql_init', function () {
                 'pinterest' => ['type' => 'SEOSocialPinterest'],
                 'youTube' => ['type' => 'SEOSocialYoutube'],
                 'wikipedia' => ['type' => 'SEOSocialWikipedia'],
+                'otherSocials' => [
+                    'type' => [
+                        'list_of' => 'String',
+                    ],
+                ],
             ],
         ]);
 
@@ -641,6 +646,7 @@ add_action('graphql_init', function () {
                         'wikipedia' => [
                             'url' => wp_gql_seo_format_string($all['wikipedia_url']),
                         ],
+                        'otherSocials' => !empty($all['other_social_urls']) ? $all['other_social_urls'] : [],
                     ],
                     'breadcrumbs' => [
                         'enabled' => wp_gql_seo_format_string($all['breadcrumbs-enable']),
