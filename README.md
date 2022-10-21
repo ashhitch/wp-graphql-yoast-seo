@@ -317,6 +317,7 @@ query GetSeoConfig {
             youTube {
                 url
             }
+            otherSocials
         }
         openGraph {
             frontPage {
