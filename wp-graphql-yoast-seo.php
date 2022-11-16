@@ -593,6 +593,10 @@ add_action('graphql_init', function () {
                 $wpseo_options = WPSEO_Options::get_instance();
                 $all = $wpseo_options->get_all();
 
+                // [separator] => sc-pipe
+                // [title-home-wpseo] => WP Graphql SEO DEMO Site
+                //metadesc-home-wpseo
+
                 $redirectsObj = class_exists('WPSEO_Redirect_Option') ? new WPSEO_Redirect_Option() : false;
                 $redirects = $redirectsObj ? $redirectsObj->get_from_option() : [];
 
