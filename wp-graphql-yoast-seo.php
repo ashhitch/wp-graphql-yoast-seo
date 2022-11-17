@@ -377,7 +377,7 @@ add_action('graphql_init', function () {
                 'homepage' => ['type' => 'SEOGlobalMetaHome'],
                 'author' => ['type' => 'SEOGlobalMetaAuthor'],
                 'config' => ['type' => 'SEOGlobalMetaConfig'],
-                '404' => ['type' => 'SEOGlobalMeta404'],
+                'notFound' => ['type' => 'SEOGlobalMeta404'],
             ],
         ]);
 
@@ -658,7 +658,7 @@ add_action('graphql_init', function () {
                 $config = [
                     'separator' => wp_gql_seo_format_string($all['separator']),
                 ];
-                $four0four = [
+                $notFound = [
                     'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-404-wpseo'])),
                     'breadcrumb' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['breadcrumbs-404crumb'])),
                 ];
@@ -669,7 +669,7 @@ add_action('graphql_init', function () {
                         'homepage' => $homepage,
                         'author' => $author,
                         'config' => $config,
-                        '404' => $four0four,
+                        'notFound' => $notFound,
                     ],
                     'webmaster' => [
                         'baiduVerify' => wp_gql_seo_format_string($all['baiduverify']),
