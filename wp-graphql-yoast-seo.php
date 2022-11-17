@@ -375,7 +375,7 @@ add_action('graphql_init', function () {
             'description' => __('The Yoast SEO meta data', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'homepage' => ['type' => 'SEOGlobalMetaHome'],
-                'author' => ['type' => 'SEOGlobalAuthorHome'],
+                'author' => ['type' => 'SEOGlobalMetaAuthor'],
                 'config' => ['type' => 'SEOGlobalMetaConfig'],
                 '404' => ['type' => 'SEOGlobalMeta404'],
             ],
