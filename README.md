@@ -253,6 +253,23 @@ query GetPostsWithIsPrimary {
 ```graphql
 query GetSeoConfig {
     seo {
+        meta {
+            author {
+                description
+                title
+            }
+            config {
+                separator
+            }
+            homepage {
+                description
+                title
+            }
+            notFound {
+                breadcrumb
+                title
+            }
+        }
         webmaster {
             googleVerify
             yandexVerify

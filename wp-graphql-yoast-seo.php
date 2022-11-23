@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.19.0
+ * Version:         4.20.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -344,6 +344,43 @@ add_action('graphql_init', function () {
             ],
         ]);
 
+        register_graphql_object_type('SEOGlobalMetaHome', [
+            'description' => __('The Yoast SEO homepage data', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'title' => ['type' => 'String'],
+                'description' => ['type' => 'String'],
+            ],
+        ]);
+        register_graphql_object_type('SEOGlobalMetaAuthor', [
+            'description' => __('The Yoast SEO Author data', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'title' => ['type' => 'String'],
+                'description' => ['type' => 'String'],
+            ],
+        ]);
+        register_graphql_object_type('SEOGlobalMetaConfig', [
+            'description' => __('The Yoast SEO meta config data', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'separator' => ['type' => 'String'],
+            ],
+        ]);
+        register_graphql_object_type('SEOGlobalMeta404', [
+            'description' => __('The Yoast SEO meta 404 data', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'title' => ['type' => 'String'],
+                'breadcrumb' => ['type' => 'String'],
+            ],
+        ]);
+        register_graphql_object_type('SEOGlobalMeta', [
+            'description' => __('The Yoast SEO meta data', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'homepage' => ['type' => 'SEOGlobalMetaHome'],
+                'author' => ['type' => 'SEOGlobalMetaAuthor'],
+                'config' => ['type' => 'SEOGlobalMetaConfig'],
+                'notFound' => ['type' => 'SEOGlobalMeta404'],
+            ],
+        ]);
+
         register_graphql_object_type('SEOSchema', [
             'description' => __('The Yoast SEO schema data', 'wp-graphql-yoast-seo'),
             'fields' => [
@@ -514,6 +551,7 @@ add_action('graphql_init', function () {
         register_graphql_object_type('SEOConfig', [
             'description' => __('The Yoast SEO site level configuration data', 'wp-graphql-yoast-seo'),
             'fields' => [
+                'meta' => ['type' => 'SEOGlobalMeta'],
                 'schema' => ['type' => 'SEOSchema'],
                 'webmaster' => ['type' => 'SEOWebmaster'],
                 'social' => ['type' => 'SEOSocial'],
@@ -592,7 +630,6 @@ add_action('graphql_init', function () {
             'resolve' => function ($source, array $args, AppContext $context) use ($post_types) {
                 $wpseo_options = WPSEO_Options::get_instance();
                 $all = $wpseo_options->get_all();
-
                 $redirectsObj = class_exists('WPSEO_Redirect_Option') ? new WPSEO_Redirect_Option() : false;
                 $redirects = $redirectsObj ? $redirectsObj->get_from_option() : [];
 
@@ -610,8 +647,30 @@ add_action('graphql_init', function () {
 
                 $contentTypes = wp_gql_seo_build_content_type_data($post_types, $all);
 
+                $homepage = [
+                    'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-home-wpseo'])),
+                    'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-home-wpseo'])),
+                ];
+                $author = [
+                    'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-author-wpseo'])),
+                    'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-author-wpseo'])),
+                ];
+                $config = [
+                    'separator' => wp_gql_seo_format_string($all['separator']),
+                ];
+                $notFound = [
+                    'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-404-wpseo'])),
+                    'breadcrumb' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['breadcrumbs-404crumb'])),
+                ];
+
                 return [
                     'contentTypes' => $contentTypes,
+                    'meta' => [
+                        'homepage' => $homepage,
+                        'author' => $author,
+                        'config' => $config,
+                        'notFound' => $notFound,
+                    ],
                     'webmaster' => [
                         'baiduVerify' => wp_gql_seo_format_string($all['baiduverify']),
                         'googleVerify' => wp_gql_seo_format_string($all['googleverify']),
