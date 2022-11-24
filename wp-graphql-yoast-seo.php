@@ -181,7 +181,7 @@ add_action('graphql_init', function () {
             if ($post_type_object->graphql_single_name) {
                 $tag = wp_gql_seo_get_field_key($post_type_object->graphql_single_name);
 
-                $schemaArray = YoastSEO()->meta->for_post_type_archive($type)->schema;
+                $meta = YoastSEO()->meta->for_post_type_archive($type);
 
                 $carry[$tag] = [
                     'title' => !empty($all['title-' . $type])
@@ -190,71 +190,37 @@ add_action('graphql_init', function () {
                     'metaDesc' => !empty($all['metadesc-' . $type])
                         ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-' . $type]))
                         : null,
-                    'metaRobotsNoindex' => !empty($all['noindex-' . $type]) ? boolval($all['noindex-' . $type]) : false,
+                    'metaRobotsNoindex' => !empty($all['noindex-' . $type]) ? 'noindex' : 'index',
                     'schemaType' => !empty($all['schema-page-type-' . $type])
                         ? $all['schema-page-type-' . $type]
                         : null,
 
                     'schema' => [
-                        'raw' => !empty($schemaArray) ? json_encode($schemaArray, JSON_UNESCAPED_SLASHES) : null,
+                        'raw' => !empty($meta->schema) ? json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
                     ],
                     'archive' =>
-                        $tag == 'post' //Posts are stored like this
-                            ? [
-                                'hasArchive' => true,
-                                'archiveLink' => get_post_type_archive_link($type),
-                                'title' => !empty($all['title-archive-wpseo'])
-                                    ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-archive-wpseo']))
-                                    : null,
-                                'metaDesc' => !empty($all['metadesc-archive-wpseo'])
-                                    ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-archive-wpseo']))
-                                    : null,
-                                'metaRobotsNoindex' => !empty($all['noindex-archive-wpseo'])
-                                    ? $all['noindex-archive-wpseo']
-                                    : null,
-                                'breadcrumbTitle' => !empty($all['bctitle-archive-wpseo'])
-                                    ? $all['bctitle-archive-wpseo']
-                                    : null,
-                                'metaRobotsNoindex' => boolval($all['noindex-archive-wpseo']),
-                                'fullHead' => is_string(
-                                    YoastSEO()
-                                        ->meta->for_post_type_archive($type)
-                                        ->get_head()
-                                )
-                                    ? YoastSEO()
-                                        ->meta->for_post_type_archive($type)
-                                        ->get_head()
-                                    : YoastSEO()
-                                        ->meta->for_post_type_archive($type)
-                                        ->get_head()->html,
-                            ]
-                            : [
-                                'hasArchive' => boolval($post_type_object->has_archive),
-                                'archiveLink' => get_post_type_archive_link($type),
-                                'title' => !empty($all['title-ptarchive-' . $type])
-                                    ? $all['title-ptarchive-' . $type]
-                                    : null,
-                                'metaDesc' => !empty($all['metadesc-ptarchive-' . $type])
-                                    ? $all['metadesc-ptarchive-' . $type]
-                                    : null,
-                                'metaRobotsNoindex' => !empty($all['noindex-ptarchive-' . $type])
-                                    ? boolval($all['noindex-ptarchive-' . $type])
-                                    : false,
-                                'breadcrumbTitle' => !empty($all['bctitle-ptarchive-' . $type])
-                                    ? $all['bctitle-ptarchive-' . $type]
-                                    : null,
-                                'fullHead' => is_string(
-                                    YoastSEO()
-                                        ->meta->for_post_type_archive($type)
-                                        ->get_head()
-                                )
-                                    ? YoastSEO()
-                                        ->meta->for_post_type_archive($type)
-                                        ->get_head()
-                                    : YoastSEO()
-                                        ->meta->for_post_type_archive($type)
-                                        ->get_head()->html,
-                            ],
+                        [
+                            'hasArchive' => boolval($post_type_object->has_archive),
+                            'archiveLink' => get_post_type_archive_link($type),
+                            'title' => !empty($meta->title)
+                                ? $meta->title
+                                : null,
+                            'metaDesc' => !empty($meta->indexable->description)
+                                ? $meta->indexable->description
+                                : null,
+                            'metaRobotsNoindex' => !empty($meta->robots['index'])
+                                ? $meta->robots['index']
+                                : 'noindex',
+                            'metaRobotsNofollow' => !empty($meta->robots['follow'])
+                                ? $meta->robots['follow']
+                                : 'nofollow',
+                            'breadcrumbTitle' => !empty($meta->indexable->breadcrumb_title)
+                                ? $meta->indexable->breadcrumb_title
+                                : null,
+                            'fullHead' => is_string($meta->get_head())
+                                ? $meta->get_head()
+                                : $meta->get_head()->html,
+                        ],
                 ];
             }
         }
@@ -518,13 +484,14 @@ add_action('graphql_init', function () {
         ]);
 
         register_graphql_object_type('SEOContentTypeArchive', [
-            'description' => __('he Yoast SEO search appearance content types fields', 'wp-graphql-yoast-seo'),
+            'description' => __('The Yoast SEO search appearance content types fields', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'hasArchive' => ['type' => 'Boolean'],
                 'title' => ['type' => 'String'],
                 'archiveLink' => ['type' => 'String'],
                 'metaDesc' => ['type' => 'String'],
-                'metaRobotsNoindex' => ['type' => 'Boolean'],
+                'metaRobotsNoindex' => ['type' => 'String'],
+                'metaRobotsNofollow' => ['type' => 'String'],
                 'breadcrumbTitle' => ['type' => 'String'],
                 'fullHead' => ['type' => 'String'],
             ],
@@ -534,7 +501,7 @@ add_action('graphql_init', function () {
             'fields' => [
                 'title' => ['type' => 'String'],
                 'metaDesc' => ['type' => 'String'],
-                'metaRobotsNoindex' => ['type' => 'Boolean'],
+                'metaRobotsNoindex' => ['type' => 'String'],
                 'schemaType' => ['type' => 'String'],
                 'schema' => ['type' => 'SEOPageInfoSchema'],
                 'archive' => ['type' => 'SEOContentTypeArchive'],
