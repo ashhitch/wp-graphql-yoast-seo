@@ -2,7 +2,7 @@
 Contributors: ash_hitch
 Tags: SEO, Yoast, WPGraphQL, GraphQL, Headless WordPress, Decoupled WordPress, JAMStack
 Requires at least: 5.0
-Tested up to: 6
+Tested up to: 6.1.1
 Requires PHP: 7.1
 Stable tag: 4.20.0
 License: GPLv3
