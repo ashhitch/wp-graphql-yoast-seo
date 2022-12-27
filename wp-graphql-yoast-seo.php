@@ -190,7 +190,7 @@ add_action('graphql_init', function () {
                     'metaDesc' => !empty($all['metadesc-' . $type])
                         ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-' . $type]))
                         : null,
-                    'metaRobotsNoindex' => !empty($all['noindex-' . $type]) ? 'noindex' : 'index',
+                    'metaRobotsNoindex' => !empty($all['noindex-' . $type]) ? boolval($all['noindex-' . $type]) : false,
                     'schemaType' => !empty($all['schema-page-type-' . $type])
                         ? $all['schema-page-type-' . $type]
                         : null,
@@ -208,10 +208,16 @@ add_action('graphql_init', function () {
                             'metaDesc' => !empty($meta->indexable->description)
                                 ? $meta->indexable->description
                                 : null,
-                            'metaRobotsNoindex' => !empty($meta->robots['index'])
+                            'metaRobotsNoindex' => !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
+                                ? false
+                                : true,
+                            'metaRobotsNofollow' => !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
+                                ? false
+                                : true,
+                            'metaRobotsIndex' => !empty($meta->robots['index'])
                                 ? $meta->robots['index']
                                 : 'noindex',
-                            'metaRobotsNofollow' => !empty($meta->robots['follow'])
+                            'metaRobotsFollow' => !empty($meta->robots['follow'])
                                 ? $meta->robots['follow']
                                 : 'nofollow',
                             'breadcrumbTitle' => !empty($meta->indexable->breadcrumb_title)
@@ -490,8 +496,10 @@ add_action('graphql_init', function () {
                 'title' => ['type' => 'String'],
                 'archiveLink' => ['type' => 'String'],
                 'metaDesc' => ['type' => 'String'],
-                'metaRobotsNoindex' => ['type' => 'String'],
-                'metaRobotsNofollow' => ['type' => 'String'],
+                'metaRobotsNoindex' => ['type' => 'Boolean'],
+                'metaRobotsNofollow' => ['type' => 'Boolean'],
+                'metaRobotsIndex' => ['type' => 'String'],
+                'metaRobotsFollow' => ['type' => 'String'],
                 'breadcrumbTitle' => ['type' => 'String'],
                 'fullHead' => ['type' => 'String'],
             ],
@@ -501,7 +509,7 @@ add_action('graphql_init', function () {
             'fields' => [
                 'title' => ['type' => 'String'],
                 'metaDesc' => ['type' => 'String'],
-                'metaRobotsNoindex' => ['type' => 'String'],
+                'metaRobotsNoindex' => ['type' => 'Boolean'],
                 'schemaType' => ['type' => 'String'],
                 'schema' => ['type' => 'SEOPageInfoSchema'],
                 'archive' => ['type' => 'SEOContentTypeArchive'],
