@@ -203,10 +203,10 @@ add_action('graphql_init', function () {
                             'hasArchive' => boolval($post_type_object->has_archive),
                             'archiveLink' => get_post_type_archive_link($type),
                             'title' => !empty($meta->title)
-                                ? $meta->title
+                                ? wp_gql_seo_format_string($meta->title)
                                 : null,
                             'metaDesc' => !empty($meta->indexable->description)
-                                ? $meta->indexable->description
+                                ? wp_gql_seo_format_string($meta->indexable->description)
                                 : null,
                             'metaRobotsNoindex' => !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
                                 ? false
