@@ -205,8 +205,8 @@ add_action('graphql_init', function () {
                             'title' => !empty($meta->title)
                                 ? wp_gql_seo_format_string($meta->title)
                                 : null,
-                            'metaDesc' => !empty($meta->indexable->description)
-                                ? wp_gql_seo_format_string($meta->indexable->description)
+                            'metaDesc' => !empty($all['metadesc-ptarchive-' . $type])
+                                ? wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type])
                                 : null,
                             'metaRobotsNoindex' => !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
                                 ? false
@@ -220,8 +220,8 @@ add_action('graphql_init', function () {
                             'metaRobotsFollow' => !empty($meta->robots['follow'])
                                 ? $meta->robots['follow']
                                 : 'nofollow',
-                            'breadcrumbTitle' => !empty($meta->indexable->breadcrumb_title)
-                                ? $meta->indexable->breadcrumb_title
+                            'breadcrumbTitle' => !empty($all['bctitle-ptarchive-' . $type])
+                                ? wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type])
                                 : null,
                             'fullHead' => is_string($meta->get_head())
                                 ? $meta->get_head()
