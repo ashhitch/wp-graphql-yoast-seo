@@ -201,7 +201,7 @@ add_action('graphql_init', function () {
                     'archive' =>
                         [
                             'hasArchive' => boolval($post_type_object->has_archive),
-                            'archiveLink' => get_post_type_archive_link($type),
+                            'archiveLink' => apply_filters('wp_gql_seo_archive_link', get_post_type_archive_link($type)),
                             'title' => !empty($meta->title)
                                 ? wp_gql_seo_format_string($meta->title)
                                 : null,
