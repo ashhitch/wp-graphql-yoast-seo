@@ -1,31 +1,37 @@
 name: WordPress Coding Standards
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
-
-jobs:
+    push:
+        branches:
+            - master
+        paths:
+            - '**.php'
+            - 'phpcs.xml'
+            - '.github/workflows/coding-standards.yml'
+    pull_request:
+        branches:
+            - master
+        paths:
+            - '**.php'
+            - 'phpcs.xml'
+            - '.github/workflows/coding-standards.yml'
+ jobs:
   phpcs:
-      name: PHPCS
-      runs-on: ubuntu-latest
-      steps:
-         - uses: actions/checkout@v2
-         - name: Get Composer Cache Directory
-           id: composer-cache
-           run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-         - name: Install dependencies
-           run: composer install --prefer-dist --no-progress 
-         - name: Cache dependencies
-           uses: actions/cache@v1
-           with:
-            path: ${{ steps.composer-cache.outputs.dir }}
-            key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-            restore-keys: ${{ runner.os }}-composer
-         - name: PHPCS check
-           uses: chekalsky/phpcs-action@v1
-           with:
-             phpcs_bin_path: './vendor/bin/phpcs'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # important!
+
+      # we may use whatever way to install phpcs, just specify the path on the next step
+      # however, curl seems to be the fastest
+      - name: Install PHP_CodeSniffer
+        run: |
+          curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
+          php phpcs.phar --version
+
+      - uses: thenabeel/action-phpcs@v8
+        with:
+          files: "**.php" # you may customize glob as needed
+          phpcs_path: php phpcs.phar
+          standard: phpcs.xml
