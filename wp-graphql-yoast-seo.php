@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.20.0
+ * Version:         4.21.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -198,35 +198,28 @@ add_action('graphql_init', function () {
                     'schema' => [
                         'raw' => !empty($meta->schema) ? json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
                     ],
-                    'archive' =>
-                        [
-                            'hasArchive' => boolval($post_type_object->has_archive),
-                            'archiveLink' => apply_filters('wp_gql_seo_archive_link', get_post_type_archive_link($type), $type),
-                            'title' => !empty($meta->title)
-                                ? wp_gql_seo_format_string($meta->title)
-                                : null,
-                            'metaDesc' => !empty($all['metadesc-ptarchive-' . $type])
-                                ? wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type])
-                                : null,
-                            'metaRobotsNoindex' => !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
-                                ? false
-                                : true,
-                            'metaRobotsNofollow' => !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
-                                ? false
-                                : true,
-                            'metaRobotsIndex' => !empty($meta->robots['index'])
-                                ? $meta->robots['index']
-                                : 'noindex',
-                            'metaRobotsFollow' => !empty($meta->robots['follow'])
-                                ? $meta->robots['follow']
-                                : 'nofollow',
-                            'breadcrumbTitle' => !empty($all['bctitle-ptarchive-' . $type])
-                                ? wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type])
-                                : null,
-                            'fullHead' => is_string($meta->get_head())
-                                ? $meta->get_head()
-                                : $meta->get_head()->html,
-                        ],
+                    'archive' => [
+                        'hasArchive' => boolval($post_type_object->has_archive),
+                        'archiveLink' => apply_filters(
+                            'wp_gql_seo_archive_link',
+                            get_post_type_archive_link($type),
+                            $type
+                        ),
+                        'title' => !empty($meta->title) ? wp_gql_seo_format_string($meta->title) : null,
+                        'metaDesc' => !empty($all['metadesc-ptarchive-' . $type])
+                            ? wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type])
+                            : null,
+                        'metaRobotsNoindex' =>
+                            !empty($meta->robots['index']) && $meta->robots['index'] === 'index' ? false : true,
+                        'metaRobotsNofollow' =>
+                            !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow' ? false : true,
+                        'metaRobotsIndex' => !empty($meta->robots['index']) ? $meta->robots['index'] : 'noindex',
+                        'metaRobotsFollow' => !empty($meta->robots['follow']) ? $meta->robots['follow'] : 'nofollow',
+                        'breadcrumbTitle' => !empty($all['bctitle-ptarchive-' . $type])
+                            ? wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type])
+                            : null,
+                        'fullHead' => is_string($meta->get_head()) ? $meta->get_head() : $meta->get_head()->html,
+                    ],
                 ];
             }
         }
