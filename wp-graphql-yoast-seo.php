@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.21.0
+ * Version:         4.22.0
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -323,6 +323,13 @@ add_action('graphql_init', function () {
                 'description' => ['type' => 'String'],
             ],
         ]);
+        register_graphql_object_type('SEOGlobalMetaDate', [
+            'description' => __('The Yoast SEO Date data', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'title' => ['type' => 'String'],
+                'description' => ['type' => 'String'],
+            ],
+        ]);
         register_graphql_object_type('SEOGlobalMetaConfig', [
             'description' => __('The Yoast SEO meta config data', 'wp-graphql-yoast-seo'),
             'fields' => [
@@ -341,6 +348,7 @@ add_action('graphql_init', function () {
             'fields' => [
                 'homepage' => ['type' => 'SEOGlobalMetaHome'],
                 'author' => ['type' => 'SEOGlobalMetaAuthor'],
+                'date' => ['type' => 'SEOGlobalMetaDate'],
                 'config' => ['type' => 'SEOGlobalMetaConfig'],
                 'notFound' => ['type' => 'SEOGlobalMeta404'],
             ],
@@ -623,6 +631,10 @@ add_action('graphql_init', function () {
                     'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-author-wpseo'])),
                     'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-author-wpseo'])),
                 ];
+                $date = [
+                    'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-archive-wpseo'])),
+                    'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-archive-wpseo'])),
+                ];
                 $config = [
                     'separator' => wp_gql_seo_format_string($all['separator']),
                 ];
@@ -636,6 +648,7 @@ add_action('graphql_init', function () {
                     'meta' => [
                         'homepage' => $homepage,
                         'author' => $author,
+                        'date' => $date,
                         'config' => $config,
                         'notFound' => $notFound,
                     ],
