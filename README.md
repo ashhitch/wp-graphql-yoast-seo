@@ -258,6 +258,10 @@ query GetSeoConfig {
                 description
                 title
             }
+            date {
+                description
+                title
+            }
             config {
                 separator
             }
