@@ -18,6 +18,7 @@ if (!defined('ABSPATH')) {
 }
 
 use WPGraphQL\AppContext;
+use WPGraphQL\Model\Term;
 
 add_action('admin_init', function () {
     $core_dependencies = [
@@ -750,7 +751,11 @@ add_action('graphql_init', function () {
                 '@graph' => 'graph',
                 '@context' => 'context',
             ];
-            $meta = YoastSEO()->meta->for_post($post->ID);
+            if( $post instanceof Term ){
+                $meta = YoastSEO()->meta->for_term($post->term_id);
+            } else {
+                $meta = YoastSEO()->meta->for_post($post->ID);
+            }
 
             $schemaArray = $meta !== false ? $meta->schema : [];
 
