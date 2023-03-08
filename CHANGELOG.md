@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.22.0] - 2022-02-06
+## [4.22.1] - 2023-03-08
+
+### Fixed
+
+- Taxonomies metatag behaviour fixed (#152)
+
+## [4.22.0] - 2023-02-06
 
 ### Added
 
 -   `Date archive` title and description
 
-## [4.21.0] - 2022-01-06
+## [4.21.0] - 2023-01-06
 
 ### Added
 
