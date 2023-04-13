@@ -130,6 +130,7 @@ add_action('graphql_init', function () {
                         'default',
                         12 * HOUR_IN_SECONDS + mt_rand(0, 4 * HOUR_IN_SECONDS) // phpcs:ignore
                     );
+                    $id = null; // Set $id to null instead of false
                 } else {
                     wp_cache_set(
                         $cache_key,
@@ -139,12 +140,12 @@ add_action('graphql_init', function () {
                     );
                 }
             } elseif ('not_found' === $id) {
-                return false;
+                return null; // Return null instead of false
             }
-
+    
             return $id;
         }
-    }
+    }    
 
     function wp_gql_seo_build_content_types($types)
     {
