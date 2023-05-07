@@ -800,7 +800,7 @@ add_action('graphql_init', function () {
                     $twitter_image = $meta->twitter_image;
 
                     if (empty($twitter_image)) {
-                        return __return_empty_string();
+                        return null;
                     }
 
                     $id = wpcom_vip_attachment_url_to_postid($twitter_image);
