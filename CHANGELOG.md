@@ -5,17 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.22.3] - 2023-05-29
+
+### Fixed
+
+-   Fixes an error if $meta is empty for post type archive (#132) (thanks @LiamMartens)
+
 ## [4.22.2] - 2023-04-17
 
 ### Fixed
 
-- Cannot return null for non-nullable field "MediaItem.id" (#132) (thanks @izzygld)
+-   Cannot return null for non-nullable field "MediaItem.id" (#132) (thanks @izzygld)
 
 ## [4.22.1] - 2023-03-08
 
 ### Fixed
 
-- Taxonomies metatag behaviour fixed (#152)
+-   Taxonomies metatag behaviour fixed (#152)
 
 ## [4.22.0] - 2023-02-06
 
