@@ -904,6 +904,12 @@ add_action('graphql_init', function () {
             'type' => 'SEOUser',
             'description' => __('The Yoast SEO data of a user', 'wp-graphql-yoast-seo'),
             'resolve' => function ($user, array $args, AppContext $context) {
+                
+                // Author has no posts
+                if (!YoastSEO()->meta->for_author($user->userId)) {
+                    return [];
+                }
+                
                 $robots = YoastSEO()->meta->for_author($user->userId)->robots;
 
                 $schemaArray = YoastSEO()->meta->for_author($user->userId)->schema;
