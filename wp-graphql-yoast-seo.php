@@ -8,7 +8,7 @@
  * Author URI:      https://www.ashleyhitchcock.com
  * Text Domain:     wp-graphql-yoast-seo
  * Domain Path:     /languages
- * Version:         4.22.3
+ * Version:         4.22.4
  *
  * @package         WP_Graphql_YOAST_SEO
  */
@@ -842,7 +842,7 @@ add_action('graphql_init', function () {
                 return get_post_type_graphql_fields($post, $args, $context);
             },
         ]);
-        
+
         // if woocommerce is active, add seo to product
         if (class_exists('WooCommerce')) {
             register_graphql_field('Product', 'seo', [
@@ -916,12 +916,11 @@ add_action('graphql_init', function () {
             'type' => 'SEOUser',
             'description' => __('The Yoast SEO data of a user', 'wp-graphql-yoast-seo'),
             'resolve' => function ($user, array $args, AppContext $context) {
-                
                 // Author has no posts
                 if (!YoastSEO()->meta->for_author($user->userId)) {
                     return [];
                 }
-                
+
                 $robots = YoastSEO()->meta->for_author($user->userId)->robots;
 
                 $schemaArray = YoastSEO()->meta->for_author($user->userId)->schema;

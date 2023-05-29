@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.22.4] - 2023-05-29
+
+### Fixed
+
+-   Internal server error when querying SEO fields for a user that has no posts (#157) (thanks @pascalroget)
+-   woocommerce product support (#158) (thanks @berryhijwegen)
+
 ## [4.22.3] - 2023-05-29
 
 ### Fixed
