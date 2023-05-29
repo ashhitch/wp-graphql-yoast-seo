@@ -842,6 +842,18 @@ add_action('graphql_init', function () {
                 return get_post_type_graphql_fields($post, $args, $context);
             },
         ]);
+        
+        // if woocommerce is active, add seo to product
+        if (class_exists('WooCommerce')) {
+            register_graphql_field('Product', 'seo', [
+                'type' => 'PostTypeSEO',
+                'description' => __('The Yoast SEO data of the ContentNode', 'wp-graphql-yoast-seo'),
+                'resolve' => function ($post, array $args, AppContext $context) {
+                    return get_post_type_graphql_fields($post, $args, $context);
+                },
+            ]);
+        }
+
         // TODO connect to content node
         // Post Type SEO Data
         if (!empty($post_types) && is_array($post_types)) {
