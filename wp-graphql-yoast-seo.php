@@ -185,10 +185,6 @@ add_action('graphql_init', function () {
 
                 $meta = YoastSEO()->meta->for_post_type_archive($type);
 
-                if (empty($meta)) {
-                    continue;
-                }
-
                 $carry[$tag] = [
                     'title' => !empty($all['title-' . $type])
                         ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-' . $type]))
