@@ -4,7 +4,7 @@ Tags: SEO, Yoast, WPGraphQL, GraphQL, Headless WordPress, Decoupled WordPress, J
 Requires at least: 5.0
 Tested up to: 6.1.1
 Requires PHP: 7.1
-Stable tag: 4.22.4
+Stable tag: 4.22.5
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
