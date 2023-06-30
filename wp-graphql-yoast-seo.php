@@ -222,8 +222,7 @@ add_action('graphql_init', function () {
                     'metaRobotsIndex' => $meta->robots['index'] ?? 'noindex',
                     'metaRobotsFollow' => $meta->robots['follow'] ?? 'nofollow',
                     'breadcrumbTitle' => wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type] ?? null),
-                    'fullHead' =>
-                        !empty($meta) && is_string($meta->get_head()) ? $meta->get_head() : $meta->get_head()->html,
+                    'fullHead' => wp_gql_seo_get_full_head($meta),
                 ],
             ];
         }
@@ -275,9 +274,7 @@ add_action('graphql_init', function () {
             'opengraphModifiedTime' => wp_gql_seo_format_string(
                 $meta !== false ? $meta->open_graph_article_modified_time : ''
             ),
-            'opengraphDescription' => wp_gql_seo_format_string(
-                $meta !== false ? $meta->open_graph_description : ''
-            ),
+            'opengraphDescription' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_description : ''),
             'opengraphImage' => function () use ($post, $context, $meta) {
                 $id = wp_gql_seo_get_og_image($meta !== false ? $meta->open_graph_images : []);
 
@@ -943,17 +940,7 @@ add_action('graphql_init', function () {
                     'language' => YoastSEO()->meta->for_author($user->userId)->language,
                     'region' => YoastSEO()->meta->for_author($user->userId)->region,
                     'breadcrumbTitle' => YoastSEO()->meta->for_author($user->userId)->breadcrumb_title,
-                    'fullHead' => is_string(
-                        YoastSEO()
-                            ->meta->for_author($user->userId)
-                            ->get_head()
-                    )
-                        ? YoastSEO()
-                            ->meta->for_author($user->userId)
-                            ->get_head()
-                        : YoastSEO()
-                            ->meta->for_author($user->userId)
-                            ->get_head()->html,
+                    'fullHead' => wp_gql_seo_get_full_head(YoastSEO()->meta->for_author($user->userId)),
                     'social' => [
                         'facebook' => wp_gql_seo_format_string(get_the_author_meta('facebook', $user->userId)),
                         'twitter' => wp_gql_seo_format_string(get_the_author_meta('twitter', $user->userId)),
@@ -1067,17 +1054,7 @@ add_action('graphql_init', function () {
                                 : null,
                             'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs,
                             'cornerstone' => boolval(YoastSEO()->meta->for_term($term->term_id)->is_cornerstone),
-                            'fullHead' => is_string(
-                                YoastSEO()
-                                    ->meta->for_term($term->term_id)
-                                    ->get_head()
-                            )
-                                ? YoastSEO()
-                                    ->meta->for_term($term->term_id)
-                                    ->get_head()
-                                : YoastSEO()
-                                    ->meta->for_term($term->term_id)
-                                    ->get_head()->html,
+                            'fullHead' => wp_gql_seo_get_full_head(YoastSEO()->meta->for_term($term->term_id)),
                             'schema' => [
                                 'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                             ],
