@@ -177,58 +177,57 @@ add_action('graphql_init', function () {
     function wp_gql_seo_build_content_type_data($types, $all)
     {
         $carry = [];
+
+        // Validate input parameters
+        if (!is_array($types) || empty($types) || !is_array($all) || empty($all)) {
+            return $carry;
+        }
+
         foreach ($types as $type) {
             $post_type_object = get_post_type_object($type);
 
-            if ($post_type_object->graphql_single_name) {
-                $tag = wp_gql_seo_get_field_key($post_type_object->graphql_single_name);
-
-                $meta = YoastSEO()->meta->for_post_type_archive($type);
-
-                if (empty($meta)) {
-                    continue;
-                }
-
-                $carry[$tag] = [
-                    'title' => !empty($all['title-' . $type])
-                        ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-' . $type]))
-                        : null,
-                    'metaDesc' => !empty($all['metadesc-' . $type])
-                        ? wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-' . $type]))
-                        : null,
-                    'metaRobotsNoindex' => !empty($all['noindex-' . $type]) ? boolval($all['noindex-' . $type]) : false,
-                    'schemaType' => !empty($all['schema-page-type-' . $type])
-                        ? $all['schema-page-type-' . $type]
-                        : null,
-
-                    'schema' => [
-                        'raw' => !empty($meta->schema) ? json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
-                    ],
-                    'archive' => [
-                        'hasArchive' => boolval($post_type_object->has_archive),
-                        'archiveLink' => apply_filters(
-                            'wp_gql_seo_archive_link',
-                            get_post_type_archive_link($type),
-                            $type
-                        ),
-                        'title' => !empty($meta->title) ? wp_gql_seo_format_string($meta->title) : null,
-                        'metaDesc' => !empty($all['metadesc-ptarchive-' . $type])
-                            ? wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type])
-                            : null,
-                        'metaRobotsNoindex' =>
-                            !empty($meta->robots['index']) && $meta->robots['index'] === 'index' ? false : true,
-                        'metaRobotsNofollow' =>
-                            !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow' ? false : true,
-                        'metaRobotsIndex' => !empty($meta->robots['index']) ? $meta->robots['index'] : 'noindex',
-                        'metaRobotsFollow' => !empty($meta->robots['follow']) ? $meta->robots['follow'] : 'nofollow',
-                        'breadcrumbTitle' => !empty($all['bctitle-ptarchive-' . $type])
-                            ? wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type])
-                            : null,
-                        'fullHead' => is_string($meta->get_head()) ? $meta->get_head() : $meta->get_head()->html,
-                    ],
-                ];
+            // Validate post type object
+            if (!$post_type_object || !$post_type_object->graphql_single_name) {
+                continue;
             }
+
+            $tag = wp_gql_seo_get_field_key($post_type_object->graphql_single_name);
+
+            $meta = YoastSEO()->meta->for_post_type_archive($type);
+
+            $carry[$tag] = [
+                'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-' . $type] ?? null)),
+                'metaDesc' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-' . $type] ?? null)),
+                'metaRobotsNoindex' => boolval($all['noindex-' . $type] ?? false),
+                'schemaType' => $all['schema-page-type-' . $type] ?? null,
+                'schema' => [
+                    'raw' =>
+                        !empty($meta) && !empty($meta->schema)
+                            ? json_encode($meta->schema, JSON_UNESCAPED_SLASHES)
+                            : null,
+                ],
+                'archive' => [
+                    'hasArchive' => boolval($post_type_object->has_archive),
+                    'archiveLink' => apply_filters('wp_gql_seo_archive_link', get_post_type_archive_link($type), $type),
+                    'title' => wp_gql_seo_format_string($meta->title ?? null),
+                    'metaDesc' => wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type] ?? null),
+                    'metaRobotsNoindex' =>
+                        !empty($meta) && !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
+                            ? false
+                            : true,
+                    'metaRobotsNofollow' =>
+                        !empty($meta) && !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
+                            ? false
+                            : true,
+                    'metaRobotsIndex' => $meta->robots['index'] ?? 'noindex',
+                    'metaRobotsFollow' => $meta->robots['follow'] ?? 'nofollow',
+                    'breadcrumbTitle' => wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type] ?? null),
+                    'fullHead' =>
+                        !empty($meta) && is_string($meta->get_head()) ? $meta->get_head() : $meta->get_head()->html,
+                ],
+            ];
         }
+
         return $carry;
     }
 
