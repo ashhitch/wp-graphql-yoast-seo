@@ -603,6 +603,20 @@ add_action('graphql_init', function () {
             ],
         ]);
 
+        register_graphql_object_type('SEOTaxonomyArchive', [
+            'description' => __('The Yoast SEO archive configuration data for taxonomies', 'wp-graphql-yoast-seo'),
+            'fields' => [
+                'title' => ['type' => 'String'],
+                'metaDesc' => ['type' => 'String'],
+                'metaRobotsNoindex' => ['type' => 'Boolean'],
+                'metaRobotsNofollow' => ['type' => 'Boolean'],
+                'metaRobotsIndex' => ['type' => 'String'],
+                'metaRobotsFollow' => ['type' => 'String'],
+                'breadcrumbTitle' => ['type' => 'String'],
+                'fullHead' => ['type' => 'String'],
+            ],
+        ]);
+
         $allTypes = wp_gql_seo_build_content_types($post_types);
 
         register_graphql_object_type('SEOContentTypes', [
@@ -625,6 +639,36 @@ add_action('graphql_init', function () {
                 ],
                 'openGraph' => ['type' => 'SEOOpenGraph'],
                 'contentTypes' => ['type' => 'SEOContentTypes'],
+                'taxonomyArchives' => [
+                    'type' => ['list_of' => 'SEOTaxonomyArchive'],
+                    'description' => __('The Yoast SEO archive configuration data for taxonomies', 'wp-graphql-yoast-seo'),
+                    'resolve' => function () {
+                        $taxonomies = \WPGraphQL::get_allowed_taxonomies();
+                        $archive_data = [];
+
+                        foreach ($taxonomies as $tax) {
+                            $taxonomy = get_taxonomy($tax);
+                            if (empty($taxonomy) || !isset($taxonomy->graphql_single_name)) {
+                                continue;
+                            }
+
+                            $archive_meta = YoastSEO()->meta->for_term_archive($tax);
+
+                            $archive_data[] = [
+                                'title' => wp_gql_seo_format_string($archive_meta->title ?? null),
+                                'metaDesc' => wp_gql_seo_format_string($archive_meta->description ?? null),
+                                'metaRobotsNoindex' => boolval($archive_meta->robots['index'] ?? false),
+                                'metaRobotsNofollow' => boolval($archive_meta->robots['follow'] ?? false),
+                                'metaRobotsIndex' => $archive_meta->robots['index'] ?? 'noindex',
+                                'metaRobotsFollow' => $archive_meta->robots['follow'] ?? 'nofollow',
+                                'breadcrumbTitle' => wp_gql_seo_format_string($archive_meta->breadcrumb_title ?? null),
+                                'fullHead' => wp_gql_seo_get_full_head($archive_meta),
+                            ];
+                        }
+
+                        return $archive_data;
+                    },
+                ],
             ],
         ]);
 
@@ -820,6 +864,36 @@ add_action('graphql_init', function () {
                                 ->get_loader('post')
                                 ->load_deferred(absint($all['open_graph_frontpage_image_id'])),
                         ],
+                    ],
+                    'taxonomyArchives' => [
+                        'type' => ['list_of' => 'SEOTaxonomyArchive'],
+                        'description' => __('The Yoast SEO archive configuration data for taxonomies', 'wp-graphql-yoast-seo'),
+                        'resolve' => function () {
+                            $taxonomies = \WPGraphQL::get_allowed_taxonomies();
+                            $archive_data = [];
+
+                            foreach ($taxonomies as $tax) {
+                                $taxonomy = get_taxonomy($tax);
+                                if (empty($taxonomy) || !isset($taxonomy->graphql_single_name)) {
+                                    continue;
+                                }
+
+                                $archive_meta = YoastSEO()->meta->for_term_archive($tax);
+
+                                $archive_data[] = [
+                                    'title' => wp_gql_seo_format_string($archive_meta->title ?? null),
+                                    'metaDesc' => wp_gql_seo_format_string($archive_meta->description ?? null),
+                                    'metaRobotsNoindex' => boolval($archive_meta->robots['index'] ?? false),
+                                    'metaRobotsNofollow' => boolval($archive_meta->robots['follow'] ?? false),
+                                    'metaRobotsIndex' => $archive_meta->robots['index'] ?? 'noindex',
+                                    'metaRobotsFollow' => $archive_meta->robots['follow'] ?? 'nofollow',
+                                    'breadcrumbTitle' => wp_gql_seo_format_string($archive_meta->breadcrumb_title ?? null),
+                                    'fullHead' => wp_gql_seo_get_full_head($archive_meta),
+                                ];
+                            }
+
+                            return $archive_data;
+                        },
                     ],
                 ];
             },
@@ -1060,6 +1134,9 @@ add_action('graphql_init', function () {
                                 'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                             ],
                         ];
+
+                        // Get archive dat
+
                         wp_reset_query();
 
                         return !empty($seo) ? $seo : null;
