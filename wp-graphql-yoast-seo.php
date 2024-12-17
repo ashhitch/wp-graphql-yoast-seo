@@ -1130,8 +1130,6 @@ add_action('graphql_init', function () {
                             ],
                         ];
 
-                        // Get archive dat
-
                         wp_reset_query();
 
                         return !empty($seo) ? $seo : null;
