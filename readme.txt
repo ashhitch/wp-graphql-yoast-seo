@@ -1,10 +1,10 @@
 === WPGraphQL Yoast SEO Addon ===
 Contributors: ash_hitch
-Tags: SEO, Yoast, WPGraphQL, GraphQL, Headless WordPress, Decoupled WordPress, JAMStack
+Tags: SEO, Yoast, WPGraphQL, GraphQL, Headless WordPress
 Requires at least: 5.0
 Tested up to: 6.7.1
 Requires PHP: 7.1
-Stable tag: v4.23.1
+Stable tag: 4.23.2
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 

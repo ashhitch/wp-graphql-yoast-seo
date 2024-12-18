@@ -8,7 +8,7 @@
  * Author URI: https://www.ashleyhitchcock.com
  * Text Domain: wp-graphql-yoast-seo
  * Domain Path: /languages
- * Version: v4.23.1
+ * Version: v4.23.2
  * Requires Plugins: wp-graphql, wordpress-seo
  *
  * @package WP_Graphql_YOAST_SEO
