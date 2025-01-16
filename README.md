@@ -43,6 +43,25 @@ This is an extension to the WPGraphQL plugin (https://github.com/wp-graphql/wp-g
 composer require ashhitch/wp-graphql-yoast-seo
 ```
 
+## Docker Setup for development
+
+To set up a local WordPress environment using Docker, follow these steps:
+
+1. **Build and start the Docker containers**:
+
+    ```sh
+    docker-compose up -d
+    ```
+
+2. **Run the setup script** to install WordPress, activate plugins, and load dummy data:
+
+    ```sh
+    docker-compose exec wordpress bash /var/www/html/wp-content/plugins/wp-graphql-yoast-seo/setup.sh
+    ```
+
+3. **Access WordPress**:
+   Open your browser and go to `http://localhost:8000`.
+
 ## Find this useful?
 
 <a href="https://www.buymeacoffee.com/ashhitch" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 40px !important;width: auto !important;" ></a>
