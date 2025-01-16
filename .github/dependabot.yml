@@ -1,0 +1,18 @@
+version: 2
+updates:
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      commit-message:
+          prefix: 'deps'
+      ignore:
+          # For all deps
+          - dependency-name: '*'
+            # ignore all major updates
+            update-types: ['version-update:semver-major']
+      groups:
+          all-dependencies:
+              patterns:
+                  - '*'
+      versioning-strategy: increase-if-necessary
