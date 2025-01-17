@@ -3,6 +3,7 @@ version: '3.8'
 services:
     wordpress:
         image: wordpress:latest
+        platform: linux/amd64
         ports:
             - '8000:80'
         environment:
@@ -20,6 +21,7 @@ services:
 
     db:
         image: mysql:5.7
+        platform: linux/amd64
         environment:
             MYSQL_DATABASE: exampledb
             MYSQL_USER: exampleuser
@@ -30,6 +32,7 @@ services:
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
+        platform: linux/amd64
         ports:
             - '8080:80'
         environment:
