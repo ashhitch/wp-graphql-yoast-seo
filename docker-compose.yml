@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
     wordpress:
-        image: wordpress:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
         platform: linux/amd64
         ports:
             - '8000:80'
