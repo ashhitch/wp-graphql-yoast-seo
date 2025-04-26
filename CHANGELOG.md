@@ -5,10 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.0] - 2025-04-26
+
+This refactoring has organised the plugin into these components:
+
+-   Main Plugin File (wp-graphql-yoast-seo.php): Acts as the bootstrap file that initialises the plugin and loads all required components.
+
+-   Dependencies Check (includes/admin/dependencies.php): Handles checking for required plugins (WPGraphQL and Yoast SEO) and shows admin notices if they're missing.
+
+-   Helper Functions (includes/helpers/functions.php): Contains utility functions used throughout the plugin for tasks like string formatting, image handling, and building data structures.
+
+-   Schema Types (includes/schema/types.php): Defines all the GraphQL types used to represent Yoast SEO data in the schema.
+
 ## [4.23.0] - 2024-12-17
 
 ### Added
-- Taxonomies archive configuration
+
+-   Taxonomies archive configuration
 
 ## [4.22.5] - 2023-06-30
 
