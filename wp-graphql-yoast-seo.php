@@ -255,7 +255,6 @@ add_action('graphql_init', function () {
         foreach ($taxonomies as $taxonomy) {
             $taxonomy_object = get_taxonomy($taxonomy);
 
-
             // Validate taxonomy object
             if (!$taxonomy_object || !$taxonomy_object->graphql_single_name) {
                 continue;
@@ -264,8 +263,12 @@ add_action('graphql_init', function () {
             $tag = wp_gql_seo_get_field_key($taxonomy_object->graphql_single_name);
             $carry[$tag] = [
                 'archive' => [
-                    'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-tax-' . $taxonomy] ?? null)),
-                    'metaDesc' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-tax-' . $taxonomy] ?? null)),
+                    'title' => wp_gql_seo_format_string(
+                        wp_gql_seo_replace_vars($all['title-tax-' . $taxonomy] ?? null)
+                    ),
+                    'metaDesc' => wp_gql_seo_format_string(
+                        wp_gql_seo_replace_vars($all['metadesc-tax-' . $taxonomy] ?? null)
+                    ),
                     'metaRobotsNoindex' => boolval($all['noindex-tax-' . $taxonomy] ?? false),
                 ],
             ];
@@ -654,8 +657,7 @@ add_action('graphql_init', function () {
             'fields' => $allTypes,
         ]);
 
-
-           register_graphql_object_type('SEOTaxonomyTypeArchive', [
+        register_graphql_object_type('SEOTaxonomyTypeArchive', [
             'description' => __('The Yoast SEO search appearance Taxonomy types fields', 'wp-graphql-yoast-seo'),
             'fields' => [
                 'title' => ['type' => 'String'],
@@ -672,7 +674,7 @@ add_action('graphql_init', function () {
 
         register_graphql_object_type('SEOTaxonomyTypes', [
             'description' => __('The Yoast SEO archive configuration data for taxonomies', 'wp-graphql-yoast-seo'),
-            'fields' =>  $allTaxonomies,
+            'fields' => $allTaxonomies,
         ]);
 
         register_graphql_object_type('SEOConfig', [
@@ -889,7 +891,6 @@ add_action('graphql_init', function () {
                                 ->load_deferred(absint($all['open_graph_frontpage_image_id'])),
                         ],
                     ],
-               
                 ];
             },
         ]);

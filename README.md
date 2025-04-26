@@ -43,6 +43,139 @@ This is an extension to the WPGraphQL plugin (https://github.com/wp-graphql/wp-g
 composer require ashhitch/wp-graphql-yoast-seo
 ```
 
+## Contributor Setup
+
+This plugin uses Docker for local development to ensure a consistent environment for all contributors.
+
+### Prerequisites
+
+Before you begin, make sure you have installed:
+
+1. [Docker](https://www.docker.com/get-started)
+2. [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop)
+3. Git
+
+### Getting Started
+
+1. **Clone the repository**:
+
+    ```sh
+    git clone https://github.com/ashhitch/wp-graphql-yoast-seo.git
+    cd wp-graphql-yoast-seo
+    ```
+
+2. **Start the Docker environment**:
+
+    ```sh
+    docker-compose up -d
+    ```
+
+    This will build and start the following containers:
+
+    - WordPress (accessible at http://localhost:8000)
+    - MySQL database
+    - phpMyAdmin (accessible at http://localhost:8080)
+
+3. **Access WordPress**:
+
+    The setup script will automatically:
+
+    - Install WordPress
+    - Install and activate the WPGraphQL plugin
+    - Install and activate the Yoast SEO plugin
+    - Activate the wp-graphql-yoast-seo plugin
+    - Create some test content (posts and pages)
+
+    Default credentials:
+
+    - Admin Username: `admin`
+    - Admin Password: `password`
+    - Admin Email: `admin@example.com`
+
+### Development Workflow
+
+1. **Make your code changes** to the plugin files in your local repository.
+
+2. **Test your changes**:
+    - Visit http://localhost:8000 to access the WordPress admin
+    - You can use tools like [GraphiQL](https://github.com/wp-graphql/wp-graphql) (included with WPGraphQL) to test your GraphQL queries
+3. **Restart containers if needed**:
+
+    ```sh
+    docker-compose restart
+    ```
+
+4. **View logs**:
+
+    ```sh
+    docker-compose logs -f wordpress
+    ```
+
+5. **Stop the environment** when you're done:
+
+    ```sh
+    docker-compose down
+    ```
+
+    To completely remove volumes (database data) as well:
+
+    ```sh
+    docker-compose down -v
+    ```
+
+### Coding Standards
+
+This plugin follows WordPress Coding Standards. Before submitting a pull request:
+
+1. **Install development dependencies**:
+
+    ```sh
+    composer install
+    ```
+
+2. **Run code quality checks**:
+
+    ```sh
+    composer run phpcs
+    ```
+
+3. **Fix coding standards automatically** (when possible):
+
+    ```sh
+    composer run phpcbf
+    ```
+
+### GraphQL Testing
+
+To test your GraphQL queries with the WPGraphQL Yoast SEO plugin:
+
+1. Access the GraphiQL interface at http://localhost:8000/wp-admin/admin.php?page=graphiql-ide
+2. Try some of the example queries from the Usage section below
+
+### Troubleshooting
+
+If you encounter issues:
+
+1. **Check container status**:
+
+    ```sh
+    docker-compose ps
+    ```
+
+2. **Rebuild containers**:
+
+    ```sh
+    docker-compose down
+    docker-compose build --no-cache
+    docker-compose up -d
+    ```
+
+3. **Check WordPress logs**:
+
+    ```sh
+    docker-compose logs wordpress
+    ```
+
 ## Find this useful?
 
 <a href="https://www.buymeacoffee.com/ashhitch" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 40px !important;width: auto !important;" ></a>

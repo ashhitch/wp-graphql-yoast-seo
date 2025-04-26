@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+    wordpress:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        platform: linux/amd64
+        ports:
+            - '8000:80'
+        environment:
+            WORDPRESS_DB_HOST: db
+            WORDPRESS_DB_USER: exampleuser
+            WORDPRESS_DB_PASSWORD: examplepass
+            WORDPRESS_DB_NAME: exampledb
+        volumes:
+            - ./wp-content:/var/www/html/wp-content
+            - ./wp-config.php:/var/www/html/wp-config.php
+            - .:/var/www/html/wp-content/plugins/wp-graphql-yoast-seo
+            - ./wp-graphql-yoast-seo.php:/var/www/html/wp-content/plugins/wp-graphql-yoast-seo/wp-graphql-yoast-seo.php
+        depends_on:
+            - db
+
+    db:
+        image: mysql:5.7
+        platform: linux/amd64
+        environment:
+            MYSQL_DATABASE: exampledb
+            MYSQL_USER: exampleuser
+            MYSQL_PASSWORD: examplepass
+            MYSQL_ROOT_PASSWORD: rootpass
+        volumes:
+            - db_data:/var/lib/mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        platform: linux/amd64
+        ports:
+            - '8080:80'
+        environment:
+            PMA_HOST: db
+            MYSQL_ROOT_PASSWORD: rootpass
+
+volumes:
+    db_data:
