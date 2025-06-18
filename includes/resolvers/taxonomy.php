@@ -36,16 +36,17 @@ add_action('graphql_register_types', function () {
                     $term_obj = get_term($term->term_id);
 
                     $meta = WPSEO_Taxonomy_Meta::get_term_meta((int) $term_obj->term_id, $term_obj->taxonomy);
-                    $robots = YoastSEO()->meta->for_term($term->term_id)->robots;
+                    $yoast_meta = YoastSEO()->meta->for_term($term->term_id);
+                    $robots = $yoast_meta->robots;
 
-                    $schemaArray = YoastSEO()->meta->for_term($term->term_id)->schema;
+                    $schemaArray = $yoast_meta->schema;
 
                     // Get data
                     $seo = [
                         'title' => wp_gql_seo_format_string(
-                            html_entity_decode(wp_strip_all_tags(YoastSEO()->meta->for_term($term->term_id)->title))
+                            html_entity_decode(wp_strip_all_tags($yoast_meta->title))
                         ),
-                        'metaDesc' => wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->description),
+                        'metaDesc' => wp_gql_seo_format_string($yoast_meta->description),
                         'focuskw' => isset($meta['wpseo_focuskw'])
                             ? wp_gql_seo_format_string($meta['wpseo_focuskw'])
                             : $meta['wpseo_focuskw'],
