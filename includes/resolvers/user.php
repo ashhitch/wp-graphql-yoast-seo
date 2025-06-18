@@ -19,35 +19,38 @@ add_action('graphql_register_types', function () {
         'type' => 'SEOUser',
         'description' => __('The Yoast SEO data of a user', 'wp-graphql-yoast-seo'),
         'resolve' => function ($user, array $args, AppContext $context) {
+            // Cache the author meta data
+            $authorMeta = YoastSEO()->meta->for_author($user->userId);
+
             // Author has no posts
-            if (!YoastSEO()->meta->for_author($user->userId)) {
+            if (!$authorMeta) {
                 return [];
             }
 
-            $robots = YoastSEO()->meta->for_author($user->userId)->robots;
+            $robots = $authorMeta->robots;
 
-            $schemaArray = YoastSEO()->meta->for_author($user->userId)->schema;
+            $schemaArray = $authorMeta->schema;
 
             $userSeo = [
-                'title' => wp_gql_seo_format_string(YoastSEO()->meta->for_author($user->userId)->title),
-                'metaDesc' => wp_gql_seo_format_string(YoastSEO()->meta->for_author($user->userId)->description),
+                'title' => wp_gql_seo_format_string($authorMeta->title),
+                'metaDesc' => wp_gql_seo_format_string($authorMeta->description),
                 'metaRobotsNoindex' => $robots['index'],
                 'metaRobotsNofollow' => $robots['follow'],
-                'canonical' => YoastSEO()->meta->for_author($user->userId)->canonical,
-                'opengraphTitle' => YoastSEO()->meta->for_author($user->userId)->open_graph_title,
-                'opengraphDescription' => YoastSEO()->meta->for_author($user->userId)->open_graph_description,
+                'canonical' => $authorMeta->canonical,
+                'opengraphTitle' => $authorMeta->open_graph_title,
+                'opengraphDescription' => $authorMeta->open_graph_description,
                 'opengraphImage' => $context
                     ->get_loader('post')
-                    ->load_deferred(absint(YoastSEO()->meta->for_author($user->userId)->open_graph_image_id)),
+                    ->load_deferred(absint($authorMeta->open_graph_image_id)),
                 'twitterImage' => $context
                     ->get_loader('post')
-                    ->load_deferred(absint(YoastSEO()->meta->for_author($user->userId)->twitter_image_id)),
-                'twitterTitle' => YoastSEO()->meta->for_author($user->userId)->twitter_title,
-                'twitterDescription' => YoastSEO()->meta->for_author($user->userId)->twitter_description,
-                'language' => YoastSEO()->meta->for_author($user->userId)->language,
-                'region' => YoastSEO()->meta->for_author($user->userId)->region,
-                'breadcrumbTitle' => YoastSEO()->meta->for_author($user->userId)->breadcrumb_title,
-                'fullHead' => wp_gql_seo_get_full_head(YoastSEO()->meta->for_author($user->userId)),
+                    ->load_deferred(absint($authorMeta->twitter_image_id)),
+                'twitterTitle' => $authorMeta->twitter_title,
+                'twitterDescription' => $authorMeta->twitter_description,
+                'language' => $authorMeta->language,
+                'region' => $authorMeta->region,
+                'breadcrumbTitle' => $authorMeta->breadcrumb_title,
+                'fullHead' => wp_gql_seo_get_full_head($authorMeta),
                 'social' => [
                     'facebook' => wp_gql_seo_format_string(get_the_author_meta('facebook', $user->userId)),
                     'twitter' => wp_gql_seo_format_string(get_the_author_meta('twitter', $user->userId)),
