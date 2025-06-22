@@ -145,6 +145,42 @@ This plugin follows WordPress Coding Standards. Before submitting a pull request
     composer run phpcbf
     ```
 
+### Testing
+
+This plugin includes a comprehensive PHPUnit test suite that verifies all functionality. The tests cover:
+
+1. Post Type SEO data
+2. Taxonomy SEO data
+3. User SEO data
+4. Primary Taxonomy functionality
+5. Root Query SEO data
+6. Helper functions
+7. Schema registration
+
+Since this project uses Docker for development, tests are designed to run within the Docker environment.
+
+#### Running Tests in Docker
+
+1. **Run all tests**:
+
+    ```sh
+    ./bin/docker-test.sh
+    ```
+
+2. **Run a specific test file**:
+
+    ```sh
+    ./bin/docker-test.sh tests/test-post-type-seo.php
+    ```
+
+The script will automatically:
+- Start Docker containers if they're not running
+- Install test dependencies in the container
+- Set up the WordPress test environment
+- Run the specified tests
+
+For more information about the test suite, see the [tests/README.md](tests/README.md) file.
+
 ### GraphQL Testing
 
 To test your GraphQL queries with the WPGraphQL Yoast SEO plugin:
