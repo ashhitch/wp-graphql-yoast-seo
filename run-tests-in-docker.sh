@@ -1,70 +1,5 @@
 #!/bin/bash
 
-# Exit if any command fails
-set -e
-
-# Colors for terminal output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-echo -e "${GREEN}Running WP GraphQL Yoast SEO tests in Docker...${NC}"
-
-# Check if Docker is running
-if ! docker info > /dev/null 2>&1; then
-  echo -e "${RED}Docker is not running. Please start Docker and try again.${NC}"
-  exit 1
-fi
-
-# Check if docker-compose is available
-if ! command -v docker-compose > /dev/null 2>&1; then
-  echo -e "${RED}docker-compose is not installed. Please install docker-compose and try again.${NC}"
-  exit 1
-fi
-
-# Start Docker containers if they're not already running
-if ! docker-compose ps | grep -q "wordpress.*Up"; then
-  echo -e "${YELLOW}Starting Docker containers...${NC}"
-  docker-compose up -d
-  
-  # Wait for WordPress container to be ready
-  echo -e "${YELLOW}Waiting for WordPress container to be ready...${NC}"
-  sleep 10
-fi
-
-# Install necessary packages in the container
-echo -e "${YELLOW}Installing necessary packages in container...${NC}"
-docker-compose exec wordpress bash -c "apt-get update && apt-get install -y curl zip unzip git subversion"
-
-# Check if Composer is installed in the container
-echo -e "${YELLOW}Checking for Composer in container...${NC}"
-docker-compose exec wordpress bash -c "if ! command -v composer > /dev/null 2>&1; then \
-  curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer; \
-fi"
-
-# Install PHPUnit and required dependencies in the container
-echo -e "${YELLOW}Installing test dependencies in container...${NC}"
-docker-compose exec wordpress bash -c "cd /var/www/html/wp-content/plugins/wp-graphql-yoast-seo && \
-  composer require --dev phpunit/phpunit:'^9.0' yoast/phpunit-polyfills:'^2.0' --with-all-dependencies"
-
-# Set database credentials
-DB_NAME="exampledb"
-DB_USER="exampleuser"
-DB_PASS="examplepass"
-DB_HOST="db"
-
-echo -e "${GREEN}Using database: ${DB_NAME}, user: ${DB_USER}, host: ${DB_HOST}${NC}"
-
-# Fix permissions for install-wp-tests.sh
-echo -e "${YELLOW}Fixing permissions for install-wp-tests.sh...${NC}"
-docker-compose exec wordpress bash -c "chmod +x /var/www/html/wp-content/plugins/wp-graphql-yoast-seo/bin/install-wp-tests.sh"
-
-# Create a simple test script to run inside the container
-echo -e "${YELLOW}Creating test runner script...${NC}"
-docker-compose exec wordpress bash -c "cat > /var/www/html/wp-content/plugins/wp-graphql-yoast-seo/run-tests-in-docker.sh << 'EOL'
-#!/bin/bash
-
 # Set up WordPress test environment
 cd /var/www/html/wp-content/plugins/wp-graphql-yoast-seo
 
@@ -114,7 +49,7 @@ define( 'AUTH_SALT',        'put your unique phrase here' );
 define( 'SECURE_AUTH_SALT', 'put your unique phrase here' );
 define( 'LOGGED_IN_SALT',   'put your unique phrase here' );
 define( 'NONCE_SALT',       'put your unique phrase here' );
-$table_prefix = 'wpgraphql_test_';
+ = 'wpgraphql_test_';
 define( 'WP_TESTS_DOMAIN', 'example.org' );
 define( 'WP_TESTS_EMAIL', 'admin@example.org' );
 define( 'WP_TESTS_TITLE', 'Test Blog' );
@@ -152,37 +87,20 @@ cat > ./tests/custom-bootstrap.php << 'EOBOOT'
 // Set the path to the PHPUnit Polyfills
 define( 'WP_TESTS_PHPUNIT_POLYFILLS_PATH', '/var/www/html/wp-content/plugins/wp-graphql-yoast-seo/vendor/yoast/phpunit-polyfills' );
 
-$_tests_dir = '/tmp/wordpress-tests-lib';
+ = '/tmp/wordpress-tests-lib';
 
 // Give access to tests_add_filter() function.
-require_once $_tests_dir . '/includes/functions.php';
+require_once  . '/includes/functions.php';
 
 // Start up the WP testing environment.
-require $_tests_dir . '/includes/bootstrap.php';
+require  . '/includes/bootstrap.php';
 EOBOOT
 
 # Run the tests with our custom bootstrap
-if [ -n "$1" ]; then
+if [ -n  ]; then
   # Run specific test file
-  ./vendor/bin/phpunit --bootstrap=tests/custom-bootstrap.php "$1"
+  ./vendor/bin/phpunit --bootstrap=tests/custom-bootstrap.php 
 else
   # Run all tests
   ./vendor/bin/phpunit --bootstrap=tests/custom-bootstrap.php
 fi
-EOL"
-
-# Make the test runner script executable
-docker-compose exec wordpress bash -c "chmod +x /var/www/html/wp-content/plugins/wp-graphql-yoast-seo/run-tests-in-docker.sh"
-
-# Run the tests
-echo -e "${YELLOW}Running tests...${NC}"
-
-if [ -n "$1" ]; then
-  # Run specific test file
-  docker-compose exec wordpress bash -c "cd /var/www/html/wp-content/plugins/wp-graphql-yoast-seo && ./run-tests-in-docker.sh \"$1\""
-else
-  # Run all tests
-  docker-compose exec wordpress bash -c "cd /var/www/html/wp-content/plugins/wp-graphql-yoast-seo && ./run-tests-in-docker.sh"
-fi
-
-echo -e "${GREEN}Tests completed!${NC}"

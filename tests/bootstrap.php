@@ -23,13 +23,8 @@ require_once $_tests_dir . '/includes/functions.php';
  * Manually load the plugin being tested.
  */
 function _manually_load_plugin() {
-	// Load the WPGraphQL plugin.
-	require_once dirname( dirname( __FILE__ ) ) . '/../wp-graphql/wp-graphql.php';
-	
-	// Load the Yoast SEO plugin.
-	require_once dirname( dirname( __FILE__ ) ) . '/../wordpress-seo/wp-seo.php';
-	
-	// Load the plugin.
+	// The plugins will be loaded by the custom config we added in docker-test.sh
+	// Just load our plugin here
 	require_once dirname( dirname( __FILE__ ) ) . '/wp-graphql-yoast-seo.php';
 }
 tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
