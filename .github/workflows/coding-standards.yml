@@ -19,7 +19,7 @@ jobs:
     phpcs:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v4
               with:
                   fetch-depth: 0 # important!
 
@@ -30,7 +30,7 @@ jobs:
                   tools: composer
 
             - name: Cache Composer dependencies
-              uses: actions/cache@v2
+              uses: actions/cache@v4
               with:
                   path: /tmp/composer-cache
                   key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
