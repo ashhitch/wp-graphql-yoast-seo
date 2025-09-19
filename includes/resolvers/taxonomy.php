@@ -56,28 +56,28 @@ add_action('graphql_register_types', function () {
                         'metaRobotsNoindex' => $robots['index'],
                         'metaRobotsNofollow' => $robots['follow'],
                         'opengraphTitle' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_title
+                            $yoast_meta->open_graph_title
                         ),
                         'opengraphUrl' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_url
+                            $yoast_meta->open_graph_url
                         ),
                         'opengraphSiteName' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_site_name
+                            $yoast_meta->open_graph_site_name
                         ),
                         'opengraphType' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_type
+                            $yoast_meta->open_graph_type
                         ),
                         'opengraphAuthor' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_article_author
+                            $yoast_meta->open_graph_article_author
                         ),
                         'opengraphPublisher' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_article_publisher
+                            $yoast_meta->open_graph_article_publisher
                         ),
                         'opengraphPublishedTime' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_article_published_time
+                            $yoast_meta->open_graph_article_published_time
                         ),
                         'opengraphModifiedTime' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_article_modified_time
+                            $yoast_meta->open_graph_article_modified_time
                         ),
                         'opengraphDescription' => wp_gql_seo_format_string(
                             YoastSEO()->meta->for_term($term->term_id)->open_graph_description
@@ -104,7 +104,7 @@ add_action('graphql_register_types', function () {
                         'cornerstone' => boolval(YoastSEO()->meta->for_term($term->term_id)->is_cornerstone),
                         'fullHead' => wp_gql_seo_get_full_head(YoastSEO()->meta->for_term($term->term_id)),
                         'schema' => [
-                            'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                            'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                         ],
                     ];
 
@@ -137,7 +137,7 @@ add_action('graphql_register_types', function () {
                     register_graphql_field($name, 'isPrimary', [
                         'type' => 'Boolean',
                         'description' => __('The Yoast SEO Primary ' . $tax->name, 'wp-graphql-yoast-seo'),
-                        'resolve' => function ($item, array $args, AppContext $context) use ($tax) {
+                        'resolve' => function ($item) use ($tax) {
                             $postId = $item['source']->ID;
 
                             $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);

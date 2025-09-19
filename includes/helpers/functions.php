@@ -75,7 +75,7 @@ function wp_gql_seo_get_og_image($images)
  */
 function wp_gql_seo_get_field_key($field_key)
 {
-    $field_key = lcfirst(preg_replace('/[^a-zA-Z0-9 -]/', ' ', $field_key));
+    $field_key = lcfirst(preg_replace('/[^a-zA-Z0-9 \-]/', ' ', $field_key));
     $field_key = lcfirst(str_replace('_', ' ', ucwords($field_key, '_')));
     $field_key = lcfirst(str_replace('-', ' ', ucwords($field_key, '_')));
     $field_key = lcfirst(str_replace(' ', '', ucwords($field_key, ' ')));
@@ -217,7 +217,7 @@ function wp_gql_seo_build_content_type_data($types, $all)
             'schemaType' => $all['schema-page-type-' . $type] ?? null,
             'schema' => [
                 'raw' =>
-                    !empty($meta) && !empty($meta->schema) ? json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
+                    !empty($meta) && !empty($meta->schema) ? wp_json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
             ],
             'archive' => [
                 'hasArchive' => boolval($post_type_object->has_archive),

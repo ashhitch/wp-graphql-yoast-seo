@@ -25,12 +25,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     // Base array
     $seo = [];
 
-    $map = [
-        '@id' => 'id',
-        '@type' => 'type',
-        '@graph' => 'graph',
-        '@context' => 'context',
-    ];
+    // Removed unused $map variable
     if ($post instanceof Term) {
         $meta = YoastSEO()->meta->for_term($post->term_id);
     } else {
@@ -63,7 +58,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
             $meta !== false ? $meta->open_graph_article_modified_time : ''
         ),
         'opengraphDescription' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_description : ''),
-        'opengraphImage' => function () use ($post, $context, $meta) {
+        'opengraphImage' => function () use ($context, $meta) {
             $id = wp_gql_seo_get_og_image($meta !== false ? $meta->open_graph_images : []);
 
             return $context->get_loader('post')->load_deferred(absint($id));
@@ -71,7 +66,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'twitterCardType' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_card : ''),
         'twitterTitle' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_title : ''),
         'twitterDescription' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_description : ''),
-        'twitterImage' => function () use ($post, $context, $meta) {
+        'twitterImage' => function () use ($context, $meta) {
             $twitter_image = $meta->twitter_image;
 
             if (empty($twitter_image)) {
@@ -85,13 +80,12 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'canonical' => wp_gql_seo_format_string($meta !== false ? $meta->canonical : ''),
         'readingTime' => floatval($meta !== false ? $meta->estimated_reading_time_minutes : ''),
         'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
-        // TODO: Default should be true or false?
         'cornerstone' => boolval($meta !== false ? $meta->indexable->is_cornerstone : false),
         'fullHead' => wp_gql_seo_get_full_head($meta),
         'schema' => [
             'pageType' => $meta !== false && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
             'articleType' => $meta !== false && is_array($meta->schema_article_type) ? $meta->schema_article_type : [],
-            'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+            'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
         ],
     ];
 
