@@ -75,7 +75,7 @@ function wp_gql_seo_get_og_image($images)
  */
 function wp_gql_seo_get_field_key($field_key)
 {
-    $field_key = lcfirst(preg_replace('/[^a-zA-Z0-9 -]/', ' ', $field_key));
+    $field_key = lcfirst(preg_replace('/[^a-zA-Z0-9 \-]/', ' ', $field_key));
     $field_key = lcfirst(str_replace('_', ' ', ucwords($field_key, '_')));
     $field_key = lcfirst(str_replace('-', ' ', ucwords($field_key, '_')));
     $field_key = lcfirst(str_replace(' ', '', ucwords($field_key, ' ')));
