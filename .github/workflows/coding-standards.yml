@@ -23,15 +23,26 @@ jobs:
               with:
                   fetch-depth: 0 # important!
 
-            # we may use whatever way to install phpcs, just specify the path on the next step
-            # however, curl seems to be the fastest
-            - name: Install PHP_CodeSniffer
-              run: |
-                  curl -OL https://squizlabs.github.io/PHP_CodeSniffer/phpcs.phar
-                  php phpcs.phar --version
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '7.4'
+                  tools: composer
+
+            - name: Cache Composer dependencies
+              uses: actions/cache@v2
+              with:
+                  path: /tmp/composer-cache
+                  key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+            - name: Install Composer dependencies
+              run: composer install --dev --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+            - name: Verify PHPCS standards
+              run: ./vendor/bin/phpcs -i
 
             - uses: thenabeel/action-phpcs@v8
               with:
                   files: '**.php' # you may customize glob as needed
-                  phpcs_path: php phpcs.phar
+                  phpcs_path: ./vendor/bin/phpcs
                   standard: phpcs.xml
