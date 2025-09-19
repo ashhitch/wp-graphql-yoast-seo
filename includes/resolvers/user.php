@@ -65,11 +65,11 @@ add_action('graphql_register_types', function () {
 
                 'schema' => [
                     'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-                    'pageType' => is_array(YoastSEO()->meta->for_author($user->userId)->schema_page_type)
-                        ? YoastSEO()->meta->for_author($user->userId)->schema_page_type
+                    'pageType' => is_array($authorMeta->schema_page_type)
+                        ? $authorMeta->schema_page_type
                         : [],
-                    'articleType' => is_array(YoastSEO()->meta->for_author($user->userId)->schema_article_type)
-                        ? YoastSEO()->meta->for_author($user->userId)->schema_article_type
+                    'articleType' => is_array($authorMeta->schema_article_type)
+                        ? $authorMeta->schema_article_type
                         : [],
                 ],
             ];
