@@ -104,7 +104,7 @@ add_action('graphql_register_types', function () {
                         'cornerstone' => boolval(YoastSEO()->meta->for_term($term->term_id)->is_cornerstone),
                         'fullHead' => wp_gql_seo_get_full_head(YoastSEO()->meta->for_term($term->term_id)),
                         'schema' => [
-                            'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                            'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                         ],
                     ];
 
@@ -137,7 +137,7 @@ add_action('graphql_register_types', function () {
                     register_graphql_field($name, 'isPrimary', [
                         'type' => 'Boolean',
                         'description' => __('The Yoast SEO Primary ' . $tax->name, 'wp-graphql-yoast-seo'),
-                        'resolve' => function ($item, array $args, AppContext $context) use ($tax) {
+                        'resolve' => function ($item) use ($tax) {
                             $postId = $item['source']->ID;
 
                             $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);

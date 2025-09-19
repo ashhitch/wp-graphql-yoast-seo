@@ -64,7 +64,7 @@ add_action('graphql_register_types', function () {
                 ],
 
                 'schema' => [
-                    'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                    'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                     'pageType' => is_array($authorMeta->schema_page_type)
                         ? $authorMeta->schema_page_type
                         : [],

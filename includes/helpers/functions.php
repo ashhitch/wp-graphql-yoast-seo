@@ -217,7 +217,7 @@ function wp_gql_seo_build_content_type_data($types, $all)
             'schemaType' => $all['schema-page-type-' . $type] ?? null,
             'schema' => [
                 'raw' =>
-                    !empty($meta) && !empty($meta->schema) ? json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
+                    !empty($meta) && !empty($meta->schema) ? wp_json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
             ],
             'archive' => [
                 'hasArchive' => boolval($post_type_object->has_archive),

@@ -173,12 +173,12 @@ add_action('graphql_register_types', function () {
                         'Raw schema for ' . $post_type_object->graphql_single_name,
                         'wp-graphql-yoast-seo'
                     ),
-                    'resolve' => function ($item, array $args, AppContext $context) use ($post_type) {
+                    'resolve' => function () use ($post_type) {
                         $schemaArray = YoastSEO()->meta->for_post_type_archive($post_type)->schema;
 
                         return [
                             'schema' => [
-                                'raw' => json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
+                                'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                             ],
                         ];
                     },
