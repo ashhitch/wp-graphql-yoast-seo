@@ -2,13 +2,13 @@
 # yarn lockfile v1
 
 
-"@prettier/plugin-php@^0.22.4":
-  version "0.22.4"
-  resolved "https://registry.yarnpkg.com/@prettier/plugin-php/-/plugin-php-0.22.4.tgz#8752001f30be93079db9062c47139a2fc9ee770f"
-  integrity sha512-uZWqfyrwsxScIYkmVcfnoQGFmKVMXTHD5pqYT4l8fxzm5P3XY94hTPbf8X6TFCi2QTZBIot7GS8lfIjQjldc2g==
+"@prettier/plugin-php@^0.24.0":
+  version "0.24.0"
+  resolved "https://registry.yarnpkg.com/@prettier/plugin-php/-/plugin-php-0.24.0.tgz#c7e84dac73aa45109cfa0a0c73301063fdb3dc9f"
+  integrity sha512-x9l65fCE/pgoET6RQowgdgG8Xmzs44z6j6Hhg3coINCyCw9JBGJ5ZzMR2XHAM2jmAdbJAIgqB6cUn4/3W3XLTA==
   dependencies:
-    linguist-languages "^7.27.0"
-    php-parser "^3.1.5"
+    linguist-languages "^8.0.0"
+    php-parser "^3.2.5"
 
 ansi-escapes@^5.0.0:
   version "5.0.0"
@@ -162,10 +162,10 @@ lilconfig@2.1.0:
   resolved "https://registry.yarnpkg.com/lilconfig/-/lilconfig-2.1.0.tgz#78e23ac89ebb7e1bfbf25b18043de756548e7f52"
   integrity sha512-utWOt/GHzuUxnLKxB6dk81RoOeoNeHgbrXiuGk4yyF5qlRz+iIVWu56E2fqGHFrXz0QNUhLB/8nKqvRH66JKGQ==
 
-linguist-languages@^7.27.0:
-  version "7.27.0"
-  resolved "https://registry.yarnpkg.com/linguist-languages/-/linguist-languages-7.27.0.tgz#bf42d6c62bd04655c8f60ed2f77a84eaeae4023a"
-  integrity sha512-Wzx/22c5Jsv2ag+uKy+ITanGA5hzvBZngrNGDXLTC7ZjGM6FLCYGgomauTkxNJeP9of353OM0pWqngYA180xgw==
+linguist-languages@^8.0.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/linguist-languages/-/linguist-languages-8.2.0.tgz#d8f60eeaf0a97f04d5a4f6eb6190e39ebaf200d4"
+  integrity sha512-KCUUH9x97QWYU0SXOCGxUrZR6cSfuQrMhABB7L/0I8N0LXOeaKe7+RZs7FAwvWCV2qKfZ4Wv1luLq4OfMezSJg==
 
 lint-staged@>=13.0.1:
   version "13.3.0"
@@ -265,10 +265,10 @@ path-key@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-key/-/path-key-4.0.0.tgz#295588dc3aee64154f877adb9d780b81c554bf18"
   integrity sha512-haREypq7xkM7ErfgIyA0z+Bj4AGKlMSdlQE2jvJo6huWD1EdkKYV+G/T4nq0YEF2vgTT8kqMFKo1uHn950r4SQ==
 
-php-parser@^3.1.5:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/php-parser/-/php-parser-3.2.2.tgz#49c6fac29fbf8f995e1b8609ad52bd41b1ecda07"
-  integrity sha512-voj3rzCJmEbwHwH3QteON28wA6K+JbcaJEofyUZkUXmcViiXofjbSbcE5PtqtjX6nstnnAEYCFoRq0mkjP5/cg==
+php-parser@^3.2.5:
+  version "3.2.5"
+  resolved "https://registry.yarnpkg.com/php-parser/-/php-parser-3.2.5.tgz#24ff4b4f3e1788967f7737e43c273a5a8e7cd0ac"
+  integrity sha512-M1ZYlALFFnESbSdmRtTQrBFUHSriHgPhgqtTF/LCbZM4h7swR5PHtUceB2Kzby5CfqcsYwBn7OXTJ0+8Sajwkw==
 
 picomatch@^2.3.1:
   version "2.3.1"
