@@ -397,6 +397,7 @@ query GetSeoConfig {
             }
             config {
                 separator
+                alternateName
             }
             homepage {
                 description
