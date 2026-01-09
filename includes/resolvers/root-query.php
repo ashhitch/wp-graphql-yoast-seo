@@ -56,6 +56,7 @@ add_action('graphql_register_types', function () {
             ];
             $config = [
                 'separator' => wp_gql_seo_format_string($all['separator']),
+                'alternateName' => wp_gql_seo_format_string($all['alternate_website_name']),
             ];
             $notFound = [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-404-wpseo'])),

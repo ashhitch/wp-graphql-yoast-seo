@@ -120,6 +120,7 @@ add_action('graphql_register_types', function () {
         'description' => __('The Yoast SEO meta config data', 'wp-graphql-yoast-seo'),
         'fields' => [
             'separator' => ['type' => 'String'],
+            'alternateName' => ['type' => 'String'],
         ],
     ]);
     register_graphql_object_type('SEOGlobalMeta404', [
