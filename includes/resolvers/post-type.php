@@ -73,7 +73,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
                 return null;
             }
 
-            $id = wpcom_vip_attachment_url_to_postid($twitter_image);
+            $id = wp_gql_seo_attachment_url_to_postid($twitter_image);
 
             return $context->get_loader('post')->load_deferred(absint($id));
         },
