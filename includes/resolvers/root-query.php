@@ -174,7 +174,8 @@ add_action('graphql_register_types', function () {
                         'wp-graphql-yoast-seo'
                     ),
                     'resolve' => function () use ($post_type) {
-                        $schemaArray = YoastSEO()->meta->for_post_type_archive($post_type)->schema;
+                        $meta = YoastSEO()->meta->for_post_type_archive($post_type);
+                        $schemaArray = $meta !== false ? $meta->schema : [];
 
                         return [
                             'schema' => [
