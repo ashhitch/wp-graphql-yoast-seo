@@ -10,7 +10,7 @@ importers:
     devDependencies:
       '@prettier/plugin-php':
         specifier: ^0.24.0
-        version: 0.24.0(prettier@3.7.4)
+        version: 0.24.0(prettier@3.8.0)
       husky:
         specifier: '>=8.0.1'
         version: 9.1.7
@@ -19,7 +19,7 @@ importers:
         version: 16.2.7
       prettier:
         specifier: ^3.7.4
-        version: 3.7.4
+        version: 3.8.0
 
 packages:
 
@@ -134,8 +134,8 @@ packages:
     engines: {node: '>=0.10'}
     hasBin: true
 
-  prettier@3.7.4:
-    resolution: {integrity: sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA==}
+  prettier@3.8.0:
+    resolution: {integrity: sha512-yEPsovQfpxYfgWNhCfECjG5AQaO+K3dp6XERmOepyPDVqcJm+bjyCVO3pmU+nAPe0N5dDvekfGezt/EIiRe1TA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -185,11 +185,11 @@ packages:
 
 snapshots:
 
-  '@prettier/plugin-php@0.24.0(prettier@3.7.4)':
+  '@prettier/plugin-php@0.24.0(prettier@3.8.0)':
     dependencies:
       linguist-languages: 8.2.0
       php-parser: 3.2.5
-      prettier: 3.7.4
+      prettier: 3.8.0
 
   ansi-escapes@7.2.0:
     dependencies:
@@ -284,7 +284,7 @@ snapshots:
 
   pidtree@0.6.0: {}
 
-  prettier@3.7.4: {}
+  prettier@3.8.0: {}
 
   restore-cursor@5.1.0:
     dependencies:
