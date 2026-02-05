@@ -36,20 +36,24 @@ add_action('graphql_register_types', function () {
                 'metaDesc' => wp_gql_seo_format_string($authorMeta->description),
                 'metaRobotsNoindex' => $robots['index'],
                 'metaRobotsNofollow' => $robots['follow'],
-                'canonical' => $authorMeta->canonical,
-                'opengraphTitle' => $authorMeta->open_graph_title,
-                'opengraphDescription' => $authorMeta->open_graph_description,
+                'canonical' => wp_gql_seo_format_string($authorMeta->canonical),
+                'opengraphTitle' => wp_gql_seo_format_string($authorMeta->open_graph_title),
+                'opengraphDescription' => wp_gql_seo_format_string($authorMeta->open_graph_description),
+                'opengraphUrl' => wp_gql_seo_format_string($authorMeta->open_graph_url),
+                'opengraphSiteName' => wp_gql_seo_format_string($authorMeta->open_graph_site_name),
+                'opengraphType' => wp_gql_seo_format_string($authorMeta->open_graph_type),
                 'opengraphImage' => $context
                     ->get_loader('post')
                     ->load_deferred(absint($authorMeta->open_graph_image_id)),
                 'twitterImage' => $context
                     ->get_loader('post')
                     ->load_deferred(absint($authorMeta->twitter_image_id)),
-                'twitterTitle' => $authorMeta->twitter_title,
-                'twitterDescription' => $authorMeta->twitter_description,
+                'twitterTitle' => wp_gql_seo_format_string($authorMeta->twitter_title),
+                'twitterDescription' => wp_gql_seo_format_string($authorMeta->twitter_description),
                 'language' => $authorMeta->language,
                 'region' => $authorMeta->region,
                 'breadcrumbTitle' => $authorMeta->breadcrumb_title,
+                'breadcrumbs' => $authorMeta->breadcrumbs,
                 'fullHead' => wp_gql_seo_get_full_head($authorMeta),
                 'social' => [
                     'facebook' => wp_gql_seo_format_string(get_the_author_meta('facebook', $user->userId)),

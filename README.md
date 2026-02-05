@@ -329,10 +329,33 @@ query GetUsers {
     users {
         nodes {
             seo {
+                title
                 metaDesc
                 metaRobotsNofollow
                 metaRobotsNoindex
-                title
+                canonical
+                opengraphTitle
+                opengraphDescription
+                opengraphUrl
+                opengraphSiteName
+                opengraphType
+                opengraphImage {
+                    sourceUrl
+                    altText
+                }
+                twitterTitle
+                twitterDescription
+                twitterImage {
+                    sourceUrl
+                    altText
+                }
+                breadcrumbs {
+                    url
+                    text
+                }
+                breadcrumbTitle
+                language
+                region
                 fullHead
                 social {
                     youTube
@@ -344,6 +367,11 @@ query GetUsers {
                     linkedIn
                     instagram
                     facebook
+                }
+                schema {
+                    raw
+                    pageType
+                    articleType
                 }
             }
         }
