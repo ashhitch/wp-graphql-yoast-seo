@@ -47,14 +47,19 @@ add_action('graphql_init', function () {
 /**
  * Register data loaders
  */
-add_filter('graphql_data_loaders', function($loaders, $context) {
-    if (!class_exists('\WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader')) {
-        require_once WPGRAPHQL_YOAST_SEO_PLUGIN_DIR . 'includes/dataloaders/yoast-indexable-loader.php';
-    }
-    
-    $loaders['yoast_post_indexable'] = new \WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader($context, 'post');
-    $loaders['yoast_term_indexable'] = new \WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader($context, 'term');
-    $loaders['yoast_user_indexable'] = new \WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader($context, 'user');
+add_filter(
+    'graphql_data_loaders',
+    function ($loaders, $context) {
+        if (!class_exists('\WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader')) {
+            require_once WPGRAPHQL_YOAST_SEO_PLUGIN_DIR . 'includes/dataloaders/yoast-indexable-loader.php';
+        }
 
-    return $loaders;
-}, 10, 2);
+        $loaders['yoast_post_indexable'] = new \WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader($context, 'post');
+        $loaders['yoast_term_indexable'] = new \WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader($context, 'term');
+        $loaders['yoast_user_indexable'] = new \WP_Graphql_YOAST_SEO\Data\Loader\YoastIndexableLoader($context, 'user');
+
+        return $loaders;
+    },
+    10,
+    2,
+);
