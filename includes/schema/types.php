@@ -73,7 +73,6 @@ add_action('graphql_register_types', function () {
         'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
         'cornerstone' => ['type' => 'Boolean'],
         'fullHead' => ['type' => 'String'],
-        'primaryCategory' => ['type' => 'Category'],
     ];
 
     register_graphql_object_type('TaxonomySEO', [
@@ -84,6 +83,7 @@ add_action('graphql_register_types', function () {
 
     register_graphql_object_type('PostTypeSEO', [
         'fields' => array_merge($baseSEOFields, [
+            'primaryCategory' => ['type' => 'Category'],
             'readingTime' => ['type' => 'Float'],
             'schema' => ['type' => 'SEOPostTypeSchema'],
         ]),
