@@ -93,13 +93,13 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
                 if ($is_term || !$post_id) {
                     return null;
                 }
-                
+
                 $primary_term_id = function_exists('yoast_get_primary_term_id') ? yoast_get_primary_term_id('category', $post_id) : false;
-                
-                if (empty($primary_term_id) || $primary_term_id === false) {
+                $primary_term_id = absint($primary_term_id);
+
+                if (empty($primary_term_id)) {
                     return null;
                 }
-                
                 return $context->get_loader('term')->load_deferred($primary_term_id);
             },
             'schema' => [
