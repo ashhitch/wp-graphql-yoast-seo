@@ -1,0 +1,465 @@
+query ComprehensiveSEOTest {
+  # Global SEO Configuration
+  seo {
+    # Meta Configuration
+    meta {
+      homepage {
+        title
+        description
+      }
+      author {
+        title
+        description
+      }
+      date {
+        title
+        description
+      }
+      config {
+        separator
+      }
+      notFound {
+        title
+        breadcrumb
+      }
+    }
+    
+    # Schema Configuration
+    schema {
+      companyName
+      personName
+      companyOrPerson
+      siteName
+      wordpressSiteName
+      siteUrl
+      homeUrl
+      inLanguage
+      companyLogo {
+        sourceUrl
+        altText
+      }
+      personLogo {
+        sourceUrl
+        altText
+      }
+      logo {
+        sourceUrl
+        altText
+      }
+    }
+    
+    # Webmaster Verification
+    webmaster {
+      baiduVerify
+      googleVerify
+      msVerify
+      yandexVerify
+    }
+    
+    # Social Media Configuration
+    social {
+      facebook {
+        url
+        defaultImage {
+          sourceUrl
+          altText
+        }
+      }
+      twitter {
+        username
+        cardType
+      }
+      instagram {
+        url
+      }
+      linkedIn {
+        url
+      }
+      mySpace {
+        url
+      }
+      pinterest {
+        url
+        metaTag
+      }
+      youTube {
+        url
+      }
+      wikipedia {
+        url
+      }
+      otherSocials
+    }
+    
+    # Breadcrumbs Configuration
+    breadcrumbs {
+      enabled
+      boldLast
+      showBlogPage
+      notFoundText
+      archivePrefix
+      homeText
+      prefix
+      searchPrefix
+      separator
+    }
+    
+    # Local SEO (if plugin is installed)
+    local {
+      businessType
+      locationAddress
+      locationCity
+      locationState
+      locationZipcode
+      locationCountry
+      locationPhone
+      locationEmail
+      locationVatId
+      locationTaxId
+      openingHours24h
+      useMultipleLocations
+    }
+    
+    # Redirects (Yoast Premium only)
+    redirects {
+      origin
+      target
+      type
+      format
+      source
+      destination
+      permanent
+    }
+    
+    # Open Graph Configuration
+    openGraph {
+      defaultImage {
+        sourceUrl
+        altText
+      }
+      frontPage {
+        title
+        description
+        image {
+          sourceUrl
+          altText
+        }
+      }
+    }
+    
+    # Content Types Configuration
+    contentTypes {
+      post {
+        title
+        metaDesc
+        metaRobotsNoindex
+        schemaType
+        schema {
+          raw
+        }
+        archive {
+          hasArchive
+          title
+          metaDesc
+          metaRobotsNoindex
+          metaRobotsNofollow
+          metaRobotsIndex
+          metaRobotsFollow
+          breadcrumbTitle
+          fullHead
+        }
+      }
+      page {
+        title
+        metaDesc
+        metaRobotsNoindex
+        schemaType
+        schema {
+          raw
+        }
+        archive {
+          hasArchive
+          title
+          metaDesc
+          metaRobotsNoindex
+          metaRobotsNofollow
+          metaRobotsIndex
+          metaRobotsFollow
+          breadcrumbTitle
+          fullHead
+        }
+      }
+    }
+    
+    # Taxonomy Archives Configuration
+    taxonomyArchives {
+      category {
+        archive {
+          title
+          metaDesc
+          metaRobotsNoindex
+        }
+      }
+      tag {
+        archive {
+          title
+          metaDesc
+          metaRobotsNoindex
+        }
+      }
+    }
+  }
+  
+  # Test Posts with SEO Data
+  threePosts: posts(first: 3) {
+    edges {
+      node {
+        title
+        slug
+        seo {
+          title
+          metaDesc
+          focuskw
+          metaKeywords
+          metaRobotsNoindex
+          metaRobotsNofollow
+          opengraphTitle
+          opengraphUrl
+          opengraphSiteName
+          opengraphType
+          opengraphAuthor
+          opengraphPublisher
+          opengraphPublishedTime
+          opengraphModifiedTime
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterTitle
+          twitterDescription
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          canonical
+          readingTime
+          cornerstone
+          fullHead
+          breadcrumbs {
+            url
+            text
+          }
+          primaryCategory {
+            name
+            slug
+          }
+          schema {
+            pageType
+            articleType
+            raw
+          }
+        }
+      }
+    }
+  }
+  
+  # Test Pages with SEO Data
+  pages(first: 2) {
+    edges {
+      node {
+        title
+        slug
+        seo {
+          title
+          metaDesc
+          focuskw
+          metaKeywords
+          metaRobotsNoindex
+          metaRobotsNofollow
+          opengraphTitle
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterTitle
+          twitterDescription
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          canonical
+          readingTime
+          cornerstone
+          fullHead
+          breadcrumbs {
+            url
+            text
+          }
+          schema {
+            pageType
+            articleType
+            raw
+          }
+        }
+      }
+    }
+  }
+  
+  # Test Categories with SEO Data
+  categories(first: 2) {
+    edges {
+      node {
+        name
+        slug
+        seo {
+          title
+          metaDesc
+          focuskw
+          metaKeywords
+          metaRobotsNoindex
+          metaRobotsNofollow
+          opengraphTitle
+          opengraphUrl
+          opengraphSiteName
+          opengraphType
+          opengraphAuthor
+          opengraphPublisher
+          opengraphPublishedTime
+          opengraphModifiedTime
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterTitle
+          twitterDescription
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          canonical
+          cornerstone
+          fullHead
+          breadcrumbs {
+            url
+            text
+          }
+          schema {
+            raw
+          }
+        }
+      }
+    }
+  }
+  
+  # Test Tags with SEO Data
+  tags(first: 2) {
+    edges {
+      node {
+        name
+        slug
+        seo {
+          title
+          metaDesc
+          focuskw
+          metaKeywords
+          metaRobotsNoindex
+          metaRobotsNofollow
+          opengraphTitle
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterTitle
+          twitterDescription
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          canonical
+          cornerstone
+          fullHead
+          breadcrumbs {
+            url
+            text
+          }
+          schema {
+            raw
+          }
+        }
+      }
+    }
+  }
+  
+  # Test Users with SEO Data
+  users(first: 2) {
+    edges {
+      node {
+        name
+        email
+        seo {
+          title
+          metaDesc
+          metaRobotsNoindex
+          metaRobotsNofollow
+          canonical
+          opengraphTitle
+          opengraphDescription
+          opengraphImage {
+            sourceUrl
+            altText
+          }
+          twitterImage {
+            sourceUrl
+            altText
+          }
+          twitterTitle
+          twitterDescription
+          language
+          region
+          breadcrumbTitle
+          fullHead
+          social {
+            facebook
+            twitter
+            instagram
+            linkedIn
+            mySpace
+            pinterest
+            youTube
+            soundCloud
+            wikipedia
+          }
+          schema {
+            raw
+            pageType
+            articleType
+          }
+        }
+      }
+    }
+  }
+  
+
+  
+  # Test Primary Category on Post-Category Connection
+  postsCat: posts(first: 1) {
+    edges {
+      node {
+        title
+        categories {
+          edges {
+            isPrimary
+            node {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
