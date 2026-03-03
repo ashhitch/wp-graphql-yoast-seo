@@ -73,7 +73,11 @@ class YoastIndexableLoader extends AbstractDataLoader
         
         try {
             if ($this->type === 'post') {
-                $metas = YoastSEO()->meta->for_posts($valid_keys);
+                // Use the same API call that works in the direct test
+                $metas = [];
+                foreach ($valid_keys as $post_id) {
+                    $metas[$post_id] = YoastSEO()->meta->for_post($post_id);
+                }
                 
                 // for_posts returns an array keyed by post ID
                 foreach ($keys as $key) {
