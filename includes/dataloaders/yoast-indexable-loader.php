@@ -69,19 +69,21 @@ class YoastIndexableLoader extends AbstractDataLoader
             return $loaded;
         }
         
+        $valid_keys_lookup = array_fill_keys($valid_keys, true);
+        
         try {
             if ($this->type === 'post') {
                 $metas = YoastSEO()->meta->for_posts($valid_keys);
                 
                 // for_posts returns an array keyed by post ID
                 foreach ($keys as $key) {
-                    $loaded[$key] = in_array((int)$key, $valid_keys, true) && isset($metas[$key]) ? $metas[$key] : false;
+                    $loaded[$key] = isset($valid_keys_lookup[(int)$key]) && isset($metas[$key]) ? $metas[$key] : false;
                 }
             } else if ($this->type === 'term') {
                 // Yoast doesn't have a batch API for terms yet, so we have to loop
                 // but at least we're doing it in a loader pattern for future-proofing
                 foreach ($keys as $key) {
-                    if (in_array((int)$key, $valid_keys, true)) {
+                    if (isset($valid_keys_lookup[(int)$key])) {
                         $loaded[$key] = YoastSEO()->meta->for_term((int)$key);
                     } else {
                         $loaded[$key] = false;
@@ -90,7 +92,7 @@ class YoastIndexableLoader extends AbstractDataLoader
             } else if ($this->type === 'user') {
                 // Yoast doesn't have a batch API for authors yet
                 foreach ($keys as $key) {
-                    if (in_array((int)$key, $valid_keys, true)) {
+                    if (isset($valid_keys_lookup[(int)$key])) {
                         $loaded[$key] = YoastSEO()->meta->for_author((int)$key);
                     } else {
                         $loaded[$key] = false;
