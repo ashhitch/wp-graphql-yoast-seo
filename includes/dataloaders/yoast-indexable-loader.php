@@ -79,9 +79,10 @@ class YoastIndexableLoader extends AbstractDataLoader
                     $metas[$post_id] = YoastSEO()->meta->for_post($post_id);
                 }
                 
-                // for_posts returns an array keyed by post ID
+                // $metas is an array keyed by post ID; map original keys to their meta data or false
                 foreach ($keys as $key) {
-                    $loaded[$key] = isset($valid_keys_lookup[(int)$key]) && isset($metas[$key]) ? $metas[$key] : false;
+                    $normalized_key = (int) $key;
+                    $loaded[$key] = isset($valid_keys_lookup[$normalized_key]) && isset($metas[$normalized_key]) ? $metas[$normalized_key] : false;
                 }
             } else if ($this->type === 'term') {
                 // Yoast doesn't have a batch API for terms yet, so we have to loop

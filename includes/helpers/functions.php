@@ -16,7 +16,8 @@ if (!defined('ABSPATH')) {
  * @param callable $errorHandler The error handler function
  * @return mixed
  */
-function wp_gql_seo_handle_promise_error($promise, $errorHandler) {
+function wp_gql_seo_handle_promise_error($promise, $errorHandler)
+{
     // Check if the promise supports 'otherwise' method (older WPGraphQL versions)
     if (method_exists($promise, 'otherwise')) {
         return $promise->otherwise($errorHandler);
