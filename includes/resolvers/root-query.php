@@ -81,7 +81,10 @@ add_action('graphql_register_types', function () {
                 'social' => [
                     'facebook' => [
                         'url' => wp_gql_seo_format_string($all['facebook_site']),
-                        'defaultImage' => $context->get_loader('post')->load_deferred($all['og_default_image_id']),
+                        'defaultImage' => function () use ($context, $all) {
+                            $id = absint($all['og_default_image_id']);
+                            return $id ? $context->get_loader('post')->load_deferred($id) : null;
+                        },
                     ],
                     'twitter' => [
                         'username' => wp_gql_seo_format_string($all['twitter_site']),
@@ -119,18 +122,44 @@ add_action('graphql_register_types', function () {
                     'searchPrefix' => wp_gql_seo_format_string($all['breadcrumbs-searchprefix']),
                     'separator' => wp_gql_seo_format_string($all['breadcrumbs-sep']),
                 ],
+                'local' => function () {
+                    $local_options = get_option('wpseo_local');
+                    if (empty($local_options)) {
+                        return null;
+                    }
+                    
+                    return [
+                        'businessType' => wp_gql_seo_format_string($local_options['business_type'] ?? null),
+                        'locationAddress' => wp_gql_seo_format_string($local_options['location_address'] ?? null),
+                        'locationCity' => wp_gql_seo_format_string($local_options['location_city'] ?? null),
+                        'locationState' => wp_gql_seo_format_string($local_options['location_state'] ?? null),
+                        'locationZipcode' => wp_gql_seo_format_string($local_options['location_zipcode'] ?? null),
+                        'locationCountry' => wp_gql_seo_format_string($local_options['location_country'] ?? null),
+                        'locationPhone' => wp_gql_seo_format_string($local_options['location_phone'] ?? null),
+                        'locationEmail' => wp_gql_seo_format_string($local_options['location_email'] ?? null),
+                        'locationVatId' => wp_gql_seo_format_string($local_options['location_vat_id'] ?? null),
+                        'locationTaxId' => wp_gql_seo_format_string($local_options['location_tax_id'] ?? null),
+                        'openingHours24h' => boolval($local_options['opening_hours_24h'] ?? false),
+                        'useMultipleLocations' => isset($local_options['use_multiple_locations']) && $local_options['use_multiple_locations'] === 'on',
+                    ];
+                },
                 'schema' => [
                     'companyName' => wp_gql_seo_format_string($all['company_name']),
                     'personName' => !empty($user) ? wp_gql_seo_format_string($user->user_nicename) : null,
-                    'companyLogo' => $context->get_loader('post')->load_deferred(absint($all['company_logo_id'])),
-                    'personLogo' => $context->get_loader('post')->load_deferred(absint($all['person_logo_id'])),
-                    'logo' => $context
-                        ->get_loader('post')
-                        ->load_deferred(
-                            $all['company_or_person'] === 'company'
-                                ? absint($all['company_logo_id'])
-                                : absint($all['person_logo_id'])
-                        ),
+                    'companyLogo' => function () use ($context, $all) {
+                        $id = absint($all['company_logo_id']);
+                        return $id ? $context->get_loader('post')->load_deferred($id) : null;
+                    },
+                    'personLogo' => function () use ($context, $all) {
+                        $id = absint($all['person_logo_id']);
+                        return $id ? $context->get_loader('post')->load_deferred($id) : null;
+                    },
+                    'logo' => function () use ($context, $all) {
+                        $id = $all['company_or_person'] === 'company'
+                            ? absint($all['company_logo_id'])
+                            : absint($all['person_logo_id']);
+                        return $id ? $context->get_loader('post')->load_deferred($id) : null;
+                    },
                     'companyOrPerson' => wp_gql_seo_format_string($all['company_or_person']),
                     'siteName' => wp_gql_seo_format_string(YoastSEO()->helpers->site->get_site_name()),
                     'wordpressSiteName' => wp_gql_seo_format_string(get_bloginfo('name')),
@@ -138,9 +167,14 @@ add_action('graphql_register_types', function () {
                     'homeUrl' => wp_gql_seo_format_string(apply_filters('wp_gql_seo_home_url', get_home_url())),
                     'inLanguage' => wp_gql_seo_format_string(get_bloginfo('language')),
                 ],
-                'redirects' => array_map($mappedRedirects, $redirects),
+                'redirects' => function () use ($redirects, $mappedRedirects) {
+                    return array_map($mappedRedirects, $redirects);
+                },
                 'openGraph' => [
-                    'defaultImage' => $context->get_loader('post')->load_deferred(absint($all['og_default_image_id'])),
+                    'defaultImage' => function () use ($context, $all) {
+                        $id = absint($all['og_default_image_id']);
+                        return $id ? $context->get_loader('post')->load_deferred($id) : null;
+                    },
                     'frontPage' => [
                         'title' => wp_gql_seo_format_string(
                             wp_gql_seo_replace_vars($all['open_graph_frontpage_title'])
@@ -148,9 +182,10 @@ add_action('graphql_register_types', function () {
                         'description' => wp_gql_seo_format_string(
                             wp_gql_seo_replace_vars($all['open_graph_frontpage_desc'])
                         ),
-                        'image' => $context
-                            ->get_loader('post')
-                            ->load_deferred(absint($all['open_graph_frontpage_image_id'])),
+                        'image' => function () use ($context, $all) {
+                            $id = absint($all['open_graph_frontpage_image_id']);
+                            return $id ? $context->get_loader('post')->load_deferred($id) : null;
+                        },
                     ],
                 ],
             ];

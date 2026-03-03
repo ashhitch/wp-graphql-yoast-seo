@@ -10,6 +10,29 @@ if (!defined('ABSPATH')) {
 }
 
 /**
+ * Add error handling to a promise in a compatible way
+ * 
+ * @param mixed $promise The promise to add error handling to
+ * @param callable $errorHandler The error handler function
+ * @return mixed
+ */
+function wp_gql_seo_handle_promise_error($promise, $errorHandler)
+{
+    // Check if the promise supports 'otherwise' method (older WPGraphQL versions)
+    if (method_exists($promise, 'otherwise')) {
+        return $promise->otherwise($errorHandler);
+    }
+    // Check if the promise supports 'catch' method (newer WPGraphQL versions)
+    elseif (method_exists($promise, 'catch')) {
+        return $promise->catch($errorHandler);
+    }
+    // If neither method is available, return the promise as-is
+    else {
+        return $promise;
+    }
+}
+
+/**
  * Format string for GraphQL.
  *
  * @param string $string String to format.

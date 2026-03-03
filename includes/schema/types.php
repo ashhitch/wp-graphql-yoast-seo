@@ -83,6 +83,7 @@ add_action('graphql_register_types', function () {
 
     register_graphql_object_type('PostTypeSEO', [
         'fields' => array_merge($baseSEOFields, [
+            'primaryCategory' => ['type' => 'Category'],
             'readingTime' => ['type' => 'Float'],
             'schema' => ['type' => 'SEOPostTypeSchema'],
         ]),
@@ -256,6 +257,50 @@ add_action('graphql_register_types', function () {
             'target' => ['type' => 'String'],
             'type' => ['type' => 'Int'],
             'format' => ['type' => 'String'],
+            'source' => [
+                'type' => 'String',
+                'description' => __('The Next.js compatible source path', 'wp-graphql-yoast-seo'),
+                'resolve' => function ($redirect) {
+                    $origin = $redirect['origin'] ?? '';
+                    // Yoast Premium regex redirects prefix with ?~
+                    if (strpos($origin, '?~') === 0) {
+                        return substr($origin, 2);
+                    }
+                    return $origin;
+                }
+            ],
+            'destination' => [
+                'type' => 'String',
+                'description' => __('The Next.js compatible destination path', 'wp-graphql-yoast-seo'),
+                'resolve' => function ($redirect) {
+                    return $redirect['target'] ?? '';
+                }
+            ],
+            'permanent' => [
+                'type' => 'Boolean',
+                'description' => __('Is this a permanent redirect (301)?', 'wp-graphql-yoast-seo'),
+                'resolve' => function ($redirect) {
+                    return isset($redirect['type']) && intval($redirect['type']) === 301;
+                }
+            ],
+        ],
+    ]);
+
+    register_graphql_object_type('SEOLocal', [
+        'description' => __('Yoast Local SEO global data', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'businessType' => ['type' => 'String'],
+            'locationAddress' => ['type' => 'String'],
+            'locationCity' => ['type' => 'String'],
+            'locationState' => ['type' => 'String'],
+            'locationZipcode' => ['type' => 'String'],
+            'locationCountry' => ['type' => 'String'],
+            'locationPhone' => ['type' => 'String'],
+            'locationEmail' => ['type' => 'String'],
+            'locationVatId' => ['type' => 'String'],
+            'locationTaxId' => ['type' => 'String'],
+            'openingHours24h' => ['type' => 'Boolean'],
+            'useMultipleLocations' => ['type' => 'Boolean'],
         ],
     ]);
 
@@ -336,6 +381,7 @@ add_action('graphql_register_types', function () {
             'webmaster' => ['type' => 'SEOWebmaster'],
             'social' => ['type' => 'SEOSocial'],
             'breadcrumbs' => ['type' => 'SEOBreadcrumbs'],
+            'local' => ['type' => 'SEOLocal'],
             'redirects' => [
                 'type' => [
                     'list_of' => 'SEORedirect',
