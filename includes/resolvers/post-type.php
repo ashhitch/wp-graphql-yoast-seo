@@ -107,10 +107,10 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
                 'articleType' => $meta !== false && isset($meta->schema_article_type) && is_array($meta->schema_article_type) ? $meta->schema_article_type : [],
                 'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
             ],
-        ];
+        $robots = $meta !== false ? $meta->robots : [        ];
 
         return !empty($seo) ? $seo : null;
-    })->otherwise(function (\Exception $e) {
+    })->otherwise(function (\Throwable $e) {
         // Return null if there was an error resolving the promise
         return null;
     });
