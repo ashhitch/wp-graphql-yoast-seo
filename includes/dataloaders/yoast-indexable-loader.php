@@ -102,11 +102,17 @@ class YoastIndexableLoader extends AbstractDataLoader
                 }
             }
         } catch (\Exception $e) {
-            // Log error if needed, but fail gracefully for GraphQL response
-            if (function_exists('error_log')) {
-                error_log('YoastIndexableLoader Error: ' . $e->getMessage());
+            // Log error if needed, but fail gracefully for GraphQL response.
+            // Only log when WordPress debugging is enabled to avoid spamming production logs.
+            if (
+                function_exists('error_log')
+                && (
+                    ( defined( 'WP_DEBUG' ) && WP_DEBUG )
+                    || ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG )
+                )
+            ) {
+                error_log( 'YoastIndexableLoader Error: ' . $e->getMessage() );
             }
-            
             foreach ($keys as $key) {
                 $loaded[$key] = false;
             }
