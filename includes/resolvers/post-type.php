@@ -110,7 +110,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         ];
 
         return !empty($seo) ? $seo : null;
-    })->otherwise(function (\Throwable $e) {
+    })->catch(function (\Throwable $e) {
         // Return null if there was an error resolving the promise
         return null;
     });
