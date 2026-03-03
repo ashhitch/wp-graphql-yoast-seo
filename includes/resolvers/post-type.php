@@ -104,7 +104,9 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
                     return $context->get_loader('term')->load_deferred($primary_term_id);
                 },
                 'schema' => [
-                    'pageType' => $meta !== false && isset($meta->schema_page_type) && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
+                    'pageType' => $meta !== false && isset($meta->schema_page_type) && is_array($meta->schema_page_type) ? $meta->schema_page_type : (
+                        $meta !== false && isset($schemaArray['@graph'][0]['@type']) ? [$schemaArray['@graph'][0]['@type']] : []
+                    ),
                     'articleType' => $meta !== false && isset($meta->schema_article_type) && is_array($meta->schema_article_type) ? $meta->schema_article_type : [],
                     'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                 ],
