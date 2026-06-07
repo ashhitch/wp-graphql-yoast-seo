@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.3] - 2026-06-06
+
+### Fixed
+
+- Expand .distignore with comprehensive exclusions for WordPress.org distribution
+- Rename attachment cache functions to avoid naming collision with VIP helpers
+- Fix translatable strings to use proper sprintf formatting
+- Replace wp_reset_query() with wp_reset_postdata()
+- Add languages/index.php for directory protection
+- Update tested WordPress version to 7.0
+- Add license information to plugin header
+- Remove 'v' prefix from version constant
+
 ## [5.0.2] - 2026-02-04
 
 ### Fixed

@@ -169,9 +169,10 @@ add_action('graphql_register_types', function () {
 
                 register_graphql_field($name, 'seo', [
                     'type' => 'SEOPostTypePageInfo',
-                    'description' => __(
-                        'Raw schema for ' . $post_type_object->graphql_single_name,
-                        'wp-graphql-yoast-seo'
+                    'description' => sprintf(
+                        // translators: %s is the post type singular name.
+                        __('Raw schema for %s', 'wp-graphql-yoast-seo'),
+                        $post_type_object->graphql_single_name
                     ),
                     'resolve' => function () use ($post_type) {
                         $meta = YoastSEO()->meta->for_post_type_archive($post_type);
