@@ -68,6 +68,7 @@ add_action('graphql_register_types', function () {
         'opengraphImage' => ['type' => 'MediaItem'],
         'twitterTitle' => ['type' => 'String'],
         'twitterDescription' => ['type' => 'String'],
+        'twitterCardType' => ['type' => 'String'],
         'twitterImage' => ['type' => 'MediaItem'],
         'canonical' => ['type' => 'String'],
         'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],

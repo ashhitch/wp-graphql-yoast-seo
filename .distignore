@@ -1,8 +1,42 @@
+# A set of files you probably don't want in your WordPress.org distribution
+# Used by the 10up/action-wordpress-plugin-deploy GitHub Action to keep
+# development/tooling files out of the SVN repository (files are NOT deleted,
+# only excluded from the deployed package).
+
+# Directories
 /.git
 /.github
+/.husky
+/.vscode
+/.wordpress-org
 /node_modules
 /vendor
-.prettierrc
+/wp-content
+
+# Hidden / dotfiles
+.DS_Store
 .distignore
 .gitignore
+.prettierrc
+
+# Dev config & build tooling
+Dockerfile
+docker-compose.yml
+composer.json
+composer.lock
+package.json
+phpcs.xml
+pnpm-lock.yaml
 yarn.lock
+setup.sh
+wp-config.php
+
+# Docs not required in the production plugin
+AGENTS.md
+CHANGELOG.md
+README.md
+contributors.svg
+
+# Misc / scratch files
+new.json
+old.json

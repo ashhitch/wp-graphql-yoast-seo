@@ -28,9 +28,10 @@ add_action('graphql_register_types', function () {
 
             register_graphql_field($taxonomy->graphql_single_name, 'seo', [
                 'type' => 'TaxonomySEO',
-                'description' => __(
-                    'The Yoast SEO data of the ' . $taxonomy->label . ' taxonomy.',
-                    'wp-graphql-yoast-seo'
+                'description' => sprintf(
+                    // translators: %s is the taxonomy label.
+                    __('The Yoast SEO data of the %s taxonomy.', 'wp-graphql-yoast-seo'),
+                    $taxonomy->label
                 ),
                 'resolve' => function ($term, array $args, AppContext $context) {
                     $term_obj = get_term($term->term_id);
@@ -49,7 +50,7 @@ add_action('graphql_register_types', function () {
                         'metaDesc' => wp_gql_seo_format_string($yoast_meta->description),
                         'focuskw' => isset($meta['wpseo_focuskw'])
                             ? wp_gql_seo_format_string($meta['wpseo_focuskw'])
-                            : $meta['wpseo_focuskw'],
+                            : null,
                         'metaKeywords' => isset($meta['wpseo_metakeywords'])
                             ? wp_gql_seo_format_string($meta['wpseo_metakeywords'])
                             : null,
@@ -84,7 +85,7 @@ add_action('graphql_register_types', function () {
                         ),
                         'opengraphImage' => $context
                             ->get_loader('post')
-                            ->load_deferred(absint($meta['wpseo_opengraph-image-id'])),
+                            ->load_deferred(absint($meta['wpseo_opengraph-image-id'] ?? 0)),
                         'twitterCardType' => wp_gql_seo_format_string(
                             YoastSEO()->meta->for_term($term->term_id)->twitter_card
                         ),
@@ -96,7 +97,7 @@ add_action('graphql_register_types', function () {
                         ),
                         'twitterImage' => $context
                             ->get_loader('post')
-                            ->load_deferred(absint($meta['wpseo_twitter-image-id'])),
+                            ->load_deferred(absint($meta['wpseo_twitter-image-id'] ?? 0)),
                         'canonical' => isset(YoastSEO()->meta->for_term($term->term_id)->canonical)
                             ? wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->canonical)
                             : null,
@@ -108,7 +109,7 @@ add_action('graphql_register_types', function () {
                         ],
                     ];
 
-                    wp_reset_query();
+                    wp_reset_postdata();
 
                     return !empty($seo) ? $seo : null;
                 },
@@ -136,7 +137,11 @@ add_action('graphql_register_types', function () {
 
                     register_graphql_field($name, 'isPrimary', [
                         'type' => 'Boolean',
-                        'description' => __('The Yoast SEO Primary ' . $tax->name, 'wp-graphql-yoast-seo'),
+                        'description' => sprintf(
+                            // translators: %s is the taxonomy name.
+                            __('The Yoast SEO Primary %s', 'wp-graphql-yoast-seo'),
+                            $tax->name
+                        ),
                         'resolve' => function ($item) use ($tax) {
                             $postId = $item['source']->ID;
 

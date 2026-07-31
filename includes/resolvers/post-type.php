@@ -67,7 +67,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'twitterTitle' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_title : ''),
         'twitterDescription' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_description : ''),
         'twitterImage' => function () use ($context, $meta) {
-            $twitter_image = $meta->twitter_image;
+            $twitter_image = $meta !== false ? $meta->twitter_image : '';
 
             if (empty($twitter_image)) {
                 return null;
@@ -80,7 +80,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'canonical' => wp_gql_seo_format_string($meta !== false ? $meta->canonical : ''),
         'readingTime' => floatval($meta !== false ? $meta->estimated_reading_time_minutes : ''),
         'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
-        'cornerstone' => boolval($meta !== false ? $meta->indexable->is_cornerstone : false),
+        'cornerstone' => boolval($meta !== false && $meta->indexable ? $meta->indexable->is_cornerstone : false),
         'fullHead' => wp_gql_seo_get_full_head($meta),
         'schema' => [
             'pageType' => $meta !== false && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
