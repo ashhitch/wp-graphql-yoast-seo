@@ -85,54 +85,58 @@ function wp_gql_seo_get_field_key($field_key)
 
 /**
  * Generate cache key for attachment URL.
+ * Only declare if not already defined (e.g., by VIP platform).
  *
  * @param string $url URL to generate cache key for.
  * @return string
  */
-function wp_gql_seo_attachment_cache_key($url)
-{
-    return 'wp_gql_seo_attachment_url_post_id_' . md5($url);
+if (!function_exists('wpcom_vip_attachment_cache_key')) {
+    function wpcom_vip_attachment_cache_key($url)
+    {
+        return 'wpcom_vip_attachment_url_post_id_' . md5($url);
+    }
 }
 
 /**
  * Get post ID from attachment URL with caching.
+ * Only declare if not already defined (e.g., by VIP platform).
  *
  * @param string $url URL to get post ID for.
- * @return int|false|null
+ * @return int|null
  */
-function wp_gql_seo_attachment_url_to_postid_cached($url)
-{
-    $cache_key = wp_gql_seo_attachment_cache_key($url);
-    $id = wp_cache_get($cache_key);
-    if (false === $id) {
-        $id = attachment_url_to_postid($url); // phpcs:ignore
-        if (empty($id)) {
-            wp_cache_set(
-                $cache_key,
-                'not_found',
-                'default',
-                12 * HOUR_IN_SECONDS + mt_rand(0, 4 * HOUR_IN_SECONDS) // phpcs:ignore
-            );
-            $id = null; // Set $id to null instead of false
-        } else {
-            wp_cache_set(
-                $cache_key,
-                $id,
-                'default',
-                24 * HOUR_IN_SECONDS + mt_rand(0, 12 * HOUR_IN_SECONDS) // phpcs:ignore
-            );
+if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
+    function wpcom_vip_attachment_url_to_postid($url)
+    {
+        $cache_key = wpcom_vip_attachment_cache_key($url);
+        $id = wp_cache_get($cache_key);
+        if (false === $id) {
+            $id = attachment_url_to_postid($url); // phpcs:ignore
+            if (empty($id)) {
+                wp_cache_set(
+                    $cache_key,
+                    'not_found',
+                    'default',
+                    12 * HOUR_IN_SECONDS + mt_rand(0, 4 * HOUR_IN_SECONDS) // phpcs:ignore
+                );
+                $id = null; // Set $id to null instead of false
+            } else {
+                wp_cache_set(
+                    $cache_key,
+                    $id,
+                    'default',
+                    24 * HOUR_IN_SECONDS + mt_rand(0, 12 * HOUR_IN_SECONDS) // phpcs:ignore
+                );
+            }
+        } elseif ('not_found' === $id) {
+            return false;
         }
-    } elseif ('not_found' === $id) {
-        return false;
-    }
 
-    return $id;
+        return $id;
+    }
 }
 
 /**
- * Resolve an attachment URL to a post ID, returning null instead of false.
- * Uses the WordPress.com VIP optimized function when available, otherwise
- * falls back to the plugin's own cached implementation.
+ * Wrapper for wpcom_vip_attachment_url_to_postid that returns null instead of false.
  * This is needed for GraphQL compatibility - fixes
  * "Cannot return null for non-nullable field 'MediaItem.id'" errors.
  *
@@ -142,12 +146,7 @@ function wp_gql_seo_attachment_url_to_postid_cached($url)
  */
 function wp_gql_seo_attachment_url_to_postid($url)
 {
-    if (function_exists('wpcom_vip_attachment_url_to_postid')) {
-        $id = wpcom_vip_attachment_url_to_postid($url);
-    } else {
-        $id = wp_gql_seo_attachment_url_to_postid_cached($url);
-    }
-
+    $id = wpcom_vip_attachment_url_to_postid($url);
     return (false === $id || empty($id)) ? null : $id;
 }
 
