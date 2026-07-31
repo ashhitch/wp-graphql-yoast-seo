@@ -56,6 +56,7 @@ add_action('graphql_register_types', function () {
         'metaKeywords' => ['type' => 'String'],
         'metaRobotsNoindex' => ['type' => 'String'],
         'metaRobotsNofollow' => ['type' => 'String'],
+        'robots' => ['type' => 'SEORobots'],
         'opengraphTitle' => ['type' => 'String'],
         'opengraphUrl' => ['type' => 'String'],
         'opengraphSiteName' => ['type' => 'String'],
@@ -66,19 +67,33 @@ add_action('graphql_register_types', function () {
         'opengraphModifiedTime' => ['type' => 'String'],
         'opengraphDescription' => ['type' => 'String'],
         'opengraphImage' => ['type' => 'MediaItem'],
+        'opengraphLocale' => ['type' => 'String'],
+        'opengraphFbAppId' => ['type' => 'String'],
+        'opengraphEnabled' => ['type' => 'Boolean'],
         'twitterTitle' => ['type' => 'String'],
         'twitterDescription' => ['type' => 'String'],
         'twitterCardType' => ['type' => 'String'],
         'twitterImage' => ['type' => 'MediaItem'],
+        'twitterCreator' => ['type' => 'String'],
+        'twitterSite' => ['type' => 'String'],
         'canonical' => ['type' => 'String'],
         'breadcrumbs' => ['type' => ['list_of' => 'SEOPostTypeBreadcrumbs']],
         'cornerstone' => ['type' => 'Boolean'],
         'fullHead' => ['type' => 'String'],
+        'head' => ['type' => 'SEOHead'],
+        'relNext' => ['type' => 'String'],
+        'relPrev' => ['type' => 'String'],
+        'breadcrumbTitle' => ['type' => 'String'],
+        'objectPublishedAt' => ['type' => 'String'],
+        'objectLastModified' => ['type' => 'String'],
+        'language' => ['type' => 'String'],
+        'region' => ['type' => 'String'],
     ];
 
     register_graphql_object_type('TaxonomySEO', [
         'fields' => array_merge($baseSEOFields, [
             'schema' => ['type' => 'SEOTaxonomySchema'],
+            'analysis' => ['type' => 'SEOAnalysis'],
         ]),
     ]);
 
@@ -86,6 +101,7 @@ add_action('graphql_register_types', function () {
         'fields' => array_merge($baseSEOFields, [
             'readingTime' => ['type' => 'Float'],
             'schema' => ['type' => 'SEOPostTypeSchema'],
+            'analysis' => ['type' => 'SEOAnalysis'],
         ]),
     ]);
 
@@ -93,6 +109,36 @@ add_action('graphql_register_types', function () {
         'fields' => [
             'url' => ['type' => 'String'],
             'text' => ['type' => 'String'],
+        ],
+    ]);
+
+    register_graphql_object_type('SEORobots', [
+        'description' => __('The Yoast SEO robots directives', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'noindex' => ['type' => 'String'],
+            'nofollow' => ['type' => 'String'],
+            'noarchive' => ['type' => 'Boolean'],
+            'noimageindex' => ['type' => 'Boolean'],
+            'nosnippet' => ['type' => 'Boolean'],
+        ],
+    ]);
+
+    register_graphql_object_type('SEOAnalysis', [
+        'description' => __('The Yoast SEO analysis scores and link counts', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'keywordScore' => ['type' => 'Int'],
+            'readabilityScore' => ['type' => 'Int'],
+            'inclusiveLanguageScore' => ['type' => 'Int'],
+            'linkCount' => ['type' => 'Int'],
+            'incomingLinkCount' => ['type' => 'Int'],
+        ],
+    ]);
+
+    register_graphql_object_type('SEOHead', [
+        'description' => __('The Yoast SEO head output as structured HTML and JSON', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'html' => ['type' => 'String'],
+            'json' => ['type' => 'String'],
         ],
     ]);
 
@@ -108,6 +154,9 @@ add_action('graphql_register_types', function () {
         'fields' => [
             'title' => ['type' => 'String'],
             'description' => ['type' => 'String'],
+            'noindex' => ['type' => 'Boolean'],
+            'noindexNoPosts' => ['type' => 'Boolean'],
+            'social' => ['type' => 'SEOSocialArchive'],
         ],
     ]);
     register_graphql_object_type('SEOGlobalMetaDate', [
@@ -115,6 +164,14 @@ add_action('graphql_register_types', function () {
         'fields' => [
             'title' => ['type' => 'String'],
             'description' => ['type' => 'String'],
+            'noindex' => ['type' => 'Boolean'],
+            'social' => ['type' => 'SEOSocialArchive'],
+        ],
+    ]);
+    register_graphql_object_type('SEOGlobalMetaSearch', [
+        'description' => __('The Yoast SEO search results data', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'title' => ['type' => 'String'],
         ],
     ]);
     register_graphql_object_type('SEOGlobalMetaConfig', [
@@ -136,6 +193,7 @@ add_action('graphql_register_types', function () {
             'homepage' => ['type' => 'SEOGlobalMetaHome'],
             'author' => ['type' => 'SEOGlobalMetaAuthor'],
             'date' => ['type' => 'SEOGlobalMetaDate'],
+            'search' => ['type' => 'SEOGlobalMetaSearch'],
             'config' => ['type' => 'SEOGlobalMetaConfig'],
             'notFound' => ['type' => 'SEOGlobalMeta404'],
         ],
@@ -194,6 +252,7 @@ add_action('graphql_register_types', function () {
         'fields' => [
             'username' => ['type' => 'String'],
             'cardType' => ['type' => 'SEOCardType'],
+            'enabled' => ['type' => 'Boolean'],
         ],
     ]);
 
@@ -203,6 +262,11 @@ add_action('graphql_register_types', function () {
         ],
     ]);
     register_graphql_object_type('SEOSocialLinkedIn', [
+        'fields' => [
+            'url' => ['type' => 'String'],
+        ],
+    ]);
+    register_graphql_object_type('SEOSocialMastodon', [
         'fields' => [
             'url' => ['type' => 'String'],
         ],
@@ -238,6 +302,7 @@ add_action('graphql_register_types', function () {
             'twitter' => ['type' => 'SEOSocialTwitter'],
             'instagram' => ['type' => 'SEOSocialInstagram'],
             'linkedIn' => ['type' => 'SEOSocialLinkedIn'],
+            'mastodon' => ['type' => 'SEOSocialMastodon'],
             'mySpace' => ['type' => 'SEOSocialMySpace'],
             'pinterest' => ['type' => 'SEOSocialPinterest'],
             'youTube' => ['type' => 'SEOSocialYoutube'],
@@ -274,6 +339,16 @@ add_action('graphql_register_types', function () {
         'fields' => [
             'defaultImage' => ['type' => 'MediaItem'],
             'frontPage' => ['type' => 'SEOOpenGraphFrontPage'],
+            'enabled' => ['type' => 'Boolean'],
+        ],
+    ]);
+
+    register_graphql_object_type('SEOSocialArchive', [
+        'description' => __('The Yoast SEO Premium social settings for an archive', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'title' => ['type' => 'String'],
+            'description' => ['type' => 'String'],
+            'image' => ['type' => 'MediaItem'],
         ],
     ]);
 
@@ -290,6 +365,8 @@ add_action('graphql_register_types', function () {
             'metaRobotsFollow' => ['type' => 'String'],
             'breadcrumbTitle' => ['type' => 'String'],
             'fullHead' => ['type' => 'String'],
+            'head' => ['type' => 'SEOHead'],
+            'social' => ['type' => 'SEOSocialArchive'],
         ],
     ]);
     register_graphql_object_type('SEOContentType', [
@@ -299,6 +376,7 @@ add_action('graphql_register_types', function () {
             'metaDesc' => ['type' => 'String'],
             'metaRobotsNoindex' => ['type' => 'Boolean'],
             'schemaType' => ['type' => 'String'],
+            'articleType' => ['type' => 'String'],
             'schema' => ['type' => 'SEOPageInfoSchema'],
             'archive' => ['type' => 'SEOContentTypeArchive'],
         ],
@@ -315,6 +393,7 @@ add_action('graphql_register_types', function () {
             'title' => ['type' => 'String'],
             'metaDesc' => ['type' => 'String'],
             'metaRobotsNoindex' => ['type' => 'Boolean'],
+            'social' => ['type' => 'SEOSocialArchive'],
         ],
     ]);
     register_graphql_object_type('SEOTaxonomyType', [
@@ -327,6 +406,21 @@ add_action('graphql_register_types', function () {
     register_graphql_object_type('SEOTaxonomyTypes', [
         'description' => __('The Yoast SEO archive configuration data for taxonomies', 'wp-graphql-yoast-seo'),
         'fields' => $allTaxonomies,
+    ]);
+
+    register_graphql_object_type('SEOAdvanced', [
+        'description' => __('The Yoast SEO advanced site configuration', 'wp-graphql-yoast-seo'),
+        'fields' => [
+            'siteType' => ['type' => 'String'],
+            'environmentType' => ['type' => 'String'],
+            'hasMultipleAuthors' => ['type' => 'Boolean'],
+            'xmlSitemapEnabled' => ['type' => 'Boolean'],
+            'indexNowEnabled' => ['type' => 'Boolean'],
+            'indexNowKey' => ['type' => 'String'],
+            'contentAnalysisActive' => ['type' => 'Boolean'],
+            'keywordAnalysisActive' => ['type' => 'Boolean'],
+            'inclusiveLanguageAnalysisActive' => ['type' => 'Boolean'],
+        ],
     ]);
 
     register_graphql_object_type('SEOConfig', [
@@ -345,6 +439,7 @@ add_action('graphql_register_types', function () {
             'openGraph' => ['type' => 'SEOOpenGraph'],
             'contentTypes' => ['type' => 'SEOContentTypes'],
             'taxonomyArchives' => ['type' => 'SEOTaxonomyTypes'],
+            'advanced' => ['type' => 'SEOAdvanced'],
         ],
     ]);
 
@@ -359,6 +454,7 @@ add_action('graphql_register_types', function () {
             'youTube' => ['type' => 'String'],
             'soundCloud' => ['type' => 'String'],
             'wikipedia' => ['type' => 'String'],
+            'mastodon' => ['type' => 'String'],
         ],
     ]);
 
@@ -377,19 +473,29 @@ add_action('graphql_register_types', function () {
             'metaDesc' => ['type' => 'String'],
             'metaRobotsNoindex' => ['type' => 'String'],
             'metaRobotsNofollow' => ['type' => 'String'],
+            'robots' => ['type' => 'SEORobots'],
             'canonical' => ['type' => 'String'],
             'opengraphTitle' => ['type' => 'String'],
             'opengraphDescription' => ['type' => 'String'],
             'opengraphImage' => ['type' => 'MediaItem'],
+            'opengraphLocale' => ['type' => 'String'],
+            'opengraphFbAppId' => ['type' => 'String'],
+            'opengraphEnabled' => ['type' => 'Boolean'],
             'twitterImage' => ['type' => 'MediaItem'],
             'twitterTitle' => ['type' => 'String'],
             'twitterDescription' => ['type' => 'String'],
+            'twitterCreator' => ['type' => 'String'],
+            'twitterSite' => ['type' => 'String'],
             'language' => ['type' => 'String'],
             'region' => ['type' => 'String'],
             'breadcrumbTitle' => ['type' => 'String'],
             'fullHead' => ['type' => 'String'],
+            'head' => ['type' => 'SEOHead'],
+            'relNext' => ['type' => 'String'],
+            'relPrev' => ['type' => 'String'],
             'social' => ['type' => 'SEOUserSocial'],
             'schema' => ['type' => 'SEOUserSchema'],
+            'analysis' => ['type' => 'SEOAnalysis'],
         ],
     ]);
 

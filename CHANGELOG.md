@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.1.0] - 2026-07-31
+
+### Added
+
+#### Per-object SEO fields (posts, terms, users)
+- `robots` object with `noindex`, `nofollow`, `noarchive`, `noimageindex`, `nosnippet` directives
+- `analysis` object with `keywordScore`, `readabilityScore`, `inclusiveLanguageScore`, `linkCount`, `incomingLinkCount`
+- `opengraphLocale`, `opengraphFbAppId`, `opengraphEnabled`
+- `twitterCreator`, `twitterSite`
+- `relNext`, `relPrev` pagination links
+- `breadcrumbTitle`, `objectPublishedAt`, `objectLastModified`, `language`, `region` per post/term
+- `mastodon` user social profile
+
+#### Structured head JSON
+- `head` object with `html` and `json` fields alongside the existing `fullHead` HTML string
+- Matches Yoast's own REST `/yoast/v1/get_head` endpoint output for headless consumers
+
+#### Global config gaps
+- `meta.search` with search results title
+- `meta.author.noindex`, `meta.author.noindexNoPosts`, `meta.date.noindex`
+- `contentTypes.{type}.articleType` (schema article type per post type)
+- `social.mastodon` global social profile
+- `social.twitter.enabled`, `openGraph.enabled` toggles
+- `advanced` block: `siteType`, `environmentType`, `hasMultipleAuthors`, `xmlSitemapEnabled`, `indexNowEnabled`, `indexNowKey`, `contentAnalysisActive`, `keywordAnalysisActive`, `inclusiveLanguageAnalysisActive`
+
+#### Premium social-per-archive (Yoast SEO Premium)
+- `SEOSocialArchive` type with `title`, `description`, `image`
+- `social` field on content type archives, taxonomy archives, author archives, and date archives
+- Graceful fallback to null when Premium is inactive (detected via option-key presence)
+
+### Fixed
+
+- Cache `YoastSEO()->meta->for_term()` result in taxonomy resolver instead of calling it repeatedly (N+1 fix)
+
 ## [5.0.3] - 2026-06-06
 
 ### Fixed
