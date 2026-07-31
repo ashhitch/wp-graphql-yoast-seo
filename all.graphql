@@ -1,0 +1,358 @@
+query TestAllFeatures {
+  # ─── POST SEO ───
+  posts(first: 1) {
+    edges {
+      node {
+        id
+        title
+        seo {
+          title
+          metaDesc
+          focuskw
+          metaKeywords
+          metaRobotsNoindex
+          metaRobotsNofollow
+          robots {
+            noindex
+            nofollow
+            noarchive
+            noimageindex
+            nosnippet
+          }
+          opengraphTitle
+          opengraphUrl
+          opengraphSiteName
+          opengraphType
+          opengraphAuthor
+          opengraphPublisher
+          opengraphPublishedTime
+          opengraphModifiedTime
+          opengraphDescription
+          opengraphImage { sourceUrl altText }
+          opengraphLocale
+          opengraphFbAppId
+          opengraphEnabled
+          twitterTitle
+          twitterDescription
+          twitterCardType
+          twitterImage { sourceUrl altText }
+          twitterCreator
+          twitterSite
+          canonical
+          breadcrumbs { url text }
+          cornerstone
+          fullHead
+          head { html json }
+          relNext
+          relPrev
+          breadcrumbTitle
+          objectPublishedAt
+          objectLastModified
+          language
+          region
+          readingTime
+          schema {
+            pageType
+            articleType
+            raw
+          }
+          analysis {
+            keywordScore
+            readabilityScore
+            inclusiveLanguageScore
+            linkCount
+            incomingLinkCount
+          }
+        }
+      }
+    }
+  }
+
+  # ─── TAXONOMY SEO ───
+  categories(first: 1) {
+    nodes {
+      name
+      seo {
+        title
+        metaDesc
+        focuskw
+        metaKeywords
+        metaRobotsNoindex
+        metaRobotsNofollow
+        robots {
+          noindex
+          nofollow
+          noarchive
+          noimageindex
+          nosnippet
+        }
+        opengraphTitle
+        opengraphUrl
+        opengraphSiteName
+        opengraphType
+        opengraphAuthor
+        opengraphPublisher
+        opengraphPublishedTime
+        opengraphModifiedTime
+        opengraphDescription
+        opengraphImage { sourceUrl altText }
+        opengraphLocale
+        opengraphFbAppId
+        opengraphEnabled
+        twitterTitle
+        twitterDescription
+        twitterCardType
+        twitterImage { sourceUrl altText }
+        twitterCreator
+        twitterSite
+        canonical
+        breadcrumbs { url text }
+        cornerstone
+        fullHead
+        head { html json }
+        relNext
+        relPrev
+        breadcrumbTitle
+        objectPublishedAt
+        objectLastModified
+        language
+        region
+        schema { raw }
+        analysis {
+          keywordScore
+          readabilityScore
+          inclusiveLanguageScore
+          linkCount
+          incomingLinkCount
+        }
+      }
+    }
+  }
+
+  # ─── USER SEO ───
+  users(first: 1) {
+    nodes {
+      name
+      seo {
+        title
+        metaDesc
+        metaRobotsNoindex
+        metaRobotsNofollow
+        robots {
+          noindex
+          nofollow
+          noarchive
+          noimageindex
+          nosnippet
+        }
+        canonical
+        opengraphTitle
+        opengraphDescription
+        opengraphImage { sourceUrl altText }
+        opengraphLocale
+        opengraphFbAppId
+        opengraphEnabled
+        twitterImage { sourceUrl altText }
+        twitterTitle
+        twitterDescription
+        twitterCreator
+        twitterSite
+        language
+        region
+        breadcrumbTitle
+        fullHead
+        head { html json }
+        relNext
+        relPrev
+        social {
+          facebook
+          twitter
+          instagram
+          linkedIn
+          mySpace
+          pinterest
+          youTube
+          soundCloud
+          wikipedia
+          mastodon
+        }
+        schema {
+          raw
+          pageType
+          articleType
+        }
+        analysis {
+          keywordScore
+          readabilityScore
+          inclusiveLanguageScore
+          linkCount
+          incomingLinkCount
+        }
+      }
+    }
+  }
+
+  # ─── GLOBAL SEO CONFIG ───
+  seo {
+    meta {
+      homepage { title description }
+      author {
+        title
+        description
+        noindex
+        noindexNoPosts
+        social { title description image { sourceUrl } }
+      }
+      date {
+        title
+        description
+        noindex
+        social { title description image { sourceUrl } }
+      }
+      search { title }
+      config { separator }
+      notFound { title breadcrumb }
+    }
+
+    schema {
+      companyName
+      personName
+      companyOrPerson
+      companyLogo { sourceUrl }
+      personLogo { sourceUrl }
+      logo { sourceUrl }
+      siteName
+      wordpressSiteName
+      siteUrl
+      homeUrl
+      inLanguage
+    }
+
+    webmaster {
+      baiduVerify
+      googleVerify
+      msVerify
+      yandexVerify
+    }
+
+    social {
+      facebook { url defaultImage { sourceUrl } }
+      twitter { username cardType enabled }
+      instagram { url }
+      linkedIn { url }
+      mastodon { url }
+      mySpace { url }
+      pinterest { url metaTag }
+      youTube { url }
+      wikipedia { url }
+      otherSocials
+    }
+
+    breadcrumbs {
+      enabled
+      boldLast
+      showBlogPage
+      notFoundText
+      archivePrefix
+      homeText
+      prefix
+      searchPrefix
+      separator
+    }
+
+    redirects {
+      origin
+      target
+      type
+      format
+    }
+
+    openGraph {
+      defaultImage { sourceUrl }
+      frontPage {
+        title
+        description
+        image { sourceUrl }
+      }
+      enabled
+    }
+
+    contentTypes {
+      post {
+        title
+        metaDesc
+        metaRobotsNoindex
+        schemaType
+        articleType
+        schema { raw }
+        archive {
+          hasArchive
+          archiveLink
+          title
+          metaDesc
+          metaRobotsNoindex
+          metaRobotsNofollow
+          metaRobotsIndex
+          metaRobotsFollow
+          breadcrumbTitle
+          fullHead
+          head { html json }
+          social { title description image { sourceUrl } }
+        }
+      }
+      page {
+        title
+        metaDesc
+        metaRobotsNoindex
+        schemaType
+        articleType
+        schema { raw }
+        archive {
+          hasArchive
+          archiveLink
+          title
+          metaDesc
+          metaRobotsNoindex
+          metaRobotsNofollow
+          metaRobotsIndex
+          metaRobotsFollow
+          breadcrumbTitle
+          fullHead
+          head { html json }
+          social { title description image { sourceUrl } }
+        }
+      }
+    }
+
+    taxonomyArchives {
+      category {
+        archive {
+          title
+          metaDesc
+          metaRobotsNoindex
+          social { title description image { sourceUrl } }
+        }
+      }
+      tag {
+        archive {
+          title
+          metaDesc
+          metaRobotsNoindex
+          social { title description image { sourceUrl } }
+        }
+      }
+    }
+
+    advanced {
+      siteType
+      environmentType
+      hasMultipleAuthors
+      xmlSitemapEnabled
+      indexNowEnabled
+      indexNowKey
+      contentAnalysisActive
+      keywordAnalysisActive
+      inclusiveLanguageAnalysisActive
+    }
+  }
+}
