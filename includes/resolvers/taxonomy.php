@@ -50,7 +50,7 @@ add_action('graphql_register_types', function () {
                         'metaDesc' => wp_gql_seo_format_string($yoast_meta->description),
                         'focuskw' => isset($meta['wpseo_focuskw'])
                             ? wp_gql_seo_format_string($meta['wpseo_focuskw'])
-                            : $meta['wpseo_focuskw'],
+                            : null,
                         'metaKeywords' => isset($meta['wpseo_metakeywords'])
                             ? wp_gql_seo_format_string($meta['wpseo_metakeywords'])
                             : null,
@@ -85,7 +85,7 @@ add_action('graphql_register_types', function () {
                         ),
                         'opengraphImage' => $context
                             ->get_loader('post')
-                            ->load_deferred(absint($meta['wpseo_opengraph-image-id'])),
+                            ->load_deferred(absint($meta['wpseo_opengraph-image-id'] ?? 0)),
                         'twitterCardType' => wp_gql_seo_format_string(
                             YoastSEO()->meta->for_term($term->term_id)->twitter_card
                         ),
@@ -97,7 +97,7 @@ add_action('graphql_register_types', function () {
                         ),
                         'twitterImage' => $context
                             ->get_loader('post')
-                            ->load_deferred(absint($meta['wpseo_twitter-image-id'])),
+                            ->load_deferred(absint($meta['wpseo_twitter-image-id'] ?? 0)),
                         'canonical' => isset(YoastSEO()->meta->for_term($term->term_id)->canonical)
                             ? wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->canonical)
                             : null,

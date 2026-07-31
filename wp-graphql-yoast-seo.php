@@ -37,6 +37,11 @@ require_once WPGRAPHQL_YOAST_SEO_PLUGIN_DIR . 'includes/helpers/functions.php';
  * Initialize the plugin
  */
 add_action('graphql_init', function () {
+    // Bail if Yoast SEO is not available. The dependency notice in admin will still show.
+    if (!function_exists('YoastSEO')) {
+        return;
+    }
+
     // Include schema and resolvers only when WPGraphQL is active
     require_once WPGRAPHQL_YOAST_SEO_PLUGIN_DIR . 'includes/schema/types.php';
     require_once WPGRAPHQL_YOAST_SEO_PLUGIN_DIR . 'includes/resolvers/post-type.php';
