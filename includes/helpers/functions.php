@@ -118,7 +118,7 @@ if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
                     $cache_key,
                     'not_found',
                     'default',
-                    12 * HOUR_IN_SECONDS + mt_rand(0, 4 * HOUR_IN_SECONDS), // phpcs:ignore
+                    12 * HOUR_IN_SECONDS + mt_rand(0, 4 * HOUR_IN_SECONDS) // phpcs:ignore
                 );
                 $id = null; // Set $id to null instead of false
             } else {
@@ -126,7 +126,7 @@ if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
                     $cache_key,
                     $id,
                     'default',
-                    24 * HOUR_IN_SECONDS + mt_rand(0, 12 * HOUR_IN_SECONDS), // phpcs:ignore
+                    24 * HOUR_IN_SECONDS + mt_rand(0, 12 * HOUR_IN_SECONDS) // phpcs:ignore
                 );
             }
         } elseif ('not_found' === $id) {
@@ -423,7 +423,7 @@ function wp_gql_seo_build_taxonomy_data($taxonomies, $all, $context)
             'archive' => [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-tax-' . $taxonomy] ?? null)),
                 'metaDesc' => wp_gql_seo_format_string(
-                    wp_gql_seo_replace_vars($all['metadesc-tax-' . $taxonomy] ?? null),
+                    wp_gql_seo_replace_vars($all['metadesc-tax-' . $taxonomy] ?? null)
                 ),
                 'metaRobotsNoindex' => boolval($all['noindex-tax-' . $taxonomy] ?? false),
                 'social' => wp_gql_seo_get_premium_social('tax-' . $taxonomy, $all, $context),

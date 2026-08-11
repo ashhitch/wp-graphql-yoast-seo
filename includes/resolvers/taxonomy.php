@@ -31,7 +31,7 @@ add_action('graphql_register_types', function () {
                 'description' => sprintf(
                     // translators: %s is the taxonomy label.
                     __('The Yoast SEO data of the %s taxonomy.', 'wp-graphql-yoast-seo'),
-                    $taxonomy->label,
+                    $taxonomy->label
                 ),
                 'resolve' => function ($term, array $args, AppContext $context) {
                     $term_obj = get_term($term->term_id);
@@ -68,10 +68,10 @@ add_action('graphql_register_types', function () {
                         'opengraphAuthor' => wp_gql_seo_format_string($yoast_meta->open_graph_article_author),
                         'opengraphPublisher' => wp_gql_seo_format_string($yoast_meta->open_graph_article_publisher),
                         'opengraphPublishedTime' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_article_published_time,
+                            $yoast_meta->open_graph_article_published_time
                         ),
                         'opengraphModifiedTime' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_article_modified_time,
+                            $yoast_meta->open_graph_article_modified_time
                         ),
                         'opengraphDescription' => wp_gql_seo_format_string($yoast_meta->open_graph_description),
                         'opengraphImage' => $context
@@ -98,13 +98,13 @@ add_action('graphql_register_types', function () {
                         'relNext' => wp_gql_seo_format_string($yoast_meta->rel_next),
                         'relPrev' => wp_gql_seo_format_string($yoast_meta->rel_prev),
                         'breadcrumbTitle' => wp_gql_seo_format_string(
-                            wp_gql_seo_indexable_prop($indexable, 'breadcrumb_title'),
+                            wp_gql_seo_indexable_prop($indexable, 'breadcrumb_title')
                         ),
                         'objectPublishedAt' => wp_gql_seo_format_string(
-                            wp_gql_seo_indexable_prop($indexable, 'object_published_at'),
+                            wp_gql_seo_indexable_prop($indexable, 'object_published_at')
                         ),
                         'objectLastModified' => wp_gql_seo_format_string(
-                            wp_gql_seo_indexable_prop($indexable, 'object_last_modified'),
+                            wp_gql_seo_indexable_prop($indexable, 'object_last_modified')
                         ),
                         'language' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'language')),
                         'region' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'region')),
@@ -145,7 +145,7 @@ add_action('graphql_register_types', function () {
                         'description' => sprintf(
                             // translators: %s is the taxonomy name.
                             __('The Yoast SEO Primary %s', 'wp-graphql-yoast-seo'),
-                            $tax->name,
+                            $tax->name
                         ),
                         'resolve' => function ($item) use ($tax) {
                             $postId = $item['source']->ID;

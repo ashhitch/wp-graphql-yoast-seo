@@ -54,10 +54,10 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'opengraphAuthor' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_article_author : ''),
         'opengraphPublisher' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_article_publisher : ''),
         'opengraphPublishedTime' => wp_gql_seo_format_string(
-            $meta !== false ? $meta->open_graph_article_published_time : '',
+            $meta !== false ? $meta->open_graph_article_published_time : ''
         ),
         'opengraphModifiedTime' => wp_gql_seo_format_string(
-            $meta !== false ? $meta->open_graph_article_modified_time : '',
+            $meta !== false ? $meta->open_graph_article_modified_time : ''
         ),
         'opengraphDescription' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_description : ''),
         'opengraphImage' => function () use ($context, $meta) {

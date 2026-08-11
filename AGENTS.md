@@ -64,7 +64,7 @@ wp-graphql-yoast-seo/
 - **WordPress**: 5.0+
 - **WPGraphQL**: Latest version
 - **Yoast SEO**: 14.0.0+
-- **PHP**: 7.4+
+- **PHP**: 7.1+
 
 ### Integration Points
 - Hooks into `graphql_init` action

@@ -49,7 +49,7 @@ add_action('graphql_register_types', function () {
             $author = [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-author-wpseo'] ?? null)),
                 'description' => wp_gql_seo_format_string(
-                    wp_gql_seo_replace_vars($all['metadesc-author-wpseo'] ?? null),
+                    wp_gql_seo_replace_vars($all['metadesc-author-wpseo'] ?? null)
                 ),
                 'noindex' => boolval($all['noindex-author-wpseo'] ?? false),
                 'noindexNoPosts' => boolval($all['noindex-author-noposts-wpseo'] ?? false),
@@ -58,7 +58,7 @@ add_action('graphql_register_types', function () {
             $date = [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-archive-wpseo'] ?? null)),
                 'description' => wp_gql_seo_format_string(
-                    wp_gql_seo_replace_vars($all['metadesc-archive-wpseo'] ?? null),
+                    wp_gql_seo_replace_vars($all['metadesc-archive-wpseo'] ?? null)
                 ),
                 'noindex' => boolval($all['noindex-archive-wpseo'] ?? false),
                 'social' => wp_gql_seo_get_premium_social('archive-wpseo', $all, $context),
@@ -148,7 +148,7 @@ add_action('graphql_register_types', function () {
                         ->load_deferred(
                             $all['company_or_person'] === 'company'
                                 ? absint($all['company_logo_id'] ?? 0)
-                                : absint($all['person_logo_id'] ?? 0),
+                                : absint($all['person_logo_id'] ?? 0)
                         ),
                     'companyOrPerson' => wp_gql_seo_format_string($all['company_or_person'] ?? null),
                     'siteName' => wp_gql_seo_format_string(YoastSEO()->helpers->site->get_site_name()),
@@ -164,10 +164,10 @@ add_action('graphql_register_types', function () {
                         ->load_deferred(absint($all['og_default_image_id'] ?? 0)),
                     'frontPage' => [
                         'title' => wp_gql_seo_format_string(
-                            wp_gql_seo_replace_vars($all['open_graph_frontpage_title'] ?? null),
+                            wp_gql_seo_replace_vars($all['open_graph_frontpage_title'] ?? null)
                         ),
                         'description' => wp_gql_seo_format_string(
-                            wp_gql_seo_replace_vars($all['open_graph_frontpage_desc'] ?? null),
+                            wp_gql_seo_replace_vars($all['open_graph_frontpage_desc'] ?? null)
                         ),
                         'image' => $context
                             ->get_loader('post')
@@ -207,7 +207,7 @@ add_action('graphql_register_types', function () {
                     'description' => sprintf(
                         // translators: %s is the post type singular name.
                         __('Raw schema for %s', 'wp-graphql-yoast-seo'),
-                        $post_type_object->graphql_single_name,
+                        $post_type_object->graphql_single_name
                     ),
                     'resolve' => function () use ($post_type) {
                         $meta = YoastSEO()->meta->for_post_type_archive($post_type);
