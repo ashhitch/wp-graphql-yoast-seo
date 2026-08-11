@@ -26,5 +26,8 @@
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
+    },
+    "extra": {
+        "installer-name": "add-wpgraphql-seo"
     }
 }
