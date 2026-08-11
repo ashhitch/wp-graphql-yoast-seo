@@ -38,15 +38,19 @@ add_action('graphql_register_types', function () {
 
                     $meta = WPSEO_Taxonomy_Meta::get_term_meta((int) $term_obj->term_id, $term_obj->taxonomy);
                     $yoast_meta = YoastSEO()->meta->for_term($term->term_id);
+
+                    if ($yoast_meta === false) {
+                        return null;
+                    }
+
                     $robots = $yoast_meta->robots;
 
                     $schemaArray = $yoast_meta->schema;
+                    $indexable = $yoast_meta->indexable;
 
                     // Get data
                     $seo = [
-                        'title' => wp_gql_seo_format_string(
-                            html_entity_decode(wp_strip_all_tags($yoast_meta->title))
-                        ),
+                        'title' => wp_gql_seo_format_string(html_entity_decode(wp_strip_all_tags($yoast_meta->title))),
                         'metaDesc' => wp_gql_seo_format_string($yoast_meta->description),
                         'focuskw' => isset($meta['wpseo_focuskw'])
                             ? wp_gql_seo_format_string($meta['wpseo_focuskw'])
@@ -56,57 +60,58 @@ add_action('graphql_register_types', function () {
                             : null,
                         'metaRobotsNoindex' => $robots['index'],
                         'metaRobotsNofollow' => $robots['follow'],
-                        'opengraphTitle' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_title
-                        ),
-                        'opengraphUrl' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_url
-                        ),
-                        'opengraphSiteName' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_site_name
-                        ),
-                        'opengraphType' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_type
-                        ),
-                        'opengraphAuthor' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_article_author
-                        ),
-                        'opengraphPublisher' => wp_gql_seo_format_string(
-                            $yoast_meta->open_graph_article_publisher
-                        ),
+                        'robots' => wp_gql_seo_build_robots($robots, $indexable),
+                        'opengraphTitle' => wp_gql_seo_format_string($yoast_meta->open_graph_title),
+                        'opengraphUrl' => wp_gql_seo_format_string($yoast_meta->open_graph_url),
+                        'opengraphSiteName' => wp_gql_seo_format_string($yoast_meta->open_graph_site_name),
+                        'opengraphType' => wp_gql_seo_format_string($yoast_meta->open_graph_type),
+                        'opengraphAuthor' => wp_gql_seo_format_string($yoast_meta->open_graph_article_author),
+                        'opengraphPublisher' => wp_gql_seo_format_string($yoast_meta->open_graph_article_publisher),
                         'opengraphPublishedTime' => wp_gql_seo_format_string(
                             $yoast_meta->open_graph_article_published_time
                         ),
                         'opengraphModifiedTime' => wp_gql_seo_format_string(
                             $yoast_meta->open_graph_article_modified_time
                         ),
-                        'opengraphDescription' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->open_graph_description
-                        ),
+                        'opengraphDescription' => wp_gql_seo_format_string($yoast_meta->open_graph_description),
                         'opengraphImage' => $context
                             ->get_loader('post')
                             ->load_deferred(absint($meta['wpseo_opengraph-image-id'] ?? 0)),
-                        'twitterCardType' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->twitter_card
-                        ),
-                        'twitterTitle' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->twitter_title
-                        ),
-                        'twitterDescription' => wp_gql_seo_format_string(
-                            YoastSEO()->meta->for_term($term->term_id)->twitter_description
-                        ),
+                        'opengraphLocale' => wp_gql_seo_format_string($yoast_meta->open_graph_locale),
+                        'opengraphFbAppId' => wp_gql_seo_format_string($yoast_meta->open_graph_fb_app_id),
+                        'opengraphEnabled' => boolval($yoast_meta->open_graph_enabled),
+                        'twitterCardType' => wp_gql_seo_format_string($yoast_meta->twitter_card),
+                        'twitterTitle' => wp_gql_seo_format_string($yoast_meta->twitter_title),
+                        'twitterDescription' => wp_gql_seo_format_string($yoast_meta->twitter_description),
                         'twitterImage' => $context
                             ->get_loader('post')
                             ->load_deferred(absint($meta['wpseo_twitter-image-id'] ?? 0)),
-                        'canonical' => isset(YoastSEO()->meta->for_term($term->term_id)->canonical)
-                            ? wp_gql_seo_format_string(YoastSEO()->meta->for_term($term->term_id)->canonical)
+                        'twitterCreator' => wp_gql_seo_format_string($yoast_meta->twitter_creator),
+                        'twitterSite' => wp_gql_seo_format_string($yoast_meta->twitter_site),
+                        'canonical' => isset($yoast_meta->canonical)
+                            ? wp_gql_seo_format_string($yoast_meta->canonical)
                             : null,
-                        'breadcrumbs' => YoastSEO()->meta->for_term($term->term_id)->breadcrumbs,
-                        'cornerstone' => boolval(YoastSEO()->meta->for_term($term->term_id)->is_cornerstone),
-                        'fullHead' => wp_gql_seo_get_full_head(YoastSEO()->meta->for_term($term->term_id)),
+                        'breadcrumbs' => $yoast_meta->breadcrumbs,
+                        'cornerstone' => boolval($yoast_meta->is_cornerstone),
+                        'fullHead' => wp_gql_seo_get_full_head($yoast_meta),
+                        'head' => wp_gql_seo_get_head_obj($yoast_meta),
+                        'relNext' => wp_gql_seo_format_string($yoast_meta->rel_next),
+                        'relPrev' => wp_gql_seo_format_string($yoast_meta->rel_prev),
+                        'breadcrumbTitle' => wp_gql_seo_format_string(
+                            wp_gql_seo_indexable_prop($indexable, 'breadcrumb_title')
+                        ),
+                        'objectPublishedAt' => wp_gql_seo_format_string(
+                            wp_gql_seo_indexable_prop($indexable, 'object_published_at')
+                        ),
+                        'objectLastModified' => wp_gql_seo_format_string(
+                            wp_gql_seo_indexable_prop($indexable, 'object_last_modified')
+                        ),
+                        'language' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'language')),
+                        'region' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'region')),
                         'schema' => [
                             'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
                         ],
+                        'analysis' => wp_gql_seo_build_analysis($indexable),
                     ];
 
                     wp_reset_postdata();

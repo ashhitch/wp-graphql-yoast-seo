@@ -36,6 +36,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
 
     // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
     $robots = $meta !== false ? $meta->robots : [];
+    $indexable = $meta !== false ? $meta->indexable : null;
 
     // Get data
     $seo = [
@@ -45,6 +46,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'metaKeywords' => wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
         'metaRobotsNoindex' => $robots['index'] ?? '',
         'metaRobotsNofollow' => $robots['follow'] ?? '',
+        'robots' => wp_gql_seo_build_robots($robots, $indexable),
         'opengraphTitle' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_title : ''),
         'opengraphUrl' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_url : ''),
         'opengraphSiteName' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_site_name : ''),
@@ -63,6 +65,9 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
 
             return $context->get_loader('post')->load_deferred(absint($id));
         },
+        'opengraphLocale' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_locale : ''),
+        'opengraphFbAppId' => wp_gql_seo_format_string($meta !== false ? $meta->open_graph_fb_app_id : ''),
+        'opengraphEnabled' => $meta !== false ? boolval($meta->open_graph_enabled) : null,
         'twitterCardType' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_card : ''),
         'twitterTitle' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_title : ''),
         'twitterDescription' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_description : ''),
@@ -77,16 +82,27 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
 
             return $context->get_loader('post')->load_deferred(absint($id));
         },
+        'twitterCreator' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_creator : ''),
+        'twitterSite' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_site : ''),
         'canonical' => wp_gql_seo_format_string($meta !== false ? $meta->canonical : ''),
         'readingTime' => floatval($meta !== false ? $meta->estimated_reading_time_minutes : ''),
         'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
         'cornerstone' => boolval($meta !== false && $meta->indexable ? $meta->indexable->is_cornerstone : false),
         'fullHead' => wp_gql_seo_get_full_head($meta),
+        'head' => wp_gql_seo_get_head_obj($meta),
+        'relNext' => wp_gql_seo_format_string($meta !== false ? $meta->rel_next : ''),
+        'relPrev' => wp_gql_seo_format_string($meta !== false ? $meta->rel_prev : ''),
+        'breadcrumbTitle' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'breadcrumb_title')),
+        'objectPublishedAt' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'object_published_at')),
+        'objectLastModified' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'object_last_modified')),
+        'language' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'language')),
+        'region' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'region')),
         'schema' => [
             'pageType' => $meta !== false && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
             'articleType' => $meta !== false && is_array($meta->schema_article_type) ? $meta->schema_article_type : [],
             'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
         ],
+        'analysis' => wp_gql_seo_build_analysis($indexable),
     ];
 
     return !empty($seo) ? $seo : null;

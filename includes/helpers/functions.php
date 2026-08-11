@@ -9,6 +9,8 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
+use WPGraphQL\AppContext;
+
 /**
  * Format string for GraphQL.
  *
@@ -147,7 +149,7 @@ if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
 function wp_gql_seo_attachment_url_to_postid($url)
 {
     $id = wpcom_vip_attachment_url_to_postid($url);
-    return (false === $id || empty($id)) ? null : $id;
+    return false === $id || empty($id) ? null : $id;
 }
 
 /**
@@ -189,28 +191,150 @@ function wp_gql_seo_build_taxonomy_types($taxonomies)
 /**
  * Get full head content from Yoast SEO.
  *
+ * Delegates to wp_gql_seo_get_head_obj to avoid calling get_head() twice
+ * when both fullHead and head are requested for the same meta object.
+ *
  * @param \Yoast\WP\SEO\Surfaces\Values\Meta|bool $metaForPost Meta object.
  * @return string
  */
 function wp_gql_seo_get_full_head($metaForPost)
 {
+    return wp_gql_seo_get_head_obj($metaForPost)['html'];
+}
+
+/**
+ * Get structured head (html + json) from Yoast SEO.
+ *
+ * @param \Yoast\WP\SEO\Surfaces\Values\Meta|bool $metaForPost Meta object.
+ * @return array
+ */
+function wp_gql_seo_get_head_obj($metaForPost)
+{
     if ($metaForPost !== false) {
         $head = $metaForPost->get_head();
+        $html = is_string($head) ? $head : $head->html;
+        $json = is_object($head) && isset($head->json) ? $head->json : [];
 
-        return is_string($head) ? $head : $head->html;
+        return [
+            'html' => $html,
+            'json' => wp_json_encode($json, JSON_UNESCAPED_SLASHES),
+        ];
     }
 
-    return '';
+    return [
+        'html' => '',
+        'json' => wp_json_encode([], JSON_UNESCAPED_SLASHES),
+    ];
+}
+
+/**
+ * Safely read a property from a Yoast Indexable (or any object/array).
+ *
+ * @param mixed  $indexable The indexable object (or null/false).
+ * @param string $key       The property key.
+ * @return mixed|null
+ */
+function wp_gql_seo_indexable_prop($indexable, $key)
+{
+    if (!is_object($indexable) || !isset($indexable->{$key})) {
+        return null;
+    }
+
+    return $indexable->{$key};
+}
+
+/**
+ * Build the SEOAnalysis data array from an Indexable.
+ *
+ * @param mixed $indexable The indexable object (or null/false).
+ * @return array
+ */
+function wp_gql_seo_build_analysis($indexable)
+{
+    if (!is_object($indexable)) {
+        return [
+            'keywordScore' => null,
+            'readabilityScore' => null,
+            'inclusiveLanguageScore' => null,
+            'linkCount' => null,
+            'incomingLinkCount' => null,
+        ];
+    }
+
+    return [
+        'keywordScore' => isset($indexable->primary_focus_keyword_score)
+            ? (int) $indexable->primary_focus_keyword_score
+            : null,
+        'readabilityScore' => isset($indexable->readability_score) ? (int) $indexable->readability_score : null,
+        'inclusiveLanguageScore' => isset($indexable->inclusive_language_score)
+            ? (int) $indexable->inclusive_language_score
+            : null,
+        'linkCount' => isset($indexable->link_count) ? (int) $indexable->link_count : null,
+        'incomingLinkCount' => isset($indexable->incoming_link_count) ? (int) $indexable->incoming_link_count : null,
+    ];
+}
+
+/**
+ * Build the SEORobots data array from Yoast robots array and Indexable.
+ *
+ * @param array $robots   The robots array from Meta (index/follow keys).
+ * @param mixed $indexable The indexable object (or null/false).
+ * @return array
+ */
+function wp_gql_seo_build_robots($robots, $indexable)
+{
+    return [
+        'noindex' => isset($robots['index']) ? wp_gql_seo_format_string($robots['index']) : null,
+        'nofollow' => isset($robots['follow']) ? wp_gql_seo_format_string($robots['follow']) : null,
+        'noarchive' => boolval(wp_gql_seo_indexable_prop($indexable, 'is_robots_noarchive')),
+        'noimageindex' => boolval(wp_gql_seo_indexable_prop($indexable, 'is_robots_noimageindex')),
+        'nosnippet' => boolval(wp_gql_seo_indexable_prop($indexable, 'is_robots_nosnippet')),
+    ];
+}
+
+/**
+ * Build the Premium social archive data from Yoast SEO Premium options.
+ *
+ * Returns null for title/description and null for image when the Premium
+ * option keys are absent (graceful free-tier fallback).
+ *
+ * @param string       $option_prefix The option prefix (e.g. 'ptarchive-post', 'tax-category', 'author-wpseo', 'archive-wpseo').
+ * @param array        $all           All Yoast SEO options.
+ * @param AppContext   $context       The GraphQL AppContext for deferred image loading.
+ * @return array
+ */
+function wp_gql_seo_get_premium_social($option_prefix, $all, $context)
+{
+    $title_key = 'social-title-' . $option_prefix;
+    $desc_key = 'social-description-' . $option_prefix;
+    $image_id_key = 'social-image-id-' . $option_prefix;
+
+    $has_premium = isset($all[$title_key]) || isset($all[$desc_key]) || isset($all[$image_id_key]);
+
+    if (!$has_premium) {
+        return [
+            'title' => null,
+            'description' => null,
+            'image' => null,
+        ];
+    }
+
+    return [
+        'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all[$title_key] ?? null)),
+        'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all[$desc_key] ?? null)),
+        'image' => $context->get_loader('post')->load_deferred(absint($all[$image_id_key] ?? 0)),
+    ];
 }
 
 /**
  * Build content type data for GraphQL schema.
  *
- * @param array $types Post types.
- * @param array $all All Yoast SEO options.
+ * @param array      $types   Post types.
+ * @param array      $all     All Yoast SEO options.
+ * @param AppContext $context The GraphQL AppContext for deferred image loading.
  * @return array
  */
-function wp_gql_seo_build_content_type_data($types, $all)
+function wp_gql_seo_build_content_type_data($types, $all, $context)
 {
     $carry = [];
 
@@ -236,27 +360,32 @@ function wp_gql_seo_build_content_type_data($types, $all)
             'metaDesc' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-' . $type] ?? null)),
             'metaRobotsNoindex' => boolval($all['noindex-' . $type] ?? false),
             'schemaType' => $all['schema-page-type-' . $type] ?? null,
+            'articleType' => $all['schema-article-type-' . $type] ?? null,
             'schema' => [
                 'raw' =>
-                    !empty($meta) && !empty($meta->schema) ? wp_json_encode($meta->schema, JSON_UNESCAPED_SLASHES) : null,
+                    !empty($meta) && !empty($meta->schema)
+                        ? wp_json_encode($meta->schema, JSON_UNESCAPED_SLASHES)
+                        : null,
             ],
             'archive' => [
                 'hasArchive' => boolval($post_type_object->has_archive),
                 'archiveLink' => apply_filters('wp_gql_seo_archive_link', get_post_type_archive_link($type), $type),
-                'title' => wp_gql_seo_format_string($meta->title ?? null),
+                'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : null),
                 'metaDesc' => wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type] ?? null),
                 'metaRobotsNoindex' =>
-                    !empty($meta) && !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
+                    $meta !== false && !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
                         ? false
                         : true,
                 'metaRobotsNofollow' =>
-                    !empty($meta) && !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
+                    $meta !== false && !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
                         ? false
                         : true,
-                'metaRobotsIndex' => $meta->robots['index'] ?? 'noindex',
-                'metaRobotsFollow' => $meta->robots['follow'] ?? 'nofollow',
+                'metaRobotsIndex' => $meta !== false ? ($meta->robots['index'] ?? 'noindex') : 'noindex',
+                'metaRobotsFollow' => $meta !== false ? ($meta->robots['follow'] ?? 'nofollow') : 'nofollow',
                 'breadcrumbTitle' => wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type] ?? null),
                 'fullHead' => wp_gql_seo_get_full_head($meta),
+                'head' => wp_gql_seo_get_head_obj($meta),
+                'social' => wp_gql_seo_get_premium_social('ptarchive-' . $type, $all, $context),
             ],
         ];
     }
@@ -267,11 +396,12 @@ function wp_gql_seo_build_content_type_data($types, $all)
 /**
  * Build taxonomy data for GraphQL schema.
  *
- * @param array $taxonomies Taxonomies.
- * @param array $all All Yoast SEO options.
+ * @param array      $taxonomies Taxonomies.
+ * @param array      $all        All Yoast SEO options.
+ * @param AppContext $context    The GraphQL AppContext for deferred image loading.
  * @return array
  */
-function wp_gql_seo_build_taxonomy_data($taxonomies, $all)
+function wp_gql_seo_build_taxonomy_data($taxonomies, $all, $context)
 {
     $carry = [];
 
@@ -296,6 +426,7 @@ function wp_gql_seo_build_taxonomy_data($taxonomies, $all)
                     wp_gql_seo_replace_vars($all['metadesc-tax-' . $taxonomy] ?? null)
                 ),
                 'metaRobotsNoindex' => boolval($all['noindex-tax-' . $taxonomy] ?? false),
+                'social' => wp_gql_seo_get_premium_social('tax-' . $taxonomy, $all, $context),
             ],
         ];
     }

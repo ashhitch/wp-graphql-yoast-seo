@@ -4,7 +4,7 @@ Tags: SEO, Yoast, WPGraphQL, GraphQL, Headless WordPress
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 7.1
-Stable tag: 5.0.3
+Stable tag: 5.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -27,9 +27,19 @@ This is an extension to the WPGraphQL plugin (https://github.com/wp-graphql/wp-g
 - WooCommerce Products
 - Yoast Configuration
   - Webmaster verification
-  - Social profiles
+  - Social profiles (including Mastodon)
   - Schemas
   - Breadcrumbs
+  - Advanced robots directives (noarchive, noimageindex, nosnippet)
+  - SEO analysis scores and link counts
+  - Structured head JSON (html + json)
+  - Open Graph locale, FB App ID, enabled toggle
+  - Twitter creator/site handles, enabled toggle
+  - Pagination rel_next/rel_prev
+  - Search results, author/date archive noindex settings
+  - Schema article type per content type
+  - Sitemap, Index Now, and analysis toggles
+  - Premium: per-archive social settings (title/description/image)
 
   > Please Note: Yoast and WPGraphQL and their logos are copyright to their respective owners.
 

@@ -39,8 +39,8 @@ add_action('graphql_register_types', function () {
                 ];
             };
 
-            $contentTypes = wp_gql_seo_build_content_type_data($post_types, $all);
-            $taxonomyTypes = wp_gql_seo_build_taxonomy_data($taxonomies, $all);
+            $contentTypes = wp_gql_seo_build_content_type_data($post_types, $all, $context);
+            $taxonomyTypes = wp_gql_seo_build_taxonomy_data($taxonomies, $all, $context);
 
             $homepage = [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-home-wpseo'] ?? null)),
@@ -48,11 +48,23 @@ add_action('graphql_register_types', function () {
             ];
             $author = [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-author-wpseo'] ?? null)),
-                'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-author-wpseo'] ?? null)),
+                'description' => wp_gql_seo_format_string(
+                    wp_gql_seo_replace_vars($all['metadesc-author-wpseo'] ?? null)
+                ),
+                'noindex' => boolval($all['noindex-author-wpseo'] ?? false),
+                'noindexNoPosts' => boolval($all['noindex-author-noposts-wpseo'] ?? false),
+                'social' => wp_gql_seo_get_premium_social('author-wpseo', $all, $context),
             ];
             $date = [
                 'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-archive-wpseo'] ?? null)),
-                'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-archive-wpseo'] ?? null)),
+                'description' => wp_gql_seo_format_string(
+                    wp_gql_seo_replace_vars($all['metadesc-archive-wpseo'] ?? null)
+                ),
+                'noindex' => boolval($all['noindex-archive-wpseo'] ?? false),
+                'social' => wp_gql_seo_get_premium_social('archive-wpseo', $all, $context),
+            ];
+            $search = [
+                'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-search-wpseo'] ?? null)),
             ];
             $config = [
                 'separator' => wp_gql_seo_format_string($all['separator'] ?? null),
@@ -69,6 +81,7 @@ add_action('graphql_register_types', function () {
                     'homepage' => $homepage,
                     'author' => $author,
                     'date' => $date,
+                    'search' => $search,
                     'config' => $config,
                     'notFound' => $notFound,
                 ],
@@ -81,17 +94,23 @@ add_action('graphql_register_types', function () {
                 'social' => [
                     'facebook' => [
                         'url' => wp_gql_seo_format_string($all['facebook_site'] ?? null),
-                        'defaultImage' => $context->get_loader('post')->load_deferred(absint($all['og_default_image_id'] ?? 0)),
+                        'defaultImage' => $context
+                            ->get_loader('post')
+                            ->load_deferred(absint($all['og_default_image_id'] ?? 0)),
                     ],
                     'twitter' => [
                         'username' => wp_gql_seo_format_string($all['twitter_site'] ?? null),
                         'cardType' => wp_gql_seo_format_string($all['twitter_card_type'] ?? null),
+                        'enabled' => boolval($all['twitter'] ?? false),
                     ],
                     'instagram' => [
                         'url' => wp_gql_seo_format_string($all['instagram_url'] ?? null),
                     ],
                     'linkedIn' => [
                         'url' => wp_gql_seo_format_string($all['linkedin_url'] ?? null),
+                    ],
+                    'mastodon' => [
+                        'url' => wp_gql_seo_format_string($all['mastodon_url'] ?? null),
                     ],
                     'mySpace' => [
                         'url' => wp_gql_seo_format_string($all['myspace_url'] ?? null),
@@ -140,7 +159,9 @@ add_action('graphql_register_types', function () {
                 ],
                 'redirects' => array_map($mappedRedirects, $redirects),
                 'openGraph' => [
-                    'defaultImage' => $context->get_loader('post')->load_deferred(absint($all['og_default_image_id'] ?? 0)),
+                    'defaultImage' => $context
+                        ->get_loader('post')
+                        ->load_deferred(absint($all['og_default_image_id'] ?? 0)),
                     'frontPage' => [
                         'title' => wp_gql_seo_format_string(
                             wp_gql_seo_replace_vars($all['open_graph_frontpage_title'] ?? null)
@@ -152,6 +173,20 @@ add_action('graphql_register_types', function () {
                             ->get_loader('post')
                             ->load_deferred(absint($all['open_graph_frontpage_image_id'] ?? 0)),
                     ],
+                    'enabled' => boolval($all['opengraph'] ?? false),
+                ],
+                'advanced' => [
+                    'siteType' => wp_gql_seo_format_string($all['site_type'] ?? null),
+                    'environmentType' => wp_gql_seo_format_string($all['environment_type'] ?? null),
+                    'hasMultipleAuthors' => isset($all['has_multiple_authors'])
+                        ? boolval($all['has_multiple_authors'])
+                        : null,
+                    'xmlSitemapEnabled' => boolval($all['enable_xml_sitemap'] ?? false),
+                    'indexNowEnabled' => boolval($all['enable_index_now'] ?? false),
+                    'indexNowKey' => wp_gql_seo_format_string($all['index_now_key'] ?? null),
+                    'contentAnalysisActive' => boolval($all['content_analysis_active'] ?? false),
+                    'keywordAnalysisActive' => boolval($all['keyword_analysis_active'] ?? false),
+                    'inclusiveLanguageAnalysisActive' => boolval($all['inclusive_language_analysis_active'] ?? false),
                 ],
             ];
         },

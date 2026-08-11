@@ -8,7 +8,7 @@
  * Author URI: https://www.ashleyhitchcock.com
  * Text Domain: wp-graphql-yoast-seo
  * Domain Path: /languages
- * Version: 5.0.3
+ * Version: 5.1.0
  * Requires Plugins: wp-graphql, wordpress-seo
  * License: GPL-3.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 /**
  * Define plugin constants
  */
-define('WPGRAPHQL_YOAST_SEO_VERSION', '5.0.3');
+define('WPGRAPHQL_YOAST_SEO_VERSION', '5.1.0');
 define('WPGRAPHQL_YOAST_SEO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('WPGRAPHQL_YOAST_SEO_PLUGIN_URL', plugin_dir_url(__FILE__));
 
