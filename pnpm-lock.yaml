@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@prettier/plugin-php':
-        specifier: ^0.25.0
-        version: 0.25.0(prettier@3.9.8)
+        specifier: ^0.26.0
+        version: 0.26.0(prettier@3.9.10)
       husky:
         specifier: '>=8.0.1'
         version: 9.1.7
@@ -19,12 +19,12 @@ importers:
         version: 16.4.0
       prettier:
         specifier: ^3.7.4
-        version: 3.9.8
+        version: 3.9.10
 
 packages:
 
-  '@prettier/plugin-php@0.25.0':
-    resolution: {integrity: sha512-hi0NhucbspYqw5pZYKywEk5CxsBwA0pBcG6K08AZw7OQDoUm4Hhbxql7z/SzQGeTRHqak5PwDnVNgttZiZdrlg==}
+  '@prettier/plugin-php@0.26.0':
+    resolution: {integrity: sha512-qaKv27XSAPSnEpieY+H6Ktgzn7bQIjPKYmVWDVY4pJwnm7E1RC0whzMYHidWlfyyZK3qpnY7HPnjmecTnNC/uA==}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -78,8 +78,8 @@ packages:
     resolution: {integrity: sha512-5XHYaSyiqADb4RnZ1Bdad6cPp8Toise4TzEjcOYDHZkTCbKgiUl7WTUCpNWHuxmDt91wnsZBc9xinNzopv3JMQ==}
     engines: {node: '>=18'}
 
-  linguist-languages@8.2.0:
-    resolution: {integrity: sha512-KCUUH9x97QWYU0SXOCGxUrZR6cSfuQrMhABB7L/0I8N0LXOeaKe7+RZs7FAwvWCV2qKfZ4Wv1luLq4OfMezSJg==}
+  linguist-languages@9.5.0:
+    resolution: {integrity: sha512-Wtg9O6iHNBYFJQVtPNwWCaWkNEqZqiCGI4gSkeH8TqvgZUyb1IUWmFSa9Z9UhT392/aX6Peoa91bH9sDah1ZVw==}
 
   lint-staged@16.4.0:
     resolution: {integrity: sha512-lBWt8hujh/Cjysw5GYVmZpFHXDCgZzhrOm8vbcUdobADZNOK/bRshr2kM3DfgrrtR1DQhfupW9gnIXOfiFi+bw==}
@@ -109,8 +109,8 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
-  prettier@3.9.8:
-    resolution: {integrity: sha512-WRFq3Wn3WId7LLROfMLdH7xaFr2jR62wU8nLO6rQUOLOxNZUviyJQs1M0iIhLexSFy+L+w0ch66wtoO2jRjG0A==}
+  prettier@3.9.10:
+    resolution: {integrity: sha512-skGHTH1Yb9QvaTC4hWnRTzEYtCpApF0UMBPz+t/0ZPzP8ihefo/btKd+QA7pUE0fEwA1SbS/NmhyEcstdXOIdA==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -164,11 +164,11 @@ packages:
 
 snapshots:
 
-  '@prettier/plugin-php@0.25.0(prettier@3.9.8)':
+  '@prettier/plugin-php@0.26.0(prettier@3.9.10)':
     dependencies:
-      linguist-languages: 8.2.0
+      linguist-languages: 9.5.0
       php-parser: 3.7.0
-      prettier: 3.9.8
+      prettier: 3.9.10
 
   ansi-escapes@7.3.0:
     dependencies:
@@ -205,7 +205,7 @@ snapshots:
     dependencies:
       get-east-asian-width: 1.6.0
 
-  linguist-languages@8.2.0: {}
+  linguist-languages@9.5.0: {}
 
   lint-staged@16.4.0:
     dependencies:
@@ -243,7 +243,7 @@ snapshots:
 
   picomatch@4.0.5: {}
 
-  prettier@3.9.8: {}
+  prettier@3.9.10: {}
 
   restore-cursor@5.1.0:
     dependencies:
