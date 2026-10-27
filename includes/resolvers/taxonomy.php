@@ -33,8 +33,11 @@ add_action('graphql_register_types', function () {
                     __('The Yoast SEO data of the %s taxonomy.', 'wp-graphql-yoast-seo'),
                     $taxonomy->label
                 ),
-                'resolve' => function ($term, array $args, AppContext $context) {
-                    $yoast_meta = YoastSEO()->meta->for_term($term->term_id);
+                'resolve' => function ($term, array $args, AppContext $context) use ($taxonomy) {
+                    $term_id = $term->term_id;
+                    wp_gql_seo_setup_term_query($term_id, $taxonomy->name);
+
+                    $yoast_meta = YoastSEO()->meta->for_term($term_id);
 
                     if ($yoast_meta === false) {
                         return null;
@@ -43,13 +46,9 @@ add_action('graphql_register_types', function () {
                     $robots = $yoast_meta->robots;
 
                     $meta_cache = null;
-                    $get_term_meta = function () use ($term, &$meta_cache) {
+                    $get_term_meta = function () use ($term_id, $taxonomy, &$meta_cache) {
                         if (null === $meta_cache) {
-                            $term_obj = get_term($term->term_id);
-                            $meta_cache = WPSEO_Taxonomy_Meta::get_term_meta(
-                                (int) $term_obj->term_id,
-                                $term_obj->taxonomy
-                            );
+                            $meta_cache = WPSEO_Taxonomy_Meta::get_term_meta((int) $term_id, $taxonomy->name);
                         }
                         return $meta_cache;
                     };
@@ -61,7 +60,9 @@ add_action('graphql_register_types', function () {
                         'metaDesc' => wp_gql_seo_format_string($yoast_meta->description),
                         'focuskw' => function () use ($get_term_meta) {
                             $meta = $get_term_meta();
-                            return isset($meta['wpseo_focuskw']) ? wp_gql_seo_format_string($meta['wpseo_focuskw']) : null;
+                            return isset($meta['wpseo_focuskw'])
+                                ? wp_gql_seo_format_string($meta['wpseo_focuskw'])
+                                : null;
                         },
                         'metaKeywords' => function () use ($get_term_meta) {
                             $meta = $get_term_meta();
@@ -142,8 +143,6 @@ add_action('graphql_register_types', function () {
                             return wp_gql_seo_build_analysis($indexable);
                         },
                     ];
-
-                    wp_reset_postdata();
 
                     return !empty($seo) ? $seo : null;
                 },
