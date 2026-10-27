@@ -74,7 +74,7 @@ Before you begin, make sure you have installed:
 
     - WordPress (accessible at http://localhost:8000)
     - MySQL database
-    - phpMyAdmin (accessible at http://localhost:8080)
+    - phpMyAdmin (accessible at http://localhost:8081)
 
 3. **Access WordPress**:
 
