@@ -26,16 +26,71 @@ function wp_gql_seo_format_string($string)
  * Replace variables in string.
  *
  * @param string $string String with variables.
+ * @param array  $args   Optional additional arguments (e.g. post_type) for variable replacement.
  * @return string|null
  */
-function wp_gql_seo_replace_vars($string)
+function wp_gql_seo_replace_vars($string, $args = [])
 {
     static $objects = null;
     if (null === $objects) {
         // Merge registered post types and taxonomies together and pass them through.
         $objects = array_merge(get_post_types(), get_taxonomies());
     }
-    return isset($string) ? wpseo_replace_vars($string, $objects) : null;
+    $replace_args = !empty($args) && is_array($args) ? array_merge($objects, $args) : $objects;
+    return isset($string) ? wpseo_replace_vars($string, $replace_args) : null;
+}
+
+/**
+ * Ensure the global main query is set up for a custom taxonomy term.
+ *
+ * WPGraphQL's Term::setup() only re-parses $wp_query for 'category' and 'post_tag'.
+ * For custom taxonomies, conditional flags from an ancestor or previous node (such as
+ * is_singular or is_attachment) would otherwise remain set on $wp_query while Yoast
+ * builds the term's presentation.
+ *
+ * @param int    $term_id       The term ID.
+ * @param string $taxonomy_name Optional taxonomy name.
+ * @return void
+ */
+function wp_gql_seo_setup_term_query($term_id, $taxonomy_name = '')
+{
+    global $wp_query;
+
+    if (!($wp_query instanceof \WP_Query)) {
+        return;
+    }
+
+    $term_obj = !empty($taxonomy_name) ? get_term((int) $term_id, $taxonomy_name) : get_term((int) $term_id);
+    if (!($term_obj instanceof \WP_Term)) {
+        return;
+    }
+
+    if (in_array($term_obj->taxonomy, ['category', 'post_tag'], true)) {
+        return;
+    }
+
+    $GLOBALS['post'] = get_post(0); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+    $taxonomy_obj = get_taxonomy($term_obj->taxonomy);
+    if ($taxonomy_obj && !empty($taxonomy_obj->query_var)) {
+        $wp_query->parse_query([
+            $taxonomy_obj->query_var => $term_obj->slug,
+        ]);
+    } else {
+        $wp_query->parse_query([
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+            'tax_query' => [
+                [
+                    'taxonomy' => $term_obj->taxonomy,
+                    'field' => 'term_id',
+                    'terms' => (int) $term_obj->term_id,
+                ],
+            ],
+        ]);
+    }
+
+    $wp_query->queried_object = $term_obj;
+    $wp_query->queried_object_id = (int) $term_obj->term_id;
 }
 
 /**
@@ -310,12 +365,13 @@ function wp_gql_seo_build_robots($robots, $indexable)
  * Returns null for title/description and null for image when the Premium
  * option keys are absent (graceful free-tier fallback).
  *
- * @param string       $option_prefix The option prefix (e.g. 'ptarchive-post', 'tax-category', 'author-wpseo', 'archive-wpseo').
- * @param array        $all           All Yoast SEO options.
- * @param AppContext   $context       The GraphQL AppContext for deferred image loading.
+ * @param string     $option_prefix The option prefix (e.g. 'ptarchive-post', 'tax-category', 'author-wpseo', 'archive-wpseo').
+ * @param array      $all           All Yoast SEO options.
+ * @param AppContext $context       The GraphQL AppContext for deferred image loading.
+ * @param array      $replace_args  Optional additional arguments for variable replacement.
  * @return array
  */
-function wp_gql_seo_get_premium_social($option_prefix, $all, $context)
+function wp_gql_seo_get_premium_social($option_prefix, $all, $context, $replace_args = [])
 {
     $title_key = 'social-title-' . $option_prefix;
     $desc_key = 'social-description-' . $option_prefix;
@@ -332,8 +388,8 @@ function wp_gql_seo_get_premium_social($option_prefix, $all, $context)
     }
 
     return [
-        'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all[$title_key] ?? null)),
-        'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all[$desc_key] ?? null)),
+        'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all[$title_key] ?? null, $replace_args)),
+        'description' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all[$desc_key] ?? null, $replace_args)),
         'image' => $context->get_loader('post')->load_deferred(absint($all[$image_id_key] ?? 0)),
     ];
 }
@@ -373,9 +429,13 @@ function wp_gql_seo_build_content_type_data($types, $all, $context)
             return $meta_cache['v'];
         };
 
+        $replace_args = ['post_type' => $type];
+
         $carry[$tag] = [
-            'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-' . $type] ?? null)),
-            'metaDesc' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['metadesc-' . $type] ?? null)),
+            'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-' . $type] ?? null, $replace_args)),
+            'metaDesc' => wp_gql_seo_format_string(
+                wp_gql_seo_replace_vars($all['metadesc-' . $type] ?? null, $replace_args)
+            ),
             'metaRobotsNoindex' => boolval($all['noindex-' . $type] ?? false),
             'schemaType' => $all['schema-page-type-' . $type] ?? null,
             'articleType' => $all['schema-article-type-' . $type] ?? null,
@@ -389,7 +449,7 @@ function wp_gql_seo_build_content_type_data($types, $all, $context)
                     },
                 ];
             },
-            'archive' => function () use ($get_meta, $post_type_object, $type, $all, $context) {
+            'archive' => function () use ($get_meta, $post_type_object, $type, $all, $context, $replace_args) {
                 $meta = $get_meta();
                 return [
                     'hasArchive' => boolval($post_type_object->has_archive),
@@ -413,7 +473,7 @@ function wp_gql_seo_build_content_type_data($types, $all, $context)
                     'head' => function () use ($meta) {
                         return wp_gql_seo_get_head_obj($meta);
                     },
-                    'social' => wp_gql_seo_get_premium_social('ptarchive-' . $type, $all, $context),
+                    'social' => wp_gql_seo_get_premium_social('ptarchive-' . $type, $all, $context, $replace_args),
                 ];
             },
         ];
