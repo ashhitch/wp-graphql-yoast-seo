@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Execute the original Docker entrypoint script to ensure WordPress is properly configured
-docker-php-entrypoint apache2-foreground &
+docker-entrypoint.sh apache2-foreground &
 
 # Wait for WordPress to start
 sleep 10
