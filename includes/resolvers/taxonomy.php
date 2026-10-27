@@ -34,9 +34,6 @@ add_action('graphql_register_types', function () {
                     $taxonomy->label
                 ),
                 'resolve' => function ($term, array $args, AppContext $context) {
-                    $term_obj = get_term($term->term_id);
-
-                    $meta = WPSEO_Taxonomy_Meta::get_term_meta((int) $term_obj->term_id, $term_obj->taxonomy);
                     $yoast_meta = YoastSEO()->meta->for_term($term->term_id);
 
                     if ($yoast_meta === false) {
@@ -45,19 +42,33 @@ add_action('graphql_register_types', function () {
 
                     $robots = $yoast_meta->robots;
 
-                    $schemaArray = $yoast_meta->schema;
+                    $meta_cache = null;
+                    $get_term_meta = function () use ($term, &$meta_cache) {
+                        if (null === $meta_cache) {
+                            $term_obj = get_term($term->term_id);
+                            $meta_cache = WPSEO_Taxonomy_Meta::get_term_meta(
+                                (int) $term_obj->term_id,
+                                $term_obj->taxonomy
+                            );
+                        }
+                        return $meta_cache;
+                    };
                     $indexable = $yoast_meta->indexable;
 
                     // Get data
                     $seo = [
                         'title' => wp_gql_seo_format_string(html_entity_decode(wp_strip_all_tags($yoast_meta->title))),
                         'metaDesc' => wp_gql_seo_format_string($yoast_meta->description),
-                        'focuskw' => isset($meta['wpseo_focuskw'])
-                            ? wp_gql_seo_format_string($meta['wpseo_focuskw'])
-                            : null,
-                        'metaKeywords' => isset($meta['wpseo_metakeywords'])
-                            ? wp_gql_seo_format_string($meta['wpseo_metakeywords'])
-                            : null,
+                        'focuskw' => function () use ($get_term_meta) {
+                            $meta = $get_term_meta();
+                            return isset($meta['wpseo_focuskw']) ? wp_gql_seo_format_string($meta['wpseo_focuskw']) : null;
+                        },
+                        'metaKeywords' => function () use ($get_term_meta) {
+                            $meta = $get_term_meta();
+                            return isset($meta['wpseo_metakeywords'])
+                                ? wp_gql_seo_format_string($meta['wpseo_metakeywords'])
+                                : null;
+                        },
                         'metaRobotsNoindex' => $robots['index'],
                         'metaRobotsNofollow' => $robots['follow'],
                         'robots' => wp_gql_seo_build_robots($robots, $indexable),
@@ -74,27 +85,39 @@ add_action('graphql_register_types', function () {
                             $yoast_meta->open_graph_article_modified_time
                         ),
                         'opengraphDescription' => wp_gql_seo_format_string($yoast_meta->open_graph_description),
-                        'opengraphImage' => $context
-                            ->get_loader('post')
-                            ->load_deferred(absint($meta['wpseo_opengraph-image-id'] ?? 0)),
+                        'opengraphImage' => function () use ($context, $get_term_meta) {
+                            $meta = $get_term_meta();
+                            return $context
+                                ->get_loader('post')
+                                ->load_deferred(absint($meta['wpseo_opengraph-image-id'] ?? 0));
+                        },
                         'opengraphLocale' => wp_gql_seo_format_string($yoast_meta->open_graph_locale),
                         'opengraphFbAppId' => wp_gql_seo_format_string($yoast_meta->open_graph_fb_app_id),
                         'opengraphEnabled' => boolval($yoast_meta->open_graph_enabled),
                         'twitterCardType' => wp_gql_seo_format_string($yoast_meta->twitter_card),
                         'twitterTitle' => wp_gql_seo_format_string($yoast_meta->twitter_title),
                         'twitterDescription' => wp_gql_seo_format_string($yoast_meta->twitter_description),
-                        'twitterImage' => $context
-                            ->get_loader('post')
-                            ->load_deferred(absint($meta['wpseo_twitter-image-id'] ?? 0)),
+                        'twitterImage' => function () use ($context, $get_term_meta) {
+                            $meta = $get_term_meta();
+                            return $context
+                                ->get_loader('post')
+                                ->load_deferred(absint($meta['wpseo_twitter-image-id'] ?? 0));
+                        },
                         'twitterCreator' => wp_gql_seo_format_string($yoast_meta->twitter_creator),
                         'twitterSite' => wp_gql_seo_format_string($yoast_meta->twitter_site),
                         'canonical' => isset($yoast_meta->canonical)
                             ? wp_gql_seo_format_string($yoast_meta->canonical)
                             : null,
-                        'breadcrumbs' => $yoast_meta->breadcrumbs,
+                        'breadcrumbs' => function () use ($yoast_meta) {
+                            return $yoast_meta->breadcrumbs;
+                        },
                         'cornerstone' => boolval($yoast_meta->is_cornerstone),
-                        'fullHead' => wp_gql_seo_get_full_head($yoast_meta),
-                        'head' => wp_gql_seo_get_head_obj($yoast_meta),
+                        'fullHead' => function () use ($yoast_meta) {
+                            return wp_gql_seo_get_full_head($yoast_meta);
+                        },
+                        'head' => function () use ($yoast_meta) {
+                            return wp_gql_seo_get_head_obj($yoast_meta);
+                        },
                         'relNext' => wp_gql_seo_format_string($yoast_meta->rel_next),
                         'relPrev' => wp_gql_seo_format_string($yoast_meta->rel_prev),
                         'breadcrumbTitle' => wp_gql_seo_format_string(
@@ -108,10 +131,16 @@ add_action('graphql_register_types', function () {
                         ),
                         'language' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'language')),
                         'region' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'region')),
-                        'schema' => [
-                            'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-                        ],
-                        'analysis' => wp_gql_seo_build_analysis($indexable),
+                        'schema' => function () use ($yoast_meta) {
+                            return [
+                                'raw' => function () use ($yoast_meta) {
+                                    return wp_json_encode($yoast_meta->schema, JSON_UNESCAPED_SLASHES);
+                                },
+                            ];
+                        },
+                        'analysis' => function () use ($indexable) {
+                            return wp_gql_seo_build_analysis($indexable);
+                        },
                     ];
 
                     wp_reset_postdata();
@@ -150,8 +179,13 @@ add_action('graphql_register_types', function () {
                         'resolve' => function ($item) use ($tax) {
                             $postId = $item['source']->ID;
 
-                            $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);
-                            $primaryTaxId = $wpseo_primary_term->get_primary_term();
+                            static $primary_cache = [];
+                            $cache_key = $tax->name . ':' . $postId;
+                            if (!array_key_exists($cache_key, $primary_cache)) {
+                                $wpseo_primary_term = new WPSEO_Primary_Term($tax->name, $postId);
+                                $primary_cache[$cache_key] = $wpseo_primary_term->get_primary_term();
+                            }
+                            $primaryTaxId = $primary_cache[$cache_key];
                             $termId = $item['node']->term_id;
 
                             return $primaryTaxId === $termId;

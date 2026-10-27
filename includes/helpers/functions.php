@@ -30,12 +30,11 @@ function wp_gql_seo_format_string($string)
  */
 function wp_gql_seo_replace_vars($string)
 {
-    // Get all the post types that have been registered.
-    $post_types = get_post_types();
-    // Get all the taxonomies that have been registered.
-    $taxomonies = get_taxonomies();
-    // Merge them together and pass them through.
-    $objects = array_merge($post_types, $taxomonies);
+    static $objects = null;
+    if (null === $objects) {
+        // Merge registered post types and taxonomies together and pass them through.
+        $objects = array_merge(get_post_types(), get_taxonomies());
+    }
     return isset($string) ? wpseo_replace_vars($string, $objects) : null;
 }
 
@@ -148,8 +147,12 @@ if (!function_exists('wpcom_vip_attachment_url_to_postid')) {
  */
 function wp_gql_seo_attachment_url_to_postid($url)
 {
-    $id = wpcom_vip_attachment_url_to_postid($url);
-    return false === $id || empty($id) ? null : $id;
+    static $memo = [];
+    if (!array_key_exists($url, $memo)) {
+        $id = wpcom_vip_attachment_url_to_postid($url);
+        $memo[$url] = false === $id || empty($id) ? null : $id;
+    }
+    return $memo[$url];
 }
 
 /**
@@ -210,15 +213,24 @@ function wp_gql_seo_get_full_head($metaForPost)
  */
 function wp_gql_seo_get_head_obj($metaForPost)
 {
+    static $memo = [];
     if ($metaForPost !== false) {
-        $head = $metaForPost->get_head();
-        $html = is_string($head) ? $head : $head->html;
-        $json = is_object($head) && isset($head->json) ? $head->json : [];
+        $key = spl_object_hash($metaForPost);
+        if (!isset($memo[$key])) {
+            $head = $metaForPost->get_head();
+            $html = is_string($head) ? $head : $head->html;
+            $json = is_object($head) && isset($head->json) ? $head->json : [];
 
-        return [
-            'html' => $html,
-            'json' => wp_json_encode($json, JSON_UNESCAPED_SLASHES),
-        ];
+            // Keep the meta object referenced so its hash cannot be reused.
+            $memo[$key] = [
+                'meta' => $metaForPost,
+                'data' => [
+                    'html' => $html,
+                    'json' => wp_json_encode($json, JSON_UNESCAPED_SLASHES),
+                ],
+            ];
+        }
+        return $memo[$key]['data'];
     }
 
     return [
@@ -353,7 +365,13 @@ function wp_gql_seo_build_content_type_data($types, $all, $context)
 
         $tag = wp_gql_seo_get_field_key($post_type_object->graphql_single_name);
 
-        $meta = YoastSEO()->meta->for_post_type_archive($type);
+        $meta_cache = false;
+        $get_meta = function () use ($type, &$meta_cache) {
+            if (false === $meta_cache) {
+                $meta_cache = ['v' => YoastSEO()->meta->for_post_type_archive($type)];
+            }
+            return $meta_cache['v'];
+        };
 
         $carry[$tag] = [
             'title' => wp_gql_seo_format_string(wp_gql_seo_replace_vars($all['title-' . $type] ?? null)),
@@ -361,32 +379,43 @@ function wp_gql_seo_build_content_type_data($types, $all, $context)
             'metaRobotsNoindex' => boolval($all['noindex-' . $type] ?? false),
             'schemaType' => $all['schema-page-type-' . $type] ?? null,
             'articleType' => $all['schema-article-type-' . $type] ?? null,
-            'schema' => [
-                'raw' =>
-                    !empty($meta) && !empty($meta->schema)
-                        ? wp_json_encode($meta->schema, JSON_UNESCAPED_SLASHES)
-                        : null,
-            ],
-            'archive' => [
-                'hasArchive' => boolval($post_type_object->has_archive),
-                'archiveLink' => apply_filters('wp_gql_seo_archive_link', get_post_type_archive_link($type), $type),
-                'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : null),
-                'metaDesc' => wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type] ?? null),
-                'metaRobotsNoindex' =>
-                    $meta !== false && !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
-                        ? false
-                        : true,
-                'metaRobotsNofollow' =>
-                    $meta !== false && !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
-                        ? false
-                        : true,
-                'metaRobotsIndex' => $meta !== false ? ($meta->robots['index'] ?? 'noindex') : 'noindex',
-                'metaRobotsFollow' => $meta !== false ? ($meta->robots['follow'] ?? 'nofollow') : 'nofollow',
-                'breadcrumbTitle' => wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type] ?? null),
-                'fullHead' => wp_gql_seo_get_full_head($meta),
-                'head' => wp_gql_seo_get_head_obj($meta),
-                'social' => wp_gql_seo_get_premium_social('ptarchive-' . $type, $all, $context),
-            ],
+            'schema' => function () use ($get_meta) {
+                return [
+                    'raw' => function () use ($get_meta) {
+                        $meta = $get_meta();
+                        return !empty($meta) && !empty($meta->schema)
+                            ? wp_json_encode($meta->schema, JSON_UNESCAPED_SLASHES)
+                            : null;
+                    },
+                ];
+            },
+            'archive' => function () use ($get_meta, $post_type_object, $type, $all, $context) {
+                $meta = $get_meta();
+                return [
+                    'hasArchive' => boolval($post_type_object->has_archive),
+                    'archiveLink' => apply_filters('wp_gql_seo_archive_link', get_post_type_archive_link($type), $type),
+                    'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : null),
+                    'metaDesc' => wp_gql_seo_format_string($all['metadesc-ptarchive-' . $type] ?? null),
+                    'metaRobotsNoindex' =>
+                        $meta !== false && !empty($meta->robots['index']) && $meta->robots['index'] === 'index'
+                            ? false
+                            : true,
+                    'metaRobotsNofollow' =>
+                        $meta !== false && !empty($meta->robots['follow']) && $meta->robots['follow'] === 'follow'
+                            ? false
+                            : true,
+                    'metaRobotsIndex' => $meta !== false ? ($meta->robots['index'] ?? 'noindex') : 'noindex',
+                    'metaRobotsFollow' => $meta !== false ? ($meta->robots['follow'] ?? 'nofollow') : 'nofollow',
+                    'breadcrumbTitle' => wp_gql_seo_format_string($all['bctitle-ptarchive-' . $type] ?? null),
+                    'fullHead' => function () use ($meta) {
+                        return wp_gql_seo_get_full_head($meta);
+                    },
+                    'head' => function () use ($meta) {
+                        return wp_gql_seo_get_head_obj($meta);
+                    },
+                    'social' => wp_gql_seo_get_premium_social('ptarchive-' . $type, $all, $context),
+                ];
+            },
         ];
     }
 

@@ -30,8 +30,6 @@ add_action('graphql_register_types', function () {
             $robots = $authorMeta->robots;
             $indexable = $authorMeta->indexable;
 
-            $schemaArray = $authorMeta->schema;
-
             $userSeo = [
                 'title' => wp_gql_seo_format_string($authorMeta->title),
                 'metaDesc' => wp_gql_seo_format_string($authorMeta->description),
@@ -55,29 +53,43 @@ add_action('graphql_register_types', function () {
                 'language' => wp_gql_seo_format_string($authorMeta->language),
                 'region' => wp_gql_seo_format_string($authorMeta->region),
                 'breadcrumbTitle' => wp_gql_seo_format_string($authorMeta->breadcrumb_title),
-                'fullHead' => wp_gql_seo_get_full_head($authorMeta),
-                'head' => wp_gql_seo_get_head_obj($authorMeta),
+                'fullHead' => function () use ($authorMeta) {
+                    return wp_gql_seo_get_full_head($authorMeta);
+                },
+                'head' => function () use ($authorMeta) {
+                    return wp_gql_seo_get_head_obj($authorMeta);
+                },
                 'relNext' => wp_gql_seo_format_string($authorMeta->rel_next),
                 'relPrev' => wp_gql_seo_format_string($authorMeta->rel_prev),
-                'social' => [
-                    'facebook' => wp_gql_seo_format_string(get_the_author_meta('facebook', $user->userId)),
-                    'twitter' => wp_gql_seo_format_string(get_the_author_meta('twitter', $user->userId)),
-                    'instagram' => wp_gql_seo_format_string(get_the_author_meta('instagram', $user->userId)),
-                    'linkedIn' => wp_gql_seo_format_string(get_the_author_meta('linkedin', $user->userId)),
-                    'mySpace' => wp_gql_seo_format_string(get_the_author_meta('myspace', $user->userId)),
-                    'pinterest' => wp_gql_seo_format_string(get_the_author_meta('pinterest', $user->userId)),
-                    'youTube' => wp_gql_seo_format_string(get_the_author_meta('youtube', $user->userId)),
-                    'soundCloud' => wp_gql_seo_format_string(get_the_author_meta('soundcloud', $user->userId)),
-                    'wikipedia' => wp_gql_seo_format_string(get_the_author_meta('wikipedia', $user->userId)),
-                    'mastodon' => wp_gql_seo_format_string(get_the_author_meta('mastodon', $user->userId)),
-                ],
+                'social' => function () use ($user) {
+                    return [
+                        'facebook' => wp_gql_seo_format_string(get_the_author_meta('facebook', $user->userId)),
+                        'twitter' => wp_gql_seo_format_string(get_the_author_meta('twitter', $user->userId)),
+                        'instagram' => wp_gql_seo_format_string(get_the_author_meta('instagram', $user->userId)),
+                        'linkedIn' => wp_gql_seo_format_string(get_the_author_meta('linkedin', $user->userId)),
+                        'mySpace' => wp_gql_seo_format_string(get_the_author_meta('myspace', $user->userId)),
+                        'pinterest' => wp_gql_seo_format_string(get_the_author_meta('pinterest', $user->userId)),
+                        'youTube' => wp_gql_seo_format_string(get_the_author_meta('youtube', $user->userId)),
+                        'soundCloud' => wp_gql_seo_format_string(get_the_author_meta('soundcloud', $user->userId)),
+                        'wikipedia' => wp_gql_seo_format_string(get_the_author_meta('wikipedia', $user->userId)),
+                        'mastodon' => wp_gql_seo_format_string(get_the_author_meta('mastodon', $user->userId)),
+                    ];
+                },
 
-                'schema' => [
-                    'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-                    'pageType' => is_array($authorMeta->schema_page_type) ? $authorMeta->schema_page_type : [],
-                    'articleType' => is_array($authorMeta->schema_article_type) ? $authorMeta->schema_article_type : [],
-                ],
-                'analysis' => wp_gql_seo_build_analysis($indexable),
+                'schema' => function () use ($authorMeta) {
+                    return [
+                        'raw' => function () use ($authorMeta) {
+                            return wp_json_encode($authorMeta->schema, JSON_UNESCAPED_SLASHES);
+                        },
+                        'pageType' => is_array($authorMeta->schema_page_type) ? $authorMeta->schema_page_type : [],
+                        'articleType' => is_array($authorMeta->schema_article_type)
+                            ? $authorMeta->schema_article_type
+                            : [],
+                    ];
+                },
+                'analysis' => function () use ($indexable) {
+                    return wp_gql_seo_build_analysis($indexable);
+                },
             ];
 
             return !empty($userSeo) ? $userSeo : [];
