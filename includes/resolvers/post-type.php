@@ -28,6 +28,11 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     // Removed unused $map variable
     if ($post instanceof Term) {
         $meta = YoastSEO()->meta->for_term($post->term_id);
+    } elseif (
+        get_option('show_on_front') === 'page'
+        && (int) $post->ID === (int) get_option('page_on_front')
+    ) {
+        $meta = YoastSEO()->meta->for_home_page();
     } else {
         $meta = YoastSEO()->meta->for_post($post->ID);
     }
