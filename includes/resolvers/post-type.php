@@ -32,8 +32,6 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         $meta = YoastSEO()->meta->for_post($post->ID);
     }
 
-    $schemaArray = $meta !== false ? $meta->schema : [];
-
     // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
     $robots = $meta !== false ? $meta->robots : [];
     $indexable = $meta !== false ? $meta->indexable : null;
@@ -42,8 +40,12 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     $seo = [
         'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : ''),
         'metaDesc' => wp_gql_seo_format_string($meta !== false ? $meta->description : ''),
-        'focuskw' => wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true)),
-        'metaKeywords' => wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true)),
+        'focuskw' => function () use ($post) {
+            return wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true));
+        },
+        'metaKeywords' => function () use ($post) {
+            return wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true));
+        },
         'metaRobotsNoindex' => $robots['index'] ?? '',
         'metaRobotsNofollow' => $robots['follow'] ?? '',
         'robots' => wp_gql_seo_build_robots($robots, $indexable),
@@ -86,10 +88,16 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'twitterSite' => wp_gql_seo_format_string($meta !== false ? $meta->twitter_site : ''),
         'canonical' => wp_gql_seo_format_string($meta !== false ? $meta->canonical : ''),
         'readingTime' => floatval($meta !== false ? $meta->estimated_reading_time_minutes : ''),
-        'breadcrumbs' => $meta !== false ? $meta->breadcrumbs : [],
+        'breadcrumbs' => function () use ($meta) {
+            return $meta !== false ? $meta->breadcrumbs : [];
+        },
         'cornerstone' => boolval($meta !== false && $meta->indexable ? $meta->indexable->is_cornerstone : false),
-        'fullHead' => wp_gql_seo_get_full_head($meta),
-        'head' => wp_gql_seo_get_head_obj($meta),
+        'fullHead' => function () use ($meta) {
+            return wp_gql_seo_get_full_head($meta);
+        },
+        'head' => function () use ($meta) {
+            return wp_gql_seo_get_head_obj($meta);
+        },
         'relNext' => wp_gql_seo_format_string($meta !== false ? $meta->rel_next : ''),
         'relPrev' => wp_gql_seo_format_string($meta !== false ? $meta->rel_prev : ''),
         'breadcrumbTitle' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'breadcrumb_title')),
@@ -97,12 +105,20 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
         'objectLastModified' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'object_last_modified')),
         'language' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'language')),
         'region' => wp_gql_seo_format_string(wp_gql_seo_indexable_prop($indexable, 'region')),
-        'schema' => [
-            'pageType' => $meta !== false && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
-            'articleType' => $meta !== false && is_array($meta->schema_article_type) ? $meta->schema_article_type : [],
-            'raw' => wp_json_encode($schemaArray, JSON_UNESCAPED_SLASHES),
-        ],
-        'analysis' => wp_gql_seo_build_analysis($indexable),
+        'schema' => function () use ($meta) {
+            return [
+                'pageType' => $meta !== false && is_array($meta->schema_page_type) ? $meta->schema_page_type : [],
+                'articleType' => $meta !== false && is_array($meta->schema_article_type)
+                    ? $meta->schema_article_type
+                    : [],
+                'raw' => function () use ($meta) {
+                    return wp_json_encode($meta !== false ? $meta->schema : [], JSON_UNESCAPED_SLASHES);
+                },
+            ];
+        },
+        'analysis' => function () use ($indexable) {
+            return wp_gql_seo_build_analysis($indexable);
+        },
     ];
 
     return !empty($seo) ? $seo : null;
