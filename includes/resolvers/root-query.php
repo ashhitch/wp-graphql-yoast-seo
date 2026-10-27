@@ -24,8 +24,6 @@ add_action('graphql_register_types', function () {
 
             $wpseo_options = WPSEO_Options::get_instance();
             $all = $wpseo_options->get_all();
-            $redirectsObj = class_exists('WPSEO_Redirect_Option') ? new WPSEO_Redirect_Option() : false;
-            $redirects = $redirectsObj ? $redirectsObj->get_from_option() : [];
 
             $userID = !empty($all['company_or_person_user_id']) ? $all['company_or_person_user_id'] : null;
             $user = !empty($userID) ? get_userdata($userID) : null;
@@ -157,7 +155,11 @@ add_action('graphql_register_types', function () {
                     'homeUrl' => wp_gql_seo_format_string(apply_filters('wp_gql_seo_home_url', get_home_url())),
                     'inLanguage' => wp_gql_seo_format_string(get_bloginfo('language')),
                 ],
-                'redirects' => array_map($mappedRedirects, $redirects),
+                'redirects' => function () use ($mappedRedirects) {
+                    $redirectsObj = class_exists('WPSEO_Redirect_Option') ? new WPSEO_Redirect_Option() : false;
+                    $redirects = $redirectsObj ? $redirectsObj->get_from_option() : [];
+                    return array_map($mappedRedirects, $redirects);
+                },
                 'openGraph' => [
                     'defaultImage' => $context
                         ->get_loader('post')
