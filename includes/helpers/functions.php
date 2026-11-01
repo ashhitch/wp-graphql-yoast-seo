@@ -48,6 +48,12 @@ function wp_gql_seo_replace_vars($string, $args = [])
  * is_singular or is_attachment) would otherwise remain set on $wp_query while Yoast
  * builds the term's presentation.
  *
+ * The caller's main query is preserved by swapping in a fresh WP_Query rather
+ * than mutating the shared object: WPGraphQL's Term::tear_down() only restores
+ * $wp_query on versions with node-scoped restoration, so mutations would leak
+ * into a surrounding template loop when graphql() runs inside one.
+ * Call wp_gql_seo_restore_term_query() once the term's meta has been built.
+ *
  * @param int    $term_id       The term ID.
  * @param string $taxonomy_name Optional taxonomy name.
  * @return void
@@ -68,6 +74,16 @@ function wp_gql_seo_setup_term_query($term_id, $taxonomy_name = '')
     if (in_array($term_obj->taxonomy, ['category', 'post_tag'], true)) {
         return;
     }
+
+    // Preserve the caller's query and post globals (only once, so nested calls
+    // still restore the outermost originals); parse_query() below only ever
+    // mutates the swapped-in query object.
+    if (!isset($GLOBALS['wp_gql_seo_preserved_query'])) {
+        $GLOBALS['wp_gql_seo_preserved_query'] = $wp_query;
+        $GLOBALS['wp_gql_seo_preserved_post'] = isset($GLOBALS['post']) ? $GLOBALS['post'] : null;
+    }
+    $wp_query = new \WP_Query();
+    $GLOBALS['wp_query'] = $wp_query; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
     $GLOBALS['post'] = get_post(0); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
@@ -91,6 +107,27 @@ function wp_gql_seo_setup_term_query($term_id, $taxonomy_name = '')
 
     $wp_query->queried_object = $term_obj;
     $wp_query->queried_object_id = (int) $term_obj->term_id;
+}
+
+/**
+ * Restore the query and post globals preserved by wp_gql_seo_setup_term_query().
+ *
+ * Must be called after the term's Yoast meta has been built; lazy SEO field
+ * resolvers operate on that built meta and do not need the term query to
+ * remain in place.
+ *
+ * @return void
+ */
+function wp_gql_seo_restore_term_query()
+{
+    if (!isset($GLOBALS['wp_gql_seo_preserved_query'])) {
+        return;
+    }
+
+    $GLOBALS['wp_query'] = $GLOBALS['wp_gql_seo_preserved_query']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+    $GLOBALS['post'] = $GLOBALS['wp_gql_seo_preserved_post']; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+
+    unset($GLOBALS['wp_gql_seo_preserved_query'], $GLOBALS['wp_gql_seo_preserved_post']);
 }
 
 /**

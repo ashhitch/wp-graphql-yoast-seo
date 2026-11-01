@@ -37,7 +37,11 @@ add_action('graphql_register_types', function () {
                     $term_id = $term->term_id;
                     wp_gql_seo_setup_term_query($term_id, $taxonomy->name);
 
-                    $yoast_meta = YoastSEO()->meta->for_term($term_id);
+                    try {
+                        $yoast_meta = YoastSEO()->meta->for_term($term_id);
+                    } finally {
+                        wp_gql_seo_restore_term_query();
+                    }
 
                     if ($yoast_meta === false) {
                         return null;
