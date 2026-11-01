@@ -43,6 +43,8 @@ This is an extension to the WPGraphQL plugin (https://github.com/wp-graphql/wp-g
 composer require ashhitch/wp-graphql-yoast-seo
 ```
 
+> **Breaking change in v6.0.0 for Composer installs:** the plugin now installs into the `add-wpgraphql-seo/` directory instead of `wp-graphql-yoast-seo/`, to match the wordpress.org plugin slug (see [#204](https://github.com/ashhitch/wp-graphql-yoast-seo/pull/204)). After upgrading, remove the old `wp-graphql-yoast-seo/` directory from `wp-content/plugins/` and update any code or deployment scripts that reference the old path.
+
 ## Contributor Setup
 
 This plugin uses Docker for local development to ensure a consistent environment for all contributors.

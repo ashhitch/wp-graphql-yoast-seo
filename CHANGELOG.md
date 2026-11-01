@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2026-11-01
+
+### Fixed
+
+- Return the parent post's SEO data when querying with `asPreview: true` instead of empty fields ([#135](https://github.com/ashhitch/wp-graphql-yoast-seo/issues/135))
+- Use correct SEO metadata for the static home page — it was treated as a regular post, causing Yoast to return the wrong Open Graph type (#207)
+- Composer installs now land in `add-wpgraphql-seo/` via `extra.installer-name`, matching the wordpress.org slug so all install channels produce the same directory (#204)
+- phpMyAdmin dev port changed from 8080 to 8081 and Docker setup script now calls `docker-entrypoint.sh` correctly (#209)
+
+### Changed
+
+- Performance: add static memoization to `wp_gql_seo_replace_vars()`, `wp_gql_seo_attachment_url_to_postid()`, and `wp_gql_seo_get_head_obj()` (#209)
+- Performance: wrap expensive field resolvers in closures for lazy evaluation across post-type, taxonomy, user, and root-query resolvers (#209)
+
+### Development
+
+- Upgrade to Husky v10 and pin pnpm to 12.6.0 via `packageManager` field (#209)
+- Bump prettier 3.9.6 → 3.9.8 (#206)
+- Bump actions/checkout v1 → v4 and actions/cache v1 → v4 in contributors workflow
+
 ## [5.1.0] - 2026-07-31
 
 ### Added
