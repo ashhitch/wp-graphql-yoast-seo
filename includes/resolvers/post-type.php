@@ -28,7 +28,7 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     // Removed unused $map variable
     if ($post instanceof Term) {
         $term_id = $post->term_id;
-        wp_gql_seo_setup_term_query($term_id);
+        wp_gql_seo_setup_term_query($term_id, !empty($post->taxonomyName) ? $post->taxonomyName : '');
         try {
             $meta = YoastSEO()->meta->for_term($term_id);
         } finally {

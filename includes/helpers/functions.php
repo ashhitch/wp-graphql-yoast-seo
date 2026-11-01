@@ -85,8 +85,13 @@ function wp_gql_seo_setup_term_query($term_id, $taxonomy_name = '')
     $wp_query = new \WP_Query();
     $GLOBALS['wp_query'] = $wp_query; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
+    // Mirrors WPGraphQL's Term::setup(): get_post(0) resolves to the current
+    // global $post (or null), keeping $post populated during meta building.
     $GLOBALS['post'] = get_post(0); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
+    // parse_query() sets the conditional flags (is_tax etc.) Yoast reads while
+    // building the term presentation; no posts are fetched, so $wp_query->posts
+    // stays empty by design.
     $taxonomy_obj = get_taxonomy($term_obj->taxonomy);
     if ($taxonomy_obj && !empty($taxonomy_obj->query_var)) {
         $wp_query->parse_query([
