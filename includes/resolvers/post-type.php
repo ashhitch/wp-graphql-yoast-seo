@@ -25,16 +25,19 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     // Base array
     $seo = [];
 
-    // Removed unused $map variable
+    $post_id = $post->ID;
+
     if ($post instanceof Term) {
         $meta = YoastSEO()->meta->for_term($post->term_id);
-    } elseif (
-        get_option('show_on_front') === 'page'
-        && (int) $post->ID === (int) get_option('page_on_front')
-    ) {
-        $meta = YoastSEO()->meta->for_home_page();
     } else {
-        $meta = YoastSEO()->meta->for_post($post->ID);
+        // asPreview resolves to an autosave/revision, which Yoast stores no SEO data for.
+        $post_id = wp_is_post_revision($post_id) ?: $post_id;
+
+        if (get_option('show_on_front') === 'page' && (int) $post_id === (int) get_option('page_on_front')) {
+            $meta = YoastSEO()->meta->for_home_page();
+        } else {
+            $meta = YoastSEO()->meta->for_post($post_id);
+        }
     }
 
     // https://developer.yoast.com/blog/yoast-seo-14-0-using-yoast-seo-surfaces/
