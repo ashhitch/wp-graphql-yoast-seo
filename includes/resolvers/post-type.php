@@ -29,7 +29,11 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     if ($post instanceof Term) {
         $term_id = $post->term_id;
         wp_gql_seo_setup_term_query($term_id);
-        $meta = YoastSEO()->meta->for_term($term_id);
+        try {
+            $meta = YoastSEO()->meta->for_term($term_id);
+        } finally {
+            wp_gql_seo_restore_term_query();
+        }
     } elseif (
         get_option('show_on_front') === 'page'
         && (int) $post->ID === (int) get_option('page_on_front')
