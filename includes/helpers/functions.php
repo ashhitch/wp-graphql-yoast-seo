@@ -82,8 +82,7 @@ function wp_gql_seo_setup_term_query($term_id, $taxonomy_name = '')
         $GLOBALS['wp_gql_seo_preserved_query'] = $wp_query;
         $GLOBALS['wp_gql_seo_preserved_post'] = isset($GLOBALS['post']) ? $GLOBALS['post'] : null;
     }
-    $wp_query = new \WP_Query();
-    $GLOBALS['wp_query'] = $wp_query; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+    $wp_query = new \WP_Query(); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 
     // Mirrors WPGraphQL's Term::setup(): get_post(0) resolves to the current
     // global $post (or null), keeping $post populated during meta building.
