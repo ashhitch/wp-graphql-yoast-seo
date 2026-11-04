@@ -54,11 +54,11 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     $seo = [
         'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : ''),
         'metaDesc' => wp_gql_seo_format_string($meta !== false ? $meta->description : ''),
-        'focuskw' => function () use ($post) {
-            return wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true));
+        'focuskw' => function () use ($post_id) {
+            return wp_gql_seo_format_string(get_post_meta($post_id, '_yoast_wpseo_focuskw', true));
         },
-        'metaKeywords' => function () use ($post) {
-            return wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true));
+        'metaKeywords' => function () use ($post_id) {
+            return wp_gql_seo_format_string(get_post_meta($post_id, '_yoast_wpseo_metakeywords', true));
         },
         'metaRobotsNoindex' => $robots['index'] ?? '',
         'metaRobotsNofollow' => $robots['follow'] ?? '',
