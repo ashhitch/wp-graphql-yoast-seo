@@ -28,7 +28,13 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     $post_id = $post->ID;
 
     if ($post instanceof Term) {
-        $meta = YoastSEO()->meta->for_term($post->term_id);
+        $term_id = $post->term_id;
+        wp_gql_seo_setup_term_query($term_id, !empty($post->taxonomyName) ? $post->taxonomyName : '');
+        try {
+            $meta = YoastSEO()->meta->for_term($term_id);
+        } finally {
+            wp_gql_seo_restore_term_query();
+        }
     } else {
         // asPreview resolves to an autosave/revision, which Yoast stores no SEO data for.
         $post_id = wp_is_post_revision($post_id) ?: $post_id;
@@ -48,11 +54,11 @@ function wp_gql_seo_get_post_type_graphql_fields($post, array $args, AppContext 
     $seo = [
         'title' => wp_gql_seo_format_string($meta !== false ? $meta->title : ''),
         'metaDesc' => wp_gql_seo_format_string($meta !== false ? $meta->description : ''),
-        'focuskw' => function () use ($post) {
-            return wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_focuskw', true));
+        'focuskw' => function () use ($post_id) {
+            return wp_gql_seo_format_string(get_post_meta($post_id, '_yoast_wpseo_focuskw', true));
         },
-        'metaKeywords' => function () use ($post) {
-            return wp_gql_seo_format_string(get_post_meta($post->ID, '_yoast_wpseo_metakeywords', true));
+        'metaKeywords' => function () use ($post_id) {
+            return wp_gql_seo_format_string(get_post_meta($post_id, '_yoast_wpseo_metakeywords', true));
         },
         'metaRobotsNoindex' => $robots['index'] ?? '',
         'metaRobotsNofollow' => $robots['follow'] ?? '',
